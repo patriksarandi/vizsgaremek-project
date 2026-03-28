@@ -34,12 +34,14 @@ model Termek {
 
 model Vevo {
   VevoID      Int             @id @default(autoincrement())
-  VevoNev     String          @db.VarChar(150)
+  VevoNev     String          @unique @db.VarChar(150)
   VevoEmail   String          @unique @db.VarChar(150)
   VevoJelszo  String          @db.VarChar(255)
   Cim         String          @db.VarChar(255)
   Kosar       FizetesiKosar?
   Rendelesek  Rendeles[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model FizetesiKosar {

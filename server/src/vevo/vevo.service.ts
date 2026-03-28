@@ -52,7 +52,20 @@ export class VevoService {
 
   async findByEmail(email: string) {
     return await this.db.vevo.findUnique({
-      where: { VevoEmail: email},
+      where: {
+        VevoEmail: email
+      },
+    });
+  }
+
+  async findByEmailOrName(email: string, name: string) {
+    return await this.db.vevo.findFirst({
+      where: {
+        OR: [
+          { VevoEmail: email },
+          { VevoNev: name }
+        ]
+      }
     });
   }
 
@@ -81,20 +94,18 @@ export class VevoService {
   }
 
   async remove(id: number) {
-    await this.findOne(id);
-
     try {
-      await this.db.vevo.delete({
-        where: { VevoID: id },
-      });
-      return { message: `A(z) ${id} azonosítójú vevő sikeresen törölve.` };
+      await this.db.vevo.delete({ where: { VevoID: id } });
+      return { message: `A(z) ${id} azonosítójú vevő törölve.` };
     } catch (error: any) {
+      if (error.code === 'P2025')
+        throw new NotFoundException('Vevő nem található');
       if (error.code === 'P2003') {
         throw new BadRequestException(
-          'A vevő nem törölhető, mert már vannak rendelései. Használj deaktiválást!',
+          'A vevőnek vannak rendelései, nem törölhető!',
         );
       }
-      throw new InternalServerErrorException('Hiba történt a törlés során.');
+      throw new InternalServerErrorException('Szerver hiba a törléskor.');
     }
   }
 }

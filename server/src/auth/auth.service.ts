@@ -1,46 +1,61 @@
 ﻿import {
-    ConflictException,
+  ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
 import { VevoService } from 'src/vevo/vevo.service';
-import { SignUpDto } from './dto/signup-dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private vevoService: VevoService) {}
+  constructor(
+    private vevoService: VevoService,
+    private db: PrismaService
+) {}
 
-  async signIn(email, password): Promise<any> {
-    const customer = await this.vevoService.findByEmail(email);
+  async signIn(email: string, password: string): Promise<any> {
+    try {
+        const customer = await this.vevoService.findByEmail(email);
 
-    if (customer?.VevoJelszo !== password) {
-      throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!');
+        if (!customer) {
+        throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!');
+        }
+
+        const isPasswordMatching = await bcrypt.compare(password, customer.VevoJelszo)
+
+        if (!isPasswordMatching) {
+            throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!')
+        }
+
+        const { VevoJelszo, ...result } = customer;
+        return result;
+    } catch (e) {
+        console.error("Hiba történt:", e);
+        throw e
     }
-
-    const { VevoJelszo, ...result } = customer;
-    return result;
   }
 
   async signUp(name: string, email: string, password: string): Promise<any> {
-    try {
-        const existingUser = await this.vevoService.findByEmail(email);
-
-        if (existingUser) {
-        throw new ConflictException('Ez az e-mail cím már foglalt!');
+    const existingUser = await this.db.vevo.findFirst({
+        where: {
+            OR: [
+                {VevoNev: name},
+                {VevoEmail: email }
+            ]
         }
-
-        const newUser = await this.vevoService.create({
-            vevoNev: name,
-            vevoEmail: email,
-            vevoJelszo: password,
-            cim: '-',
-        });
-
-        return newUser;
-    } catch (error: any) {
-        if (error.code === 'P2002') {
-            throw new ConflictException('Ez az e-mail cím már regisztrálva van!')
-        }
+    });
+    if (existingUser) {
+      throw new ConflictException('Ez az e-mail cím vagy név már foglalt!');
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    return await this.vevoService.create({
+      vevoNev: name,
+      vevoEmail: email,
+      vevoJelszo: hashedPassword,
+      cim: '-',
+    });
   }
 }
