@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Kategoria {
+  KategoriaID Int      @id @default(autoincrement())
+  Nev         String   @db.VarChar(100)
+  IsDeleted   Boolean  @default(false)
+  Termekek    Termek[]
+}
+
+model Termek {
+  TermekID     Int             @id @default(autoincrement())
+  KategoriaID  Int
+  TermekNev    String          @db.VarChar(255)
+  IsDeleted    Boolean         @default(false)
+  TermekAr     Decimal         @db.Decimal(10, 2)
+  Keszlet      Int             @default(0)
+  Kategoria    Kategoria       @relation(fields: [KategoriaID], references: [KategoriaID])
+  KosarTetelek KosarTetel[]
+  Rendelesek   RendeltTermek[]
+}
+
+model Vevo {
+  VevoID      Int             @id @default(autoincrement())
+  VevoNev     String          @db.VarChar(150)
+  VevoEmail   String          @unique @db.VarChar(150)
+  VevoJelszo  String          @db.VarChar(255)
+  Cim         String          @db.VarChar(255)
+  Kosar       FizetesiKosar?
+  Rendelesek  Rendeles[]
+}
+
+model FizetesiKosar {
+  KosarID Int          @id @default(autoincrement())
+  VevoID  Int          @unique
+  Vevo    Vevo         @relation(fields: [VevoID], references: [VevoID])
+  Tetelek KosarTetel[]
+}
+
+model KosarTetel {
+  KosarTetelID    Int           @id @default(autoincrement())
+  KosarID         Int
+  TermekID        Int
+  TetelMennyiseg  Int           @default(1)
+  Kosar           FizetesiKosar @relation(fields: [KosarID], references: [KosarID], onDelete: Cascade)
+  Termek          Termek        @relation(fields: [TermekID], references: [TermekID])
+}
+
+model Rendeles {
+  RendelesID        Int             @id @default(autoincrement())
+  VevoID            Int
+  RendelesiDatum    DateTime        @default(now())
+  RendelesiVegosszeg Decimal         @db.Decimal(10, 2)
+  Statusz           String          @default("Feldolgozás alatt") @db.VarChar(50)
+  Vevo              Vevo            @relation(fields: [VevoID], references: [VevoID])
+  Termekek          RendeltTermek[]
+  Fizetesek         Fizetes[]
+}
+
+model RendeltTermek {
+  RendeltTermekID   Int      @id @default(autoincrement())
+  RendelesID        Int
+  TermekID          Int
+  RendeltMennyiseg  Int
+  RendeltEgysegar   Decimal  @db.Decimal(10, 2)
+  Rendeles          Rendeles @relation(fields: [RendelesID], references: [RendelesID], onDelete: Cascade)
+  Termek            Termek   @relation(fields: [TermekID], references: [TermekID])
+}
+
+model Fizetes {
+  FizetesID  Int      @id @default(autoincrement())
+  RendelesID Int
+  FizetesMod String   @db.VarChar(50)
+  Datum      DateTime @default(now())
+  Allapot    String   @db.VarChar(50)
+  Rendeles   Rendeles @relation(fields: [RendelesID], references: [RendelesID])
+}
