@@ -5,9 +5,25 @@ import ProductPage from "./pages/ProductPage";
 import SignUpPage from "./pages/SignUpPage";
 import WishlistPage from "./pages/WishlistPage";
 import ContactPage from "./pages/ContactPage";
+import { useEffect, useState } from "react";
 
 const App = () => {
   const productUrl = "product";
+
+  const fetchUsersData = async () => {
+    try {
+      const response = await fetch("http://localhost:7777/vevo")
+      const data = await response.json();
+    } catch (error: any) {
+      throw new Error(error.message)
+    }
+  }
+
+  useEffect(() => {
+    fetchUsersData()
+  })
+
+  
 
   return (
     <Routes>
