@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useRef, useState } from "react";
 import {
   Container,
   Card,
@@ -8,16 +8,23 @@ import {
   Form,
   Alert,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const usernameRef = useRef("");
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
   const [error, setError] = useState("");
+  const navigate = useNavigate()
 
   const handleSignUp = async (event) => {
     event.preventDefault();
+
+    const signupData = {
+        name: usernameRef.current.value,
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
+    }
 
     try {
       const response = await fetch("http://localhost:7777/auth/signup", {
@@ -25,11 +32,7 @@ const SignUpPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: username,
-          email: email,
-          password: password,
-        }),
+        body: JSON.stringify(signupData),
       });
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
@@ -37,11 +40,9 @@ const SignUpPage = () => {
       }
 
       const data = await response.json();
+      navigate('/signin')
       console.log("Sign Up successful:", data);
-
-      setUsername("");
-      setEmail("");
-      setPassword("");
+      
     } catch (error: any) {
       setError(error.message);
       throw new Error(error.message);
@@ -65,8 +66,7 @@ const SignUpPage = () => {
                 <Form.Control
                   type="text"
                   placeholder="Felhasználónév"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  ref={usernameRef}
                   required
                 />
               </Form.Group>
@@ -75,8 +75,7 @@ const SignUpPage = () => {
                 <Form.Control
                   type="email"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  ref={emailRef}
                   required
                 />
               </Form.Group>
@@ -85,8 +84,7 @@ const SignUpPage = () => {
                 <Form.Control
                   type="password"
                   placeholder="Jelszó"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  ref={passwordRef}
                   required
                 />
               </Form.Group>

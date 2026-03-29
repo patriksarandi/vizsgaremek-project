@@ -1,14 +1,23 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useRef, useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Autentikacio } from "../components/AuthContext";
 
 const SignInPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const { login } = Autentikacio();
 
   const handleLogin = async (event) => {
     event.preventDefault();
+
+    const signinData = {
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
+    }
 
     try {
       const response = await fetch("http://localhost:7777/auth/signin", {
@@ -16,20 +25,18 @@ const SignInPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
+        body: JSON.stringify(signinData),
       });
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("Login successful:", data);
+      console.log("Server:", data)
+      login(data.user || data)
 
-      setEmail("");
-      setPassword("");
+      navigate('/')
+      console.log("Login successful:", data);
     } catch (error: any) {
       setError(error.message);
       throw new Error(error.message);
@@ -48,8 +55,7 @@ const SignInPage = () => {
                 <Form.Control
                   type="email"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  ref={emailRef}
                   required
                 />
               </Form.Group>
@@ -58,8 +64,7 @@ const SignInPage = () => {
                 <Form.Control
                   type="password"
                   placeholder="Jelszó"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  ref={passwordRef}
                   required
                 />
               </Form.Group>
@@ -78,3 +83,4 @@ const SignInPage = () => {
 };
 
 export default SignInPage;
+
