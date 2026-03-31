@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 
 @Module({
   controllers: [VevoController],
-  providers: [VevoService, PrismaService], // Ezek a belső elemek
+  providers: [VevoService, PrismaService],
   exports: [VevoService],
 })
 export class VevoModule {}

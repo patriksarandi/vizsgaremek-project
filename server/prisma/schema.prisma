@@ -15,7 +15,7 @@ datasource db {
 
 model Kategoria {
   KategoriaID Int      @id @default(autoincrement())
-  Nev         String   @db.VarChar(100)
+  Nev         String   @unique @db.VarChar(100)
   IsDeleted   Boolean  @default(false)
   Termekek    Termek[]
 }
@@ -23,7 +23,7 @@ model Kategoria {
 model Termek {
   TermekID     Int             @id @default(autoincrement())
   KategoriaID  Int
-  TermekNev    String          @db.VarChar(255)
+  TermekNev    String          @unique @db.VarChar(255)
   IsDeleted    Boolean         @default(false)
   TermekAr     Decimal         @db.Decimal(10, 2)
   Keszlet      Int             @default(0)
@@ -32,12 +32,18 @@ model Termek {
   Rendelesek   RendeltTermek[]
 }
 
+enum VevoRole {
+  USER
+  ADMIN
+}
+
 model Vevo {
   VevoID      Int             @id @default(autoincrement())
   VevoNev     String          @unique @db.VarChar(150)
   VevoEmail   String          @unique @db.VarChar(150)
   VevoJelszo  String          @db.VarChar(255)
   Cim         String          @db.VarChar(255)
+  Role        VevoRole        @default(USER)
   Kosar       FizetesiKosar?
   Rendelesek  Rendeles[]
   createdAt DateTime @default(now())

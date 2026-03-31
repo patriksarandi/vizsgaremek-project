@@ -6,6 +6,7 @@
 import { PrismaService } from 'src/prisma.service';
 import { VevoService } from 'src/vevo/vevo.service';
 import * as bcrypt from 'bcrypt';
+import { SignUpDto } from './dto/signup-dto';
 
 @Injectable()
 export class AuthService {
@@ -36,25 +37,21 @@ export class AuthService {
     }
   }
 
-  async signUp(name: string, email: string, password: string): Promise<any> {
+  async signUp(dto: SignUpDto): Promise<any> {
     const existingUser = await this.db.vevo.findFirst({
-        where: {
-            OR: [
-                {VevoNev: name},
-                {VevoEmail: email }
-            ]
-        }
+        where: { VevoEmail: dto.email }
     });
     if (existingUser) {
       throw new ConflictException('Ez az e-mail cím vagy név már foglalt!');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     return await this.vevoService.create({
-      vevoNev: name,
-      vevoEmail: email,
+      vevoNev: dto.name,
+      vevoEmail: dto.email,
       vevoJelszo: hashedPassword,
+      vevoRole: dto.role,
       cim: '-',
     });
   }

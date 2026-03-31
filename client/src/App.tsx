@@ -5,6 +5,8 @@ import ProductPage from "./pages/ProductPage";
 import SignUpPage from "./pages/SignUpPage";
 import WishlistPage from "./pages/WishlistPage";
 import ContactPage from "./pages/ContactPage";
+import ProfilePage from "./pages/ProfilePage";
+import AdminPage from "./pages/AdminPage";
 
 const App = () => {
   const productUrl = "product";
@@ -17,6 +19,8 @@ const App = () => {
           <Route path={productUrl} element={<ProductPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/profile" element={<ProfilePage/>}/>
+          <Route path="/adminpage" element={<AdminPage/>}/>
         </Routes>
   );
 };

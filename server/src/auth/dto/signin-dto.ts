@@ -2,10 +2,10 @@
 
 export class SignInDto {
   @IsEmail()
-  @IsNotEmpty({ message: 'Az e-mail megadása kötelező!' })
+  @IsNotEmpty()
   email: string;
 
-  @IsString({ message: 'A jelszó szöveg típusú kell legyen!' })
-  @IsNotEmpty({ message: 'A jelszó megadása kötelező!' })
+  @IsString()
+  @IsNotEmpty()
   password: string;
 }

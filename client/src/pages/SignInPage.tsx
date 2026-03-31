@@ -4,20 +4,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { Autentikacio } from "../components/AuthContext";
 
 const SignInPage = () => {
+  const { login } = Autentikacio();
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { login } = Autentikacio();
-
   const handleLogin = async (event) => {
     event.preventDefault();
 
     const signinData = {
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-    }
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+    };
 
     try {
       const response = await fetch("http://localhost:7777/auth/signin", {
@@ -32,10 +31,10 @@ const SignInPage = () => {
       }
 
       const data = await response.json();
-      console.log("Server:", data)
-      login(data.user || data)
+      console.log("Server:", data);
+      login(data.user || data);
 
-      navigate('/')
+      navigate("/");
       console.log("Login successful:", data);
     } catch (error: any) {
       setError(error.message);
@@ -72,8 +71,10 @@ const SignInPage = () => {
                 Sign In
               </Button>
               <Form.Label>Forgot your password?</Form.Label>
-              <Form.Label>Don't have an account? 
-                <Link to="/signup">Sign Up</Link></Form.Label>
+              <Form.Label>
+                Don't have an account?
+                <Link to="/signup">Sign Up</Link>
+              </Form.Label>
             </Col>
           </Row>
         </Form>
@@ -83,4 +84,3 @@ const SignInPage = () => {
 };
 
 export default SignInPage;
-

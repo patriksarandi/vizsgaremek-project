@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateVevoDto } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -20,6 +14,7 @@ export class VevoService {
           VevoNev: dto.vevoNev,
           VevoEmail: dto.vevoEmail,
           VevoJelszo: dto.vevoJelszo,
+          Role: dto.vevoRole,
           Cim: dto.cim,
         },
       });
@@ -28,9 +23,9 @@ export class VevoService {
       return result;
     } catch (error: any) {
       if (error.code === 'P2002') {
-        throw new ConflictException('Ez az e-mail cím már regisztrálva van!');
+        throw new Error('Ez az e-mail cím már regisztrálva van!');
       }
-      throw new InternalServerErrorException(
+      throw new Error(
         'Hiba történt a regisztráció során.',
       );
     }
@@ -46,7 +41,7 @@ export class VevoService {
       where: { VevoID: id },
     });
 
-    if (!vevo) throw new NotFoundException('A vevő nem található!');
+    if (!vevo) throw new Error('A vevő nem található!');
     return vevo;
   }
 
@@ -55,17 +50,6 @@ export class VevoService {
       where: {
         VevoEmail: email
       },
-    });
-  }
-
-  async findByEmailOrName(email: string, name: string) {
-    return await this.db.vevo.findFirst({
-      where: {
-        OR: [
-          { VevoEmail: email },
-          { VevoNev: name }
-        ]
-      }
     });
   }
 
@@ -87,9 +71,9 @@ export class VevoService {
       return result;
     } catch (error: any) {
       if (error.code === 'P2002') {
-        throw new ConflictException('Ez az e-mail cím már foglalt!');
+        throw new Error('Ez az e-mail cím már foglalt!');
       }
-      throw new InternalServerErrorException('Hiba történt a módosítás során.');
+      throw new Error('Hiba történt a módosítás során.');
     }
   }
 
@@ -99,13 +83,13 @@ export class VevoService {
       return { message: `A(z) ${id} azonosítójú vevő törölve.` };
     } catch (error: any) {
       if (error.code === 'P2025')
-        throw new NotFoundException('Vevő nem található');
+        throw new Error('Vevő nem található');
       if (error.code === 'P2003') {
-        throw new BadRequestException(
+        throw new Error(
           'A vevőnek vannak rendelései, nem törölhető!',
         );
       }
-      throw new InternalServerErrorException('Szerver hiba a törléskor.');
+      throw new Error('Szerver hiba a törléskor.');
     }
   }
 }

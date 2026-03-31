@@ -1,4 +1,5 @@
-﻿import { IsString, IsNotEmpty, IsEmail } from "class-validator";
+﻿import { IsString, IsNotEmpty, IsEmail, IsEnum } from "class-validator";
+import { VevoRole } from "src/vevo/dto/create-vevo.dto";
 
 export class SignUpDto {
   @IsString({ message: 'A név szöveg típusú kell legyen!'})
@@ -12,4 +13,7 @@ export class SignUpDto {
   @IsString({ message: 'A jelszó szöveg típusú kell legyen!'})
   @IsNotEmpty({ message: 'A jelszó megadása kötelező! '})
   password: string;
+
+  @IsEnum(VevoRole)
+  role: VevoRole
 }
