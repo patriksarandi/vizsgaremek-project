@@ -46,7 +46,7 @@ const NavbarComponent = () => {
         {isAdmin && (
           <Nav.Link
             as={Link}
-            to="/adminpage"
+            to="/admin/dashboard"
             className="ms-2 fw-bold text-danger"
           >
             Admin
