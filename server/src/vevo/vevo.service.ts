@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVevoDto } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -56,25 +56,26 @@ export class VevoService {
 
   async updateNev(id: number, dto: UpdateVevoDto) {
     try {
-      if (!dto.vezeteknev && !dto.keresztnev) {
-        throw new Error('Legalább az egyik névmező megadása kötelező!');
+      console.log('Módosítás ID:', id);
+      console.log('Adatok:', dto);
+      const exists = await this.findOne(id);
+
+      if (!exists) {
+        throw new NotFoundException(`Nincs ilyen vevő: ${id}`);
       }
 
-      const modositottVevo = await this.db.vevo.update({
+      const result = await this.db.vevo.updateMany({
         where: { VevoID: id },
         data: {
-          Keresztnev: dto.keresztnev,
-          Vezeteknev: dto.vezeteknev,
+          keresztnev: dto.keresztnev,
+          vezeteknev: dto.vezeteknev,
         },
       });
 
-      return modositottVevo;
+      return result;
     } catch (error: any) {
-      if (error.code === 'P2025') {
-        throw new Error(`Nem található vevő a megadott azonosítóval: ${id}`);
-      }
-
-      throw new Error('Hiba történt a név módosítása során.');
+      console.error('Hiba a service-ben:', error.message);
+      throw error;
     }
   }
 
