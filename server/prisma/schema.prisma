@@ -41,6 +41,9 @@ enum VevoRole {
 model Vevo {
   VevoID      Int             @id @default(autoincrement())
   VevoNev     String          @unique @db.VarChar(150)
+  Vezeteknev  String?
+  Keresztnev  String?
+  Telefonszam String?
   VevoEmail   String          @unique @db.VarChar(150)
   VevoJelszo  String          @db.VarChar(255)
   Cim         String          @db.VarChar(255)

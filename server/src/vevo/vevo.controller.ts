@@ -36,9 +36,19 @@ export class VevoController {
     return this.vevoService.findByEmail(email);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVevoDto: UpdateVevoDto) {
-    return this.vevoService.update(+id, updateVevoDto);
+  @Patch(':id/teljes-nev')
+  async updateTeljesNev(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVevoDto) {
+    return await this.vevoService.updateNev(id, dto)
+  }
+
+  @Patch(':id/telefonszam')
+  async updateTelefonszam(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVevoDto) {
+    return await this.vevoService.updateTelefonszam(id, dto)
+  }
+
+  @Patch(':id/email')
+  async updateEmail(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVevoDto) {
+    return await this.vevoService.updateEmail(id, dto)
   }
 
   @Delete(':id')

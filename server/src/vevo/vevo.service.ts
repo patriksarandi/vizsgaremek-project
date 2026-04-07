@@ -16,6 +16,9 @@ export class VevoService {
           VevoJelszo: dto.vevoJelszo,
           Role: dto.vevoRole,
           Cim: dto.cim,
+          Keresztnev: dto.keresztnev,
+          Vezeteknev: dto.vezeteknev,
+          Telefonszam: dto.telefonszam,
         },
       });
 
@@ -25,9 +28,7 @@ export class VevoService {
       if (error.code === 'P2002') {
         throw new Error('Ez az e-mail cím már regisztrálva van!');
       }
-      throw new Error(
-        'Hiba történt a regisztráció során.',
-      );
+      throw new Error('Hiba történt a regisztráció során.');
     }
   }
 
@@ -48,9 +49,79 @@ export class VevoService {
   async findByEmail(email: string) {
     return await this.db.vevo.findUnique({
       where: {
-        VevoEmail: email
+        VevoEmail: email,
       },
     });
+  }
+
+  async updateNev(id: number, dto: UpdateVevoDto) {
+    try {
+      if (!dto.vezeteknev && !dto.keresztnev) {
+        throw new Error('Legalább az egyik névmező megadása kötelező!');
+      }
+
+      const modositottVevo = await this.db.vevo.update({
+        where: { VevoID: id },
+        data: {
+          Keresztnev: dto.keresztnev,
+          Vezeteknev: dto.vezeteknev,
+        },
+      });
+
+      return modositottVevo;
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new Error(`Nem található vevő a megadott azonosítóval: ${id}`);
+      }
+
+      throw new Error('Hiba történt a név módosítása során.');
+    }
+  }
+
+  async updateTelefonszam(id: number, dto: UpdateVevoDto) {
+    try {
+      if (!dto.telefonszam) {
+        throw new Error('A telefonszám nincs kitöltve.');
+      }
+
+      const modositottVevo = await this.db.vevo.update({
+        where: { VevoID: id },
+        data: {
+          Telefonszam: dto.telefonszam,
+        },
+      });
+
+      return modositottVevo;
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new Error(`Nem található vevő a megadott azonosítóval: ${id}`);
+      }
+
+      throw new Error('Hiba történt a telefonszám módosítása során.');
+    }
+  }
+
+  async updateEmail(id: number, dto: UpdateVevoDto) {
+    try {
+      if (!dto.vevoEmail) {
+        throw new Error('Az email nincs kitöltve.');
+      }
+
+      const modositottVevo = await this.db.vevo.update({
+        where: { VevoID: id },
+        data: {
+          VevoEmail: dto.vevoEmail,
+        },
+      });
+
+      return modositottVevo;
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new Error(`Nem található vevő a megadott azonosítóval: ${id}`);
+      }
+
+      throw new Error('Hiba történt az email módosítása során.');
+    }
   }
 
   async update(id: number, dto: UpdateVevoDto) {
@@ -82,12 +153,9 @@ export class VevoService {
       await this.db.vevo.delete({ where: { VevoID: id } });
       return { message: `A(z) ${id} azonosítójú vevő törölve.` };
     } catch (error: any) {
-      if (error.code === 'P2025')
-        throw new Error('Vevő nem található');
+      if (error.code === 'P2025') throw new Error('Vevő nem található');
       if (error.code === 'P2003') {
-        throw new Error(
-          'A vevőnek vannak rendelései, nem törölhető!',
-        );
+        throw new Error('A vevőnek vannak rendelései, nem törölhető!');
       }
       throw new Error('Szerver hiba a törléskor.');
     }

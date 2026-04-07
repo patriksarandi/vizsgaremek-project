@@ -18,6 +18,18 @@ export class CreateVevoDto {
 
     @IsString()
     @IsOptional()
+    vezeteknev?: string;
+
+    @IsString()
+    @IsOptional()
+    keresztnev?: string;
+
+    @IsString()
+    @IsOptional()
+    telefonszam?: string;
+
+    @IsString()
+    @IsOptional()
     cim?: string;
 
     

@@ -1,4 +1,5 @@
 ﻿import { Navbar, Container, Nav, Button } from "react-bootstrap";
+import { NavLink, Outlet } from "react-router-dom";
 
 
 const ProfilePage = () => {
@@ -19,17 +20,17 @@ const ProfilePage = () => {
         <div className="p-3" style={{ width: "210px" }}>
           <Nav className="flex-column">
             <Nav.Item className="mb-2">
-              <Nav.Link href="#">
+              <Nav.Link as={NavLink} to="profile">
                 Felhasználói fiók
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link href="#">
+              <Nav.Link as={NavLink} to="megrendelesek">
                 Megrendelések
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link>
+              <Nav.Link onClick={() => console.log("Kilépés")}>
                 Kilépés
               </Nav.Link>
             </Nav.Item>
@@ -37,7 +38,7 @@ const ProfilePage = () => {
         </div>
 
         <main className="flex-grow-1 p-4 bg-light overflow-auto">
- 
+          <Outlet/>
         </main>
       </div>
     </>

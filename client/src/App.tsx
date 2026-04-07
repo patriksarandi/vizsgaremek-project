@@ -5,12 +5,15 @@ import ProductPage from "./pages/ProductPage";
 import SignUpPage from "./pages/SignUpPage";
 import WishlistPage from "./pages/WishlistPage";
 import ContactPage from "./pages/ContactPage";
-import ProfilePage from "./pages/ProfilePage";
+
 import { useEffect, useState } from "react";
 import AdminFelhasznalokPage from "./pages/AdminPage/AdminFelhasznalokPage";
 import AdminKategoriakPage from "./pages/AdminPage/AdminKategoriakPage";
 import AdminTermekekPage from "./pages/AdminPage/AdminTermekekPage";
 import AdminPage from "./pages/AdminPage/AdminPage";
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import ProfileFelhasznaloi from "./pages/ProfilePage/ProfileFelhasznaloi";
+import ProfileMegrendelesek from "./pages/ProfilePage/ProfileMegrendelesek";
 
 const App = () => {
   const [productsData, setProductsData] = useState([]);
@@ -89,7 +92,10 @@ const App = () => {
       <Route path={productUrl} element={<ProductPage />} />
       <Route path="/wishlist" element={<WishlistPage />} />
       <Route path="/contact" element={<ContactPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/profile" element={<ProfilePage />}>
+        <Route path="profile" element={<ProfileFelhasznaloi/>}/>
+        <Route path="megrendelesek" element={<ProfileMegrendelesek/>}/>
+      </Route>
       <Route path="/admin/dashboard" element={<AdminPage/>}>
         <Route path="felhasznalok" element={<AdminFelhasznalokPage customersData={customersData}/>}/>
         <Route path="kategoriak" element={<AdminKategoriakPage categoriesData={categoriesData}/>}/>
