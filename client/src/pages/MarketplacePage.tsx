@@ -17,8 +17,14 @@ const MarketplacePage = ({ productsData, categoriesData }) => {
   const CategoryById = (kategoriaId: number) => {
     let kategoriaNev = "";
     switch (kategoriaId) {
-      case 1: kategoriaNev = "string"; break;
-      case 4: kategoriaNev = "wind"; break;
+      case 1: kategoriaNev = "Gitár"; break;
+      case 2: kategoriaNev = "BasszusGitár"; break;
+      case 3: kategoriaNev = "Billentyűs"; break;
+      case 4: kategoriaNev = "Ütős"; break;
+      case 5: kategoriaNev = "Fúvós"; break;
+      case 6: kategoriaNev = "Vonós"; break;
+      case 7: kategoriaNev = "Stúdió"; break;
+      case 8: kategoriaNev = "Tartozékok"; break;
       default: break;
     }
 
@@ -28,7 +34,7 @@ const MarketplacePage = ({ productsData, categoriesData }) => {
   const filteredProducts = productsData.filter((product) => {
     const matchesName = product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase());
     const matchesPrice = Number(product?.TermekAr) >= priceRange.min && Number(product?.TermekAr) <= priceRange.max;
-    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(product?.KategoriaNev)
+    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(CategoryById(product?.KategoriaNev))
     return matchesName && matchesPrice && matchesCategory;
   })
 
