@@ -1,7 +1,22 @@
 ﻿import { Container, Form } from "react-bootstrap";
 import "./FilterSidebar.css";
 
-const FilterSidebarComponent = ({ priceRange, setPriceRange }) => {
+const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, categoriesData, priceRange, setPriceRange }) => {
+  
+  const KategoriaNev = (kategoria: string) => {
+    let returnKategoria = "";
+    switch (kategoria) {
+      case "string": returnKategoria = "Húros"; break;
+      case "wind": returnKategoria = "Fúvós"; break;
+      case "percussion": returnKategoria = "Ütős"; break;
+      case "accessories": returnKategoria = "Kiegészítők"; break;
+      case "studio": returnKategoria = "Stúdió"; break;
+      default: break; 
+    }
+
+    return returnKategoria;
+  }
+  
   return (
     <>
       <div>
@@ -30,7 +45,7 @@ const FilterSidebarComponent = ({ priceRange, setPriceRange }) => {
               <input
                 type="range"
                 min="0"
-                max="100000"
+                max="1000000"
                 value={priceRange.max}
                 onChange={(e) => {
                   const value = Math.max(
@@ -53,11 +68,18 @@ const FilterSidebarComponent = ({ priceRange, setPriceRange }) => {
           <hr />
           <Form>
             <Form.Label>Kategória</Form.Label>
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
+            {categoriesData.map(c => (
+              <Form.Check 
+              key={c.KategoriaID}
+              label={KategoriaNev(c.Nev)} 
+              name="kategoria" 
+              value={c.Nev}
+              onChange={(e) => {
+                const {value, checked} = e.target;
+                setFilteredCategories(prev => checked ? [...prev, value] : prev.filter(cat => cat !== value))
+              }}
+              />
+            ))}
           </Form>
         </Container>
         <Container>

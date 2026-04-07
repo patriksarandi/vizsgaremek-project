@@ -11,20 +11,21 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
-  const usernameRef = useRef("");
-  const emailRef = useRef("");
-  const passwordRef = useRef("");
+  const usernameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
   const [error, setError] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSignUp = async (event) => {
     event.preventDefault();
 
     const signupData = {
-        name: usernameRef.current.value,
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-    }
+      name: usernameRef.current?.value || "",
+      email: emailRef.current?.value || "",
+      password: passwordRef.current?.value || "",
+      role: "USER",
+    };
 
     try {
       const response = await fetch("http://localhost:7777/auth/signup", {
@@ -35,14 +36,14 @@ const SignUpPage = () => {
         body: JSON.stringify(signupData),
       });
       if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-        return;
+        const errorBody = await response.json();
+        console.log("SERVER RESPONSE:", errorBody);
+        throw new Error(errorBody.message || `Error: ${response.status}`);
       }
 
       const data = await response.json();
-      navigate('/signin')
+      navigate("/signin");
       console.log("Sign Up successful:", data);
-      
     } catch (error: any) {
       setError(error.message);
       throw new Error(error.message);

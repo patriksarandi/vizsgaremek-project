@@ -54,7 +54,7 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<MarketplacePage productsData={productsData}/>} />
+      <Route path="/" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData}/>} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path={productUrl} element={<ProductPage />} />

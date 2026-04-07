@@ -29,7 +29,7 @@ export class AuthService {
             throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!')
         }
 
-        const { VevoJelszo, ...result } = customer;
+        const { ...result } = customer;
         return result;
     } catch (e) {
         console.error("Hiba történt:", e);

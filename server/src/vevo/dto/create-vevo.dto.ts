@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, MinLength, IsEnum } from "class-validator";
+import { IsString, IsNotEmpty, IsEmail, MinLength, IsEnum, IsOptional } from "class-validator";
 
 export enum VevoRole {
     USER = 'USER',
@@ -17,10 +17,11 @@ export class CreateVevoDto {
     vevoJelszo: string;
 
     @IsString()
-    @IsNotEmpty()
-    cim: string;
+    @IsOptional()
+    cim?: string;
 
-    @IsNotEmpty()
+    
     @IsEnum(VevoRole)
+    @IsOptional()
     vevoRole: VevoRole;
 }

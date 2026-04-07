@@ -28,6 +28,7 @@ model Termek {
   TermekAr     Decimal         @db.Decimal(10, 2)
   Keszlet      Int             @default(0)
   Kategoria    Kategoria       @relation(fields: [KategoriaID], references: [KategoriaID])
+  Brand        String
   KosarTetelek KosarTetel[]
   Rendelesek   RendeltTermek[]
 }

@@ -12,6 +12,7 @@ const SignInPage = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    setError("")
 
     const signinData = {
       email: emailRef.current.value,
@@ -26,15 +27,15 @@ const SignInPage = () => {
         },
         body: JSON.stringify(signinData),
       });
+      const data = await response.json();
+
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log("Server:", data);
       login(data.user || data);
-
       navigate("/");
+      
       console.log("Login successful:", data);
     } catch (error: any) {
       setError(error.message);

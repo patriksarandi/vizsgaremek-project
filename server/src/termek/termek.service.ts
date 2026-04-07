@@ -20,6 +20,8 @@ export class TermekService {
           KategoriaID: dto.kategoriaId,
           TermekNev: dto.termekNev,
           TermekAr: dto.termekAr,
+          Keszlet: dto.keszlet,
+          Brand: "Ismeretlen"
         },
       });
 

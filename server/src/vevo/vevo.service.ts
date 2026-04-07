@@ -19,7 +19,7 @@ export class VevoService {
         },
       });
 
-      const { VevoJelszo, ...result } = ujVevo;
+      const { ...result } = ujVevo;
       return result;
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -33,7 +33,7 @@ export class VevoService {
 
   async findAll() {
     const vevok = await this.db.vevo.findMany();
-    return vevok.map(({ VevoJelszo, ...vevo }) => vevo);
+    return vevok.map(({ ...vevo }) => vevo);
   }
 
   async findOne(id: number) {

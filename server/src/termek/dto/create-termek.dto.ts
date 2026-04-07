@@ -16,4 +16,8 @@ export class CreateTermekDto {
     @IsInt()
     @IsNotEmpty()
     keszlet: number;
+
+    @IsString()
+    @IsNotEmpty()
+    brand: string;
 }
