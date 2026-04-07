@@ -11,7 +11,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({
     min: 0,
-    max: 100
+    max: 1000000
   });
   const [filteredCategories, setFilteredCategories] = useState([])
   const [filteredBrands, setFilteredBrands] = useState([])

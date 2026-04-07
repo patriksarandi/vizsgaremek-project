@@ -6,8 +6,11 @@ import SignUpPage from "./pages/SignUpPage";
 import WishlistPage from "./pages/WishlistPage";
 import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
-import AdminPage from "./pages/AdminPage";
 import { useEffect, useState } from "react";
+import AdminFelhasznalokPage from "./pages/AdminPage/AdminFelhasznalokPage";
+import AdminKategoriakPage from "./pages/AdminPage/AdminKategoriakPage";
+import AdminTermekekPage from "./pages/AdminPage/AdminTermekekPage";
+import AdminPage from "./pages/AdminPage/AdminPage";
 
 const App = () => {
   const [productsData, setProductsData] = useState([]);
@@ -87,7 +90,11 @@ const App = () => {
       <Route path="/wishlist" element={<WishlistPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/admin/dashboard" element={<AdminPage productsData={productsData} setProductsData={setProductsData} categoriesData={categoriesData} customersData={customersData} setCustomersData={setCustomersData} />} />
+      <Route path="/admin/dashboard" element={<AdminPage/>}>
+        <Route path="felhasznalok" element={<AdminFelhasznalokPage customersData={customersData}/>}/>
+        <Route path="kategoriak" element={<AdminKategoriakPage categoriesData={categoriesData}/>}/>
+        <Route path="termekek" element={<AdminTermekekPage termekAdatok={productsData}/>}/>
+      </Route>
     </Routes>
   );
 };

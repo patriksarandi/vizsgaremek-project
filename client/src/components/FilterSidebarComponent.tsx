@@ -72,7 +72,7 @@ const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, cat
         <Container>
           <hr />
           <Form>
-            <Form.Label>Brand</Form.Label>
+            <Form.Label>Márka</Form.Label>
             {productsBrands?.map(brand => (
               <Form.Check
                 key={brand}
