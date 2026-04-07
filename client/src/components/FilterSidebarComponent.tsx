@@ -1,7 +1,7 @@
 ﻿import { Container, Form } from "react-bootstrap";
 import "./FilterSidebar.css";
 
-const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, categoriesData, priceRange, setPriceRange }) => {
+const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, categoriesData, priceRange, setPriceRange, productsBrands, filteredBrands, setFilteredBrands, }) => {
   
   
   return (
@@ -55,14 +55,14 @@ const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, cat
           <hr />
           <Form>
             <Form.Label>Kategória</Form.Label>
-            {categoriesData.map(c => (
+            {categoriesData?.map(c => (
               <Form.Check 
               key={c.KategoriaID}
               label={c.Nev} 
               name="kategoria" 
               value={c.Nev}
               onChange={(e) => {
-                const {value, checked} = e.target;
+                const { value, checked } = e.target;
                 setFilteredCategories(prev => checked ? [...prev, value] : prev.filter(cat => cat !== value))
               }}
               />
@@ -73,11 +73,19 @@ const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, cat
           <hr />
           <Form>
             <Form.Label>Brand</Form.Label>
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
-            <Form.Check label="1" name="kategoria" />
+            {productsBrands?.map(brand => (
+              <Form.Check
+                key={brand}
+                type="checkbox"
+                label={brand}
+                name="brand"
+                value={brand}
+                onChange={(e) => {
+                  const {value, checked} = e.target;
+                  setFilteredBrands(prev => checked ? [...prev, value] : prev.filter(brand => brand !== value))
+                }}
+                />
+            ))}
           </Form>
         </Container>
       </div>

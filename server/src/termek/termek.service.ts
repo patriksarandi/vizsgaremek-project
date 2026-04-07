@@ -41,6 +41,17 @@ export class TermekService {
     return await this.db.termek.findMany();
   }
 
+  async findAllBrands() {
+    const brands = await this.db.termek.findMany({
+      distinct: ['Brand'],
+      select: {
+        Brand: true,
+      },
+    })
+
+    return brands.map(b => b.Brand)
+  }
+
   async findOne(id: number) {
     try {
       const termek = await this.db.termek.findUnique({

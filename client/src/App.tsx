@@ -12,49 +12,75 @@ import { useEffect, useState } from "react";
 const App = () => {
   const [productsData, setProductsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([])
+  const [productsBrands, setProductsBrands] = useState([])
   const [customersData, setCustomersData] = useState([])
 
   const fetchProducts = async () => {
     try {
       const response = await fetch("http://localhost:7777/termek");
+      if (!response.ok) throw new Error("Hiba a termékek betöltésénél.")
       const data = await response.json();
       setProductsData(data);
     } catch (error: any) {
-      throw new Error(error.message);
+      console.error("Termék fetch hiba:", error.message);
+      setProductsData([])
     }
   };
 
   const fetchCategories = async () => {
     try {
       const response = await fetch("http://localhost:7777/kategoria");
+      if (!response.ok) throw new Error("Hiba a kategórák betöltésénél.")
       const data = await response.json();
       setCategoriesData(data);
     } catch (error: any) {
-      throw new Error(error.message)
+      console.error("Kategória fetch hiba:", error.message)
     }
   }
 
   const fetchCustomers = async () => {
     try {
       const response = await fetch("http://localhost:7777/vevo");
+      if (!response.ok) throw new Error("Hiba a vevők betöltésénél.")
       const data = await response.json();
       setCustomersData(data);
     } catch (error: any) {
-      throw new Error(error.message)
+      console.error("Vevő fetch hiba:", error.message)
+    }
+  }
+
+  const fetchBrands = async () => {
+    try {
+      const response = await fetch("http://localhost:7777/termek/brands");
+      if (!response.ok) {
+        throw new Error("Nem sikerült lekérni a márkákat!");
+      }
+      const data = await response.json();
+      setProductsBrands(data)
+    } catch (error: any) {
+      console.error("Márka lekérdezési hiba:", error.message)
+      setProductsBrands([])
     }
   }
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-    fetchCustomers();
-  });
+    const loadAllData = async () => {
+      await Promise.all([
+        fetchProducts(),
+        fetchCategories(),
+        fetchBrands(),
+        fetchCustomers()
+      ])
+    };
+
+    loadAllData();
+  }, []);
 
   const productUrl = "product";
 
   return (
     <Routes>
-      <Route path="/" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData}/>} />
+      <Route path="/" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData} productsBrands={productsBrands}/>} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path={productUrl} element={<ProductPage />} />

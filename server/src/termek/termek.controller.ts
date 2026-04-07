@@ -12,6 +12,11 @@ export class TermekController {
     return this.termekService.create(createTermekDto);
   }
 
+  @Get('brands')
+  findAllBrands() {
+    return this.termekService.findAllBrands();
+  }
+
   @Get()
   findAll() {
     return this.termekService.findAll();
