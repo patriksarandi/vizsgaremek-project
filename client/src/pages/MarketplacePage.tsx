@@ -34,7 +34,8 @@ const MarketplacePage = ({ productsData, categoriesData }) => {
   const filteredProducts = productsData.filter((product) => {
     const matchesName = product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase());
     const matchesPrice = Number(product?.TermekAr) >= priceRange.min && Number(product?.TermekAr) <= priceRange.max;
-    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(CategoryById(product?.KategoriaNev))
+    const currentProductCategoryName = CategoryById(product?.KategoriaID)
+    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(currentProductCategoryName)
     return matchesName && matchesPrice && matchesCategory;
   })
 

@@ -3,19 +3,6 @@ import "./FilterSidebar.css";
 
 const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, categoriesData, priceRange, setPriceRange }) => {
   
-  const KategoriaNev = (kategoria: string) => {
-    let returnKategoria = "";
-    switch (kategoria) {
-      case "string": returnKategoria = "Húros"; break;
-      case "wind": returnKategoria = "Fúvós"; break;
-      case "percussion": returnKategoria = "Ütős"; break;
-      case "accessories": returnKategoria = "Kiegészítők"; break;
-      case "studio": returnKategoria = "Stúdió"; break;
-      default: break; 
-    }
-
-    return returnKategoria;
-  }
   
   return (
     <>
@@ -71,7 +58,7 @@ const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, cat
             {categoriesData.map(c => (
               <Form.Check 
               key={c.KategoriaID}
-              label={KategoriaNev(c.Nev)} 
+              label={c.Nev} 
               name="kategoria" 
               value={c.Nev}
               onChange={(e) => {
