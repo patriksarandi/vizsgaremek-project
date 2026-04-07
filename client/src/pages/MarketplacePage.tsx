@@ -9,9 +9,17 @@ import { useState } from "react";
 const MarketplacePage = ({ productsData }) => {
   const { user, logout } = Autentikacio();
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredProducts = productsData.filter((product) =>
-    product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase())
-  )
+  const [priceRange, setPriceRange] = useState({
+    min: 0,
+    max: 100
+  });
+
+  const filteredProducts = productsData.filter((product) => {
+    const matchesName = product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase());
+    const matchesPrice = Number(product?.TermekAr) >= priceRange.min && Number(product?.TermekAr) <= priceRange.max;
+
+    return matchesName && matchesPrice;
+  })
 
   if (!user) {
     return (
@@ -28,7 +36,7 @@ const MarketplacePage = ({ productsData }) => {
         <Row flex-nowrap="true">
           <Col xs={3} md={2} lg={2} className="border-end">
             <div className="sticky-top" style={{ top: "20px" }}>
-              <FilterSidebarComponent />
+              <FilterSidebarComponent priceRange={priceRange} setPriceRange={setPriceRange} />
             </div>
           </Col>
           <Col xs={8} md={9} lg={10}>
