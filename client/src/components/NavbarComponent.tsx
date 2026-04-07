@@ -10,9 +10,8 @@ import { Link } from "react-router-dom";
 import { Autentikacio } from "./AuthContext";
 import { useRef, useState } from "react";
 
-const NavbarComponent = () => {
+const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
   const { user, logout } = Autentikacio();
-  const [searchTerm, setSearchTerm] = useState("");
   const isAdmin = user?.Role === "ADMIN";
 
   return (
@@ -25,7 +24,10 @@ const NavbarComponent = () => {
               type="search"
               placeholder="Keresés"
               className="me-2 w-300"
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
             />
           </Form>
         </Nav>

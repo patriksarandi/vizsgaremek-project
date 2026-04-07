@@ -66,6 +66,7 @@ const FelhasznalokPage = ({customersData, handleDelete}) => {
 
 const KategoriakPage = ({ categoriesData, handleAdd, handleDelete }) => {
   const [kategoriaNev, setKategoriaNev] = useState<string>("");
+  const [error, setError] = useState<string>("")
   const kategoriaAddUrl = "http://localhost:7777/kategoria";
   const ujKategoria = {
     kategoriaNev: kategoriaNev,
