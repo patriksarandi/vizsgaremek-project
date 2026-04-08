@@ -1,14 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { RendelesService } from './rendeles.service';
-import { CreateRendeleDto } from './dto/create-rendele.dto';
+import { CreateRendelesDto, KosarTetelDto } from './dto/create-rendeles.dto';
 import { UpdateRendeleDto } from './dto/update-rendeles.dto';
+import { FizetesiKosarDto } from './dto/create-rendeles.dto';
 
 @Controller('rendeles')
 export class RendelesController {
   constructor(private readonly rendelesService: RendelesService) {}
 
+  @Post('/kosar')
+  createFizetesiKosar(@Body() fizetesiKosarDto: FizetesiKosarDto) {
+    const vevoId = fizetesiKosarDto.vevoId;
+
+    if (!vevoId) {
+      throw new BadRequestException('A VevoID megadása kötelező')
+    }
+
+    const ujFizetesiKosar = this.rendelesService.createFizetesiKosar(fizetesiKosarDto)
+
+    return {ujFizetesiKosar, message: "A fizetési kosár sikeresen létrehozva"}
+  }
+
+  @Get('/kosar')
+  findAllFizetesiKosar() {
+    return this.rendelesService.findAllFizetesiKosar();
+  }
+
+  @Post('/kosartetel')
+  createKosarTetel(
+    @Body() dto: KosarTetelDto) {
+      return this.rendelesService.createKosarTetel(dto);
+  }
+
+  @Get('/kosartetel')
+  findAllKosarTetel() {
+    return this.rendelesService.findAllKosarTetel();
+  }
+
   @Post()
-  create(@Body() createRendeleDto: CreateRendeleDto) {
+  create(@Body() createRendeleDto: CreateRendelesDto) {
     return this.rendelesService.create(createRendeleDto);
   }
 
@@ -20,11 +50,6 @@ export class RendelesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.rendelesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRendeleDto: UpdateRendeleDto) {
-    return this.rendelesService.update(+id, updateRendeleDto);
   }
 
   @Delete(':id')
