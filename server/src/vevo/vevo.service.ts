@@ -125,6 +125,11 @@ export class VevoService {
     }
   }
 
+  async updateSzallitasiCim(id: number, dto: UpdateVevoDto) {
+    await this.findOne(id);
+
+  }
+
   async update(id: number, dto: UpdateVevoDto) {
     await this.findOne(id);
 

@@ -21,7 +21,7 @@ const ProfilePage = () => {
 
       <div className="d-flex">
         <div className="p-3" style={{ width: "210px" }}>
-          <Nav className="flex-column">
+          <Nav variant="pills" className="flex-column">
             <Nav.Item className="mb-2">
               <Nav.Link as={NavLink} to="profile">
                 Felhasználói fiók
@@ -29,7 +29,7 @@ const ProfilePage = () => {
             </Nav.Item>
             <Nav.Item className="mb-2">
               <Nav.Link as={NavLink} to="megrendelesek">
-                Megrendelések
+                Megrendeléseim
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>

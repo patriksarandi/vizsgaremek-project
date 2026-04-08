@@ -10,7 +10,6 @@ const ProfileFelhasznaloi = () => {
   const keresztnevRef = useRef(user.Keresztnev);
   const telefonszamRef = useRef(user.Telefonszam);
   const emailRef = useRef(user.VevoEmail);
-  const navigate = useNavigate()
 
   const handleUpdateNev = async () => {
     try {
@@ -204,6 +203,24 @@ const ProfileFelhasznaloi = () => {
           <Form.Control ref={emailRef} defaultValue={user.VevoEmail} />
         </Form.Group>
         <Button onClick={handleUpdateEmail}>E-mail Módosítása</Button>
+      </Form>
+
+      <hr/>
+      <h4>Számlázási cím</h4>
+      <Form>
+        <Form.Group className="mb-3">
+          <Form.Label>Utca és házszám</Form.Label>
+          <Form.Control></Form.Control>
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Város</Form.Label>
+          <Form.Control></Form.Control>
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Irányítószám</Form.Label>
+          <Form.Control></Form.Control>
+        </Form.Group>
+        <Button>Megadás</Button>
       </Form>
 
       <hr/>
