@@ -37,6 +37,11 @@ export class RendelesController {
     return this.rendelesService.findAllKosarTetel();
   }
 
+  @Delete('/kosartetel/:id')
+  removeKosarTetel(@Param('id') id: number) {
+    return this.rendelesService.removeKosarTetel(+id)
+  }
+
   @Post()
   create(@Body() createRendeleDto: CreateRendelesDto) {
     return this.rendelesService.create(createRendeleDto);

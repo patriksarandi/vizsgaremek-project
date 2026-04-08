@@ -14,7 +14,10 @@ export class RendelesService {
       create: { VevoID: dto.vevoId },
     });
 
-    return ujFizetesiKosar;
+    return {
+      ujFizetesiKosar,
+      message: "Új fizetési kosár sikeresen létrehozva."
+    };
   }
 
   async findAllFizetesiKosar() {
@@ -60,6 +63,12 @@ export class RendelesService {
         Termek: true,
         Kosar: true
       }
+    })
+  }
+
+  removeKosarTetel(id: number) {
+    return this.db.kosarTetel.delete({
+      where: {KosarTetelID: id}
     })
   }
 

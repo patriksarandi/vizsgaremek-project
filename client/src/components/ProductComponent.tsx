@@ -29,6 +29,10 @@ const ProductComponent = ({ product }) => {
                 <Card.Text>
                     <b>{product.TermekAr} Ft</b>
                 </Card.Text>
+                <Card.Text>
+                    <p>{product.Keszlet ? 
+                    ("Készleten: " + product.Keszlet) + " db" : "Elfogyott"}</p>
+                </Card.Text>
                 <Button>Kosárba</Button>
             </Card.Body>
         </Card>
