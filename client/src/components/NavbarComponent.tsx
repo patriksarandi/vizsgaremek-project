@@ -37,7 +37,7 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
 
             <Dropdown.Menu>
               <Dropdown.Item>
-                <Link to="profile">Felhasználói fiók</Link>
+                <Link to="profile/profile">Felhasználói fiók</Link>
               </Dropdown.Item>
               <Dropdown.Item>
                 <Button onClick={logout}>Kijelentkezés</Button>
