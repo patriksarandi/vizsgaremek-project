@@ -1,8 +1,11 @@
 ﻿import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import { NavLink, Outlet } from "react-router-dom";
+import { Autentikacio } from "../../components/AuthContext";
 
 
 const ProfilePage = () => {
+  const { logout } = Autentikacio()
+
   return (
     <>
       <Navbar expand="lg" bg="dark" className="border-bottom border-secondary">
@@ -11,7 +14,7 @@ const ProfilePage = () => {
             OnFret
           </Navbar.Brand>
           <Nav className="ms-auto">
-            <Button onClick={() => console.log("Kijelentkezés")}>Kijelentkezés</Button>
+            <Button onClick={() => logout()}>Kijelentkezés</Button>
           </Nav>
         </Container>
       </Navbar>
@@ -30,7 +33,7 @@ const ProfilePage = () => {
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link onClick={() => console.log("Kilépés")}>
+              <Nav.Link onClick={() => logout()}>
                 Kilépés
               </Nav.Link>
             </Nav.Item>
