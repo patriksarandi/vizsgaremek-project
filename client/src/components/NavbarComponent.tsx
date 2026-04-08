@@ -33,11 +33,11 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
         </Nav>
         <Nav className="me-auto">
           <Dropdown>
-            <Dropdown.Toggle variant="success">Button</Dropdown.Toggle>
+            <Dropdown.Toggle variant="success">{user.VevoNev}</Dropdown.Toggle>
 
             <Dropdown.Menu>
               <Dropdown.Item>
-                <Link to="profile">{user.VevoNev}</Link>
+                <Link to="profile">Felhasználói fiók</Link>
               </Dropdown.Item>
               <Dropdown.Item>
                 <Button onClick={logout}>Kijelentkezés</Button>

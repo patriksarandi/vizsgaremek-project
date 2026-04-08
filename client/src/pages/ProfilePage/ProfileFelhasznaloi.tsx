@@ -3,40 +3,56 @@ import { Autentikacio } from "../../components/AuthContext";
 import { useRef } from "react";
 
 const ProfileFelhasznaloi = () => {
-  const { user } = Autentikacio();
+  const { user, setUser } = Autentikacio();
 
-  const vezeteknevRef = useRef(null);
-  const keresztnevRef = useRef(null);
+  const vezeteknevRef = useRef(user.Vezeteknev);
+  const keresztnevRef = useRef(user.Keresztnev);
   const telefonszamRef = useRef(null);
   const emailRef = useRef(null);
 
   const handleUpdateNev = async () => {
+
     try {
+      if (!vezeteknevRef.current?.value || !keresztnevRef.current?.value) {
+        console.error("Minden mezőt ki kell tölteni!");
+        return;
+      }
+
       const response = await fetch(
         `http://localhost:7777/vevo/${user.VevoID}/teljes-nev`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
           body: JSON.stringify({
             vezeteknev: vezeteknevRef.current.value,
-            keresztnev: keresztnevRef.current.value,
+            keresztnev: keresztnevRef.current.value
           }),
         },
       );
 
-      // 1. ELŐSZÖR ellenőrizzük, hogy sikeres-e a válasz
-      if (!response.ok) {
-        // Ha 500-as hiba van, ide fog futni
-        const hibaSzoveg = await response.text(); // JSON helyett szövegként olvassuk be a hibát
-        throw new Error(`Szerver hiba (${response.status}): ${hibaSzoveg}`);
-      }
+      if (response.ok) {
+        const data = await response.json();
 
-      // 2. CSAK AKKOR olvassuk be JSON-ként, ha minden OK
-      const data = await response.json();
-      alert("Sikeres módosítás!");
-    } catch (error) {
-      console.error("Részletes hiba:", error);
-      alert("Hiba történt: " + error.message);
+        const frissitettUser = {
+          ...user,
+          Vezeteknev: vezeteknevRef.current.value,
+          Keresztnev: keresztnevRef.current.value,
+        };
+
+        localStorage.setItem("user", JSON.stringify(frissitettUser));
+        setUser(frissitettUser);
+
+        alert("Név sikeresen módosítva");
+      } else {
+        const errorData = await response.json();
+        console.error("Szerver hiba:", errorData);
+      }
+    } catch (error: any) {
+      console.error("Fetch hiba: ", error.message);
+      alert(error.message);
     }
   };
 

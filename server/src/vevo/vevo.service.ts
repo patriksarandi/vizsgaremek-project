@@ -67,8 +67,8 @@ export class VevoService {
       const result = await this.db.vevo.updateMany({
         where: { VevoID: id },
         data: {
-          keresztnev: dto.keresztnev,
-          vezeteknev: dto.vezeteknev,
+          Keresztnev: dto.keresztnev,
+          Vezeteknev: dto.vezeteknev,
         },
       });
 
