@@ -17,7 +17,7 @@ export class RendelesService {
       update: {},
       create: {
         KosarID: dto.vevoId,
-        VevoID: dto.vevoId
+        VevoID: dto.vevoId,
       },
     });
 
@@ -25,6 +25,17 @@ export class RendelesService {
       ujFizetesiKosar,
       message: 'Új fizetési kosár sikeresen létrehozva a vevő azonosítójával: ',
     };
+  }
+
+  async findKosarByVevo(vevoId: number) {
+    return await this.db.kosarTetel.findMany({
+      where: {
+        KosarID: vevoId,
+      },
+      include: {
+        Termek: true,
+      },
+    });
   }
 
   async findKosarTetelByVevoId(vevoId: number) {

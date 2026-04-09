@@ -1,52 +1,113 @@
-﻿import { Button, Col, Container, Dropdown, Nav, Navbar, Row } from "react-bootstrap";
+﻿import {
+  Button,
+  Col,
+  Container,
+  Dropdown,
+  Nav,
+  Navbar,
+  Row,
+} from "react-bootstrap";
 import CartItem from "../components/CartItem";
 import NavbarComponent from "../components/NavbarComponent";
+import { useEffect, useState } from "react";
+import { Autentikacio } from "../components/AuthContext";
 
 const CartPage = () => {
+  const { user } = Autentikacio();
+
+  const [kosarTetelek, setKosarTetelek] = useState([]);
+
+  const getKosarTetelek = async () => {
+    if (!user?.VevoID) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:7777/rendeles/kosartetel/${user.VevoID}`,
+      );
+      if (!response) throw new Error("Nem sikerült lekérni a kosártételeket!");
+
+      const data = await response.json();
+
+      if (data && data.Tetelek) {
+        setKosarTetelek(data.Tetelek);
+      } else {
+        setKosarTetelek([]);
+      }
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  const handleKosarTetel = async (
+    kosarId: number,
+    termekId: number,
+    tetelMennyiseg: number,
+  ) => {
+    try {
+      const response = await fetch(
+        "http://localhost:7777/rendeles/kosartetel",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kosarId: kosarId,
+            termekId: termekId,
+            tetelMennyiseg: tetelMennyiseg,
+          }),
+        },
+      );
+      if (!response.ok) {
+        console.error("Hiba történt:", response.status);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getKosarTetelek();
+  }, [user]);
+
   return (
     <>
-        <Navbar
-          expand="lg"
-          bg="dark"
-          className="border-bottom border-secondary"
-        >
-          <Container fluid>
-            <Navbar.Brand
-              style={{ color: "white", fontWeight: "bold" }}
-              href="/"
-            >
-              OnFret
-            </Navbar.Brand>
-            <Nav className="ms-auto">
-              <Button>Kijelentkezés</Button>
-            </Nav>
-          </Container>
-        </Navbar>
-        <Row>
-          <Col>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-            <CartItem></CartItem>
-          </Col>
-          <Col>
+      <Navbar expand="lg" bg="dark" className="border-bottom border-secondary">
+        <Container fluid>
+          <Navbar.Brand style={{ color: "white", fontWeight: "bold" }} href="/">
+            OnFret
+          </Navbar.Brand>
+          <Nav className="ms-auto">
+            <Button>Kijelentkezés</Button>
+          </Nav>
+        </Container>
+      </Navbar>
+      <Row>
+        <Col>
+          {kosarTetelek.length > 0 ? (
+            kosarTetelek.map((tetel) => (
+              <CartItem key={tetel.KosarTetelID} tetel={tetel} handleKosarTetel={handleKosarTetel} />
+            ))
+          ) : (
+            <p>A kosár tartalma üres</p>
+          )}
+        </Col>
+        <Col>
+          <Container>
             <Container>
-                <Container>
-                    <Row>
-                        <Col>Összesen</Col>
-                        <Col>*Összeg*</Col>
-                    </Row>
-                    <Row>
-                        <Button>Fizetés</Button>
-                    </Row>
-                </Container>
+              <Row>
+                <Col>Összesen</Col>
+                <Col>*Összeg*</Col>
+              </Row>
+              <Row>
+                <Button>Fizetés</Button>
+              </Row>
             </Container>
-          </Col>
-        </Row>
+          </Container>
+        </Col>
+      </Row>
     </>
   );
 };
