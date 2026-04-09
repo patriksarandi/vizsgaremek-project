@@ -11,38 +11,87 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({
     min: 0,
-    max: 1000000
+    max: 1000000,
   });
-  const [filteredCategories, setFilteredCategories] = useState([])
-  const [filteredBrands, setFilteredBrands] = useState([])
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [filteredBrands, setFilteredBrands] = useState([]);
 
+  const handleKosarTetel = async (
+    kosarId: number,
+    termekId: number,
+    tetelMennyiseg: number,
+  ) => {
+    try {
+      const response = await fetch("http://localhost:7777/rendeles/kosartetel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kosarId: kosarId,
+          termekId: termekId,
+          tetelMennyiseg: tetelMennyiseg,
+        }),
+      });
+      if (!response.ok) {
+        console.error("Hiba történt:", response.status);
+        return;
+      }
 
+      const data = await response.json();
+      console.log(data);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
 
   const CategoryById = (kategoriaId: number) => {
     let kategoriaNev = "";
     switch (kategoriaId) {
-      case 1: kategoriaNev = "Gitár"; break;
-      case 2: kategoriaNev = "BasszusGitár"; break;
-      case 3: kategoriaNev = "Billentyűs"; break;
-      case 4: kategoriaNev = "Ütős"; break;
-      case 5: kategoriaNev = "Fúvós"; break;
-      case 6: kategoriaNev = "Vonós"; break;
-      case 7: kategoriaNev = "Stúdió"; break;
-      case 8: kategoriaNev = "Tartozékok"; break;
-      default: break;
+      case 1:
+        kategoriaNev = "Gitár";
+        break;
+      case 2:
+        kategoriaNev = "BasszusGitár";
+        break;
+      case 3:
+        kategoriaNev = "Billentyűs";
+        break;
+      case 4:
+        kategoriaNev = "Ütős";
+        break;
+      case 5:
+        kategoriaNev = "Fúvós";
+        break;
+      case 6:
+        kategoriaNev = "Vonós";
+        break;
+      case 7:
+        kategoriaNev = "Stúdió";
+        break;
+      case 8:
+        kategoriaNev = "Tartozékok";
+        break;
+      default:
+        break;
     }
 
     return kategoriaNev;
-  }
+  };
 
   const filteredProducts = productsData.filter((product) => {
-    const matchesName = product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase());
-    const matchesPrice = Number(product?.TermekAr) >= priceRange.min && Number(product?.TermekAr) <= priceRange.max;
-    const currentProductCategoryName = CategoryById(product?.KategoriaID)
-    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(currentProductCategoryName)
-    const matchesBrands = filteredBrands.length === 0 || filteredBrands.includes(product?.Brand)
+    const matchesName = product?.TermekNev?.toLowerCase()?.includes(
+      searchTerm.toLowerCase(),
+    );
+    const matchesPrice =
+      Number(product?.TermekAr) >= priceRange.min &&
+      Number(product?.TermekAr) <= priceRange.max;
+    const currentProductCategoryName = CategoryById(product?.KategoriaID);
+    const matchesCategory =
+      filteredCategories.length === 0 ||
+      filteredCategories.includes(currentProductCategoryName);
+    const matchesBrands =
+      filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
     return matchesName && matchesPrice && matchesCategory && matchesBrands;
-  })
+  });
 
   if (!user) {
     return (
@@ -59,23 +108,26 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
         <Row flex-nowrap="true">
           <Col xs={3} md={2} lg={2} className="border-end">
             <div className="sticky-top" style={{ top: "20px" }}>
-              <FilterSidebarComponent filteredCategories={filteredCategories} setFilteredCategories={setFilteredCategories} categoriesData={categoriesData} priceRange={priceRange} setPriceRange={setPriceRange} productsBrands={productsBrands} filteredBrands={filteredBrands} setFilteredBrands={setFilteredBrands} />
+              <FilterSidebarComponent
+                filteredCategories={filteredCategories}
+                setFilteredCategories={setFilteredCategories}
+                categoriesData={categoriesData}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                productsBrands={productsBrands}
+                filteredBrands={filteredBrands}
+                setFilteredBrands={setFilteredBrands}
+              />
             </div>
           </Col>
           <Col xs={8} md={9} lg={10}>
             <Row className="g-4">
               {filteredProducts.map((p) => (
                 <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
-                  <div
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "15px",
-                      borderRadius: "8px",
-                      height: "100%",
-                    }}
-                  >
-                    <ProductComponent product={p} />
-                  </div>
+                  <ProductComponent
+                    product={p}
+                    handleKosarTetel={handleKosarTetel}
+                  />
                 </Col>
               ))}
             </Row>
