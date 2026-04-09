@@ -30,10 +30,10 @@ const ProductComponent = ({ product }) => {
                     <b>{product.TermekAr} Ft</b>
                 </Card.Text>
                 <Card.Text>
-                    <p>{product.Keszlet ? 
-                    ("Készleten: " + product.Keszlet) + " db" : "Elfogyott"}</p>
+                    {product.Keszlet ? 
+                    ("Készleten: " + product.Keszlet) + " db" : "Elfogyott"}
                 </Card.Text>
-                <Button>Kosárba</Button>
+                <Button onClick={() => console.log(product)}>Kosárba</Button>
             </Card.Body>
         </Card>
     )

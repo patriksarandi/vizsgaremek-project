@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRendelesDto } from './dto/create-rendeles.dto';
 import { FizetesiKosarDto, KosarTetelDto } from './dto/create-rendeles.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -11,12 +15,15 @@ export class RendelesService {
     const ujFizetesiKosar = await this.db.fizetesiKosar.upsert({
       where: { VevoID: dto.vevoId },
       update: {},
-      create: { VevoID: dto.vevoId },
-    }); 
+      create: {
+        KosarID: dto.vevoId,
+        VevoID: dto.vevoId
+      },
+    });
 
     return {
       ujFizetesiKosar,
-      message: "Új fizetési kosár sikeresen létrehozva."
+      message: 'Új fizetési kosár sikeresen létrehozva a vevő azonosítójával: ',
     };
   }
 
@@ -28,24 +35,24 @@ export class RendelesService {
       include: {
         Tetelek: {
           include: {
-            Termek: true
-          }
-        }
-      }
+            Termek: true,
+          },
+        },
+      },
     });
 
-    if (!kosar) return {message: "A kosár nem található!"}
+    if (!kosar) return { message: 'A kosár nem található!' };
 
     return {
       ...kosar,
-      Tetelek: kosar.Tetelek.map(tetel => ({
+      Tetelek: kosar.Tetelek.map((tetel) => ({
         ...tetel,
         Termek: {
           ...tetel.Termek,
-          TermekAr: Number(tetel.Termek.TermekAr)
-        }
-      }))
-    }
+          TermekAr: Number(tetel.Termek.TermekAr),
+        },
+      })),
+    };
   }
 
   async findAllFizetesiKosar() {
@@ -75,21 +82,23 @@ export class RendelesService {
         KosarID_TermekID: {
           KosarID: dto.kosarId,
           TermekID: dto.termekId,
-        }
-      }
-    })
+        },
+      },
+    });
 
     const ujOsszMennyiseg = (meglevo?.TetelMennyiseg || 0) + dto.tetelMennyiseg;
 
     if (termek.Keszlet < ujOsszMennyiseg) {
-      throw new BadRequestException(`Nincs elég a készleten. Elérhető: ${termek.Keszlet}`)
+      throw new BadRequestException(
+        `Nincs elég a készleten. Elérhető: ${termek.Keszlet}`,
+      );
     }
 
     const ujKosarTetel = await this.db.kosarTetel.upsert({
       where: {
         KosarID_TermekID: {
           KosarID: dto.kosarId,
-          TermekID: dto.termekId
+          TermekID: dto.termekId,
         },
       },
       update: {
@@ -108,18 +117,18 @@ export class RendelesService {
 
     return {
       message: 'Sikeresen létrehozott kosártétel.',
-      adat: ujKosarTetel
-    }
+      adat: ujKosarTetel,
+    };
   }
 
   async getTermekKeszletMennyiseg(termekId: number) {
     const result = await this.db.termek.findUnique({
       where: { TermekID: termekId },
-      select: { Keszlet: true }
-    })
+      select: { Keszlet: true },
+    });
 
     if (!result) {
-      throw new NotFoundException("Termék nem található!")
+      throw new NotFoundException('Termék nem található!');
     }
 
     return result.Keszlet;
@@ -129,15 +138,15 @@ export class RendelesService {
     return this.db.kosarTetel.findMany({
       include: {
         Termek: true,
-        Kosar: true
-      }
-    })
+        Kosar: true,
+      },
+    });
   }
 
   removeKosarTetel(id: number) {
     return this.db.kosarTetel.delete({
-      where: {KosarTetelID: id}
-    })
+      where: { KosarTetelID: id },
+    });
   }
 
   create(createRendelesDto: CreateRendelesDto) {
@@ -147,10 +156,10 @@ export class RendelesService {
   async removeKosar(vevoId: number) {
     try {
       await this.db.fizetesiKosar.delete({
-        where: { VevoID: vevoId }
-      })
+        where: { VevoID: vevoId },
+      });
     } catch (error: any) {
-      console.error(error.message)
+      console.error(error.message);
     }
   }
 }

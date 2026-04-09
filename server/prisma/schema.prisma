@@ -55,7 +55,7 @@ model Vevo {
 }
 
 model FizetesiKosar {
-  KosarID Int          @id @default(autoincrement())
+  KosarID Int          @id 
   VevoID  Int          @unique
   Vevo    Vevo         @relation(fields: [VevoID], references: [VevoID])
   Tetelek KosarTetel[]

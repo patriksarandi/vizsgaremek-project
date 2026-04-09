@@ -16,6 +16,8 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   const [filteredCategories, setFilteredCategories] = useState([])
   const [filteredBrands, setFilteredBrands] = useState([])
 
+
+
   const CategoryById = (kategoriaId: number) => {
     let kategoriaNev = "";
     switch (kategoriaId) {

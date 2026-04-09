@@ -47,12 +47,23 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    return await this.vevoService.create({
+    const ujVevo = await this.vevoService.create({
       vevoNev: dto.name,
       vevoEmail: dto.email,
       vevoJelszo: hashedPassword,
       vevoRole: dto.role,
       cim: '-',
     });
+
+    const vevoFizetesiKosara = await this.db.fizetesiKosar.create({
+      data: {
+        KosarID: ujVevo.VevoID,
+        Vevo: {
+          connect: {VevoID: ujVevo.VevoID}
+        }
+      }
+    })
+
+    return {ujVevo, vevoFizetesiKosara, message: "Fizetési kosár létrehozva:", };
   }
 }

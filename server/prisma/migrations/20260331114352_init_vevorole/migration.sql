@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `vevo` ADD COLUMN `Role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER';

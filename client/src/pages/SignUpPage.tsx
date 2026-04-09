@@ -17,6 +17,7 @@ const SignUpPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+
   const handleSignUp = async (event) => {
     event.preventDefault();
 

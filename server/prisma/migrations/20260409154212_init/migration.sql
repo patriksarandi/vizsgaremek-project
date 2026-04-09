@@ -2,7 +2,9 @@
 CREATE TABLE `Kategoria` (
     `KategoriaID` INTEGER NOT NULL AUTO_INCREMENT,
     `Nev` VARCHAR(100) NOT NULL,
+    `IsDeleted` BOOLEAN NOT NULL DEFAULT false,
 
+    UNIQUE INDEX `Kategoria_Nev_key`(`Nev`),
     PRIMARY KEY (`KategoriaID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -11,9 +13,12 @@ CREATE TABLE `Termek` (
     `TermekID` INTEGER NOT NULL AUTO_INCREMENT,
     `KategoriaID` INTEGER NOT NULL,
     `TermekNev` VARCHAR(255) NOT NULL,
+    `IsDeleted` BOOLEAN NOT NULL DEFAULT false,
     `TermekAr` DECIMAL(10, 2) NOT NULL,
     `Keszlet` INTEGER NOT NULL DEFAULT 0,
+    `Brand` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `Termek_TermekNev_key`(`TermekNev`),
     PRIMARY KEY (`TermekID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -21,10 +26,17 @@ CREATE TABLE `Termek` (
 CREATE TABLE `Vevo` (
     `VevoID` INTEGER NOT NULL AUTO_INCREMENT,
     `VevoNev` VARCHAR(150) NOT NULL,
+    `Vezeteknev` VARCHAR(191) NULL,
+    `Keresztnev` VARCHAR(191) NULL,
+    `Telefonszam` VARCHAR(191) NULL,
     `VevoEmail` VARCHAR(150) NOT NULL,
     `VevoJelszo` VARCHAR(255) NOT NULL,
     `Cim` VARCHAR(255) NOT NULL,
+    `Role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
+    UNIQUE INDEX `Vevo_VevoNev_key`(`VevoNev`),
     UNIQUE INDEX `Vevo_VevoEmail_key`(`VevoEmail`),
     PRIMARY KEY (`VevoID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -45,6 +57,7 @@ CREATE TABLE `KosarTetel` (
     `TermekID` INTEGER NOT NULL,
     `TetelMennyiseg` INTEGER NOT NULL DEFAULT 1,
 
+    UNIQUE INDEX `KosarTetel_KosarID_TermekID_key`(`KosarID`, `TermekID`),
     PRIMARY KEY (`KosarTetelID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
