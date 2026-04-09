@@ -14,6 +14,7 @@ import AdminPage from "./pages/AdminPage/AdminPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import ProfileFelhasznaloi from "./pages/ProfilePage/ProfileFelhasznaloi";
 import ProfileMegrendelesek from "./pages/ProfilePage/ProfileMegrendelesek";
+import CartPage from "./pages/CartPage";
 
 const App = () => {
   const [productsData, setProductsData] = useState([]);
@@ -101,6 +102,7 @@ const App = () => {
         <Route path="kategoriak" element={<AdminKategoriakPage categoriesData={categoriesData}/>}/>
         <Route path="termekek" element={<AdminTermekekPage termekAdatok={productsData}/>}/>
       </Route>
+      <Route path="/kosar" element={<CartPage/>}/>
     </Routes>
   );
 };

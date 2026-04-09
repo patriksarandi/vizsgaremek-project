@@ -38,6 +38,11 @@ export class RendelesController {
       }
   }
 
+  @Get("/kosartetel/:vevoId")
+  async findKosarTetelByVevoId(@Param('vevoId', ParseIntPipe) vevoId: number) {
+    return this.rendelesService.findKosarTetelByVevoId(vevoId)
+  }
+
   @Get('/kosartetel')
   findAllKosarTetel() {
     return this.rendelesService.findAllKosarTetel();

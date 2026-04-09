@@ -45,6 +45,9 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
             </Dropdown.Menu>
           </Dropdown>
         </Nav>
+        <Nav>
+          <Link to="/kosar">Kosár</Link>
+        </Nav>
         {isAdmin && (
           <Nav.Link
             as={Link}

@@ -12,12 +12,40 @@ export class RendelesService {
       where: { VevoID: dto.vevoId },
       update: {},
       create: { VevoID: dto.vevoId },
-    });
+    }); 
 
     return {
       ujFizetesiKosar,
       message: "Új fizetési kosár sikeresen létrehozva."
     };
+  }
+
+  async findKosarTetelByVevoId(vevoId: number) {
+    const kosar = await this.db.fizetesiKosar.findUnique({
+      where: {
+        VevoID: vevoId,
+      },
+      include: {
+        Tetelek: {
+          include: {
+            Termek: true
+          }
+        }
+      }
+    });
+
+    if (!kosar) return {message: "A kosár nem található!"}
+
+    return {
+      ...kosar,
+      Tetelek: kosar.Tetelek.map(tetel => ({
+        ...tetel,
+        Termek: {
+          ...tetel.Termek,
+          TermekAr: Number(tetel.Termek.TermekAr)
+        }
+      }))
+    }
   }
 
   async findAllFizetesiKosar() {
