@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { RendelesService } from './rendeles.service';
 import { CreateRendelesDto, KosarTetelDto } from './dto/create-rendeles.dto';
-import { UpdateRendeleDto } from './dto/update-rendeles.dto';
 import { FizetesiKosarDto } from './dto/create-rendeles.dto';
 
 @Controller('rendeles')
@@ -18,7 +17,10 @@ export class RendelesController {
 
     const ujFizetesiKosar = this.rendelesService.createFizetesiKosar(fizetesiKosarDto)
 
-    return {ujFizetesiKosar, message: "A fizetési kosár sikeresen létrehozva"}
+    return {
+      ujFizetesiKosar, 
+      message: "A fizetési kosár sikeresen létrehozva"
+    }
   }
 
   @Get('/kosar')
@@ -27,9 +29,13 @@ export class RendelesController {
   }
 
   @Post('/kosartetel')
-  createKosarTetel(
+  async createKosarTetel(
     @Body() dto: KosarTetelDto) {
-      return this.rendelesService.createKosarTetel(dto);
+      try {
+        return await this.rendelesService.createKosarTetel(dto, dto.vevoId);
+      } catch (error: any) {
+        throw new BadRequestException('Nem sikerült a tétel a kosárhoz adni.')
+      }
   }
 
   @Get('/kosartetel')
@@ -47,18 +53,8 @@ export class RendelesController {
     return this.rendelesService.create(createRendeleDto);
   }
 
-  @Get()
-  findAll() {
-    return this.rendelesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rendelesService.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rendelesService.remove(+id);
+  @Delete('/kosar/:vevoId')
+  remove(@Param('vevoId') vevoId: string) {
+    return this.rendelesService.removeKosar(+vevoId);
   }
 }

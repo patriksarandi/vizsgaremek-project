@@ -18,6 +18,8 @@ export class KosarTetelDto {
     @IsInt({message: "A tétel mennyiség szám!"})
     @IsNotEmpty({message: "A tétel mennyiség nem lehet üres!"})
     tetelMennyiseg: number;
+
+    vevoId: number;
 }
 
 export class RendeltTermekDto {

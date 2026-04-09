@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRendelesDto } from './dto/create-rendeles.dto';
 import { FizetesiKosarDto, KosarTetelDto } from './dto/create-rendeles.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -33,7 +33,7 @@ export class RendelesService {
     });
   }
 
-  async createKosarTetel(dto: KosarTetelDto) {
+  async createKosarTetel(dto: KosarTetelDto, vevoId: number) {
     const termek = await this.db.termek.findUnique({
       where: { TermekID: dto.termekId },
     });
@@ -42,8 +42,34 @@ export class RendelesService {
       throw new NotFoundException('Ilyen termék nem létezik');
     }
 
-    const ujKosarTetel = await this.db.kosarTetel.create({
-      data: {
+    const meglevo = await this.db.kosarTetel.findUnique({
+      where: {
+        KosarID_TermekID: {
+          KosarID: dto.kosarId,
+          TermekID: dto.termekId,
+        }
+      }
+    })
+
+    const ujOsszMennyiseg = (meglevo?.TetelMennyiseg || 0) + dto.tetelMennyiseg;
+
+    if (termek.Keszlet < ujOsszMennyiseg) {
+      throw new BadRequestException(`Nincs elég a készleten. Elérhető: ${termek.Keszlet}`)
+    }
+
+    const ujKosarTetel = await this.db.kosarTetel.upsert({
+      where: {
+        KosarID_TermekID: {
+          KosarID: dto.kosarId,
+          TermekID: dto.termekId
+        },
+      },
+      update: {
+        TetelMennyiseg: {
+          increment: dto.tetelMennyiseg,
+        },
+      },
+      create: {
         KosarID: dto.kosarId,
         TermekID: dto.termekId,
         TetelMennyiseg: dto.tetelMennyiseg,
@@ -52,9 +78,23 @@ export class RendelesService {
 
     console.log(ujKosarTetel);
 
-    return ujKosarTetel
-      ? { message: 'Sikeresen létrehozott kosártétel' }
-      : { message: 'Nem sikerült.' };
+    return {
+      message: 'Sikeresen létrehozott kosártétel.',
+      adat: ujKosarTetel
+    }
+  }
+
+  async getTermekKeszletMennyiseg(termekId: number) {
+    const result = await this.db.termek.findUnique({
+      where: { TermekID: termekId },
+      select: { Keszlet: true }
+    })
+
+    if (!result) {
+      throw new NotFoundException("Termék nem található!")
+    }
+
+    return result.Keszlet;
   }
 
   findAllKosarTetel() {
@@ -76,19 +116,13 @@ export class RendelesService {
     return 'This action adds a new rendele';
   }
 
-  findAll() {
-    return `This action returns all rendeles`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} rendele`;
-  }
-
-  update(id: number, dto: CreateRendelesDto) {
-    return `This action updates a #${id} rendele`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} rendele`;
+  async removeKosar(vevoId: number) {
+    try {
+      await this.db.fizetesiKosar.delete({
+        where: { VevoID: vevoId }
+      })
+    } catch (error: any) {
+      console.error(error.message)
+    }
   }
 }

@@ -68,6 +68,8 @@ model KosarTetel {
   TetelMennyiseg  Int           @default(1)
   Kosar           FizetesiKosar @relation(fields: [KosarID], references: [KosarID], onDelete: Cascade)
   Termek          Termek        @relation(fields: [TermekID], references: [TermekID])
+
+  @@unique([KosarID, TermekID])
 }
 
 model Rendeles {
