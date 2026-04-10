@@ -154,9 +154,56 @@ export class RendelesService {
     });
   }
 
-  removeKosarTetel(id: number) {
-    return this.db.kosarTetel.delete({
-      where: { KosarTetelID: id },
+  async updateKosarTetelMennyiseg(
+    vevoId: number,
+    termekId: number,
+    valtozas: number,
+  ) {
+    const meglevo = await this.db.kosarTetel.findFirst({
+      where: {
+        KosarID: vevoId,
+        TermekID: termekId,
+      },
+    });
+
+    if (!meglevo) {
+      throw new NotFoundException('Nincs ilyen tétel!');
+    }
+
+    const ujMennyiseg = meglevo.TetelMennyiseg + valtozas;
+
+    if (ujMennyiseg <= 0) {
+      return await this.db.kosarTetel.delete({
+        where: {
+          KosarID_TermekID: {
+            KosarID: vevoId,
+            TermekID: termekId,
+          },
+        },
+      });
+    }
+
+    if (valtozas > 0) {
+      const termek = await this.db.termek.findUnique({
+        where: { TermekID: termekId },
+      });
+
+      if (termek && termek.Keszlet < ujMennyiseg) {
+        throw new BadRequestException(
+          `Nincs elég készleten. Elérhető: ${termek.Keszlet}`,
+        );
+      }
+    }
+
+    return await this.db.kosarTetel.update({
+      where: {
+        KosarTetelID: meglevo.KosarTetelID,
+      },
+      data: {
+        TetelMennyiseg: {
+          increment: valtozas,
+        },
+      },
     });
   }
 
@@ -164,13 +211,24 @@ export class RendelesService {
     return 'This action adds a new rendele';
   }
 
+  async removeKosarTetel(id: number) {
+    const letezik = await this.db.kosarTetel.findUnique({
+      where: { KosarTetelID: id },
+    });
+    if (!letezik) throw new NotFoundException('A tétel nem található');
+
+    return await this.db.kosarTetel.delete({
+      where: { KosarTetelID: id },
+    });
+  }
+
   async removeKosar(vevoId: number) {
-    try {
-      await this.db.fizetesiKosar.delete({
-        where: { VevoID: vevoId },
-      });
-    } catch (error: any) {
-      console.error(error.message);
-    }
+    await this.db.kosarTetel.deleteMany({
+      where: { KosarID: vevoId },
+    });
+
+    return await this.db.fizetesiKosar.delete({
+      where: { VevoID: vevoId },
+    });
   }
 }

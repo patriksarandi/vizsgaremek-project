@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { Autentikacio } from "../components/AuthContext";
 
 const CartPage = () => {
-  const { user } = Autentikacio();
+  const { user, logout } = Autentikacio();
 
   const [kosarTetelek, setKosarTetelek] = useState([]);
 
@@ -25,7 +25,6 @@ const CartPage = () => {
         `http://localhost:7777/rendeles/kosartetel/${user.VevoID}`,
       );
       if (!response) throw new Error("Nem sikerült lekérni a kosártételeket!");
-
       const data = await response.json();
 
       if (data && data.Tetelek) {
@@ -35,6 +34,29 @@ const CartPage = () => {
       }
     } catch (error: any) {
       console.error(error.message);
+    }
+  };
+
+  const updateTermekMennyiseg = async (termekId: number, valtozas: number) => {
+    try {
+      const response = await fetch(
+        "http://localhost:7777/rendeles/kosartetel/update",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            vevoId: Number(user.VevoID),
+            termekId: Number(termekId),
+            valtozas: Number(valtozas),
+          }),
+        },
+      );
+
+      if (response.ok) {
+        getKosarTetelek();
+      }
+    } catch (error: any) {
+      console.error("Hiba a módosítás során:", error);
     }
   };
 
@@ -74,7 +96,11 @@ const CartPage = () => {
 
   return (
     <>
-      <Navbar expand="lg" bg="dark" className="border-bottom border-secondary">
+      <Navbar
+        expand="lg"
+        bg="dark"
+        className="border-bottom border-secondary mb-4"
+      >
         <Container fluid>
           <Navbar.Brand style={{ color: "white", fontWeight: "bold" }} href="/">
             OnFret
@@ -88,7 +114,11 @@ const CartPage = () => {
         <Col>
           {kosarTetelek.length > 0 ? (
             kosarTetelek.map((tetel) => (
-              <CartItem key={tetel.KosarTetelID} tetel={tetel} handleKosarTetel={handleKosarTetel} />
+              <CartItem
+                key={tetel.KosarTetelID}
+                tetel={tetel}
+                updateTermekMennyiseg={updateTermekMennyiseg}
+              />
             ))
           ) : (
             <p>A kosár tartalma üres</p>
@@ -102,7 +132,7 @@ const CartPage = () => {
                 <Col>*Összeg*</Col>
               </Row>
               <Row>
-                <Button>Fizetés</Button>
+                <Button>Megrendelés</Button>
               </Row>
             </Container>
           </Container>
