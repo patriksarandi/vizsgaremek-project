@@ -208,6 +208,15 @@ export class RendelesService {
   }
 
   async createRendeles(vevoId: number, dto: CreateRendelesDto) {
+    const kosar = await this.db.fizetesiKosar.findUnique({
+      where: { VevoID: vevoId},
+      include: { Tetelek: {include: {Termek: true}}}
+    })
+
+    if (!kosar || kosar.Tetelek.length === 0) {
+      throw new BadRequestException('A kosár üres!')
+    }
+    
     const ujRendeles = await this.db.rendeles.create({
       data: {
         VevoID: vevoId,
