@@ -218,7 +218,7 @@ export class RendelesService {
     }
 
     return await this.db.$transaction(async (tx) => {
-      const ujRendeles = await this.db.rendeles.create({
+      const ujRendeles = await tx.rendeles.create({
         data: {
           VevoID: vevoId,
           RendelesiDatum: dto.rendelesiDatum || new Date(),
@@ -256,7 +256,16 @@ export class RendelesService {
         data: { RendelesiVegosszeg: osszeg }
       })
 
-      return ujRendeles;
+      await tx.kosarTetel.deleteMany({
+        where: { KosarID: vevoId }
+      });
+
+      return {
+        ...ujRendeles,
+        success: true,
+        RendelesiVegosszeg: osszeg,
+        message: "Rendelés sikeresen leadva"
+      }
     });
   }
 
