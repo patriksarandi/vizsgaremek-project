@@ -64,8 +64,8 @@ export class RendelesController {
   }
 
   @Post()
-  create(@Body() createRendeleDto: CreateRendelesDto) {
-    return this.rendelesService.create(createRendeleDto);
+  createRendeles(@Body('vevoId', ParseIntPipe) vevoId: number, @Body() createRendeleDto: CreateRendelesDto) {
+    return this.rendelesService.createRendeles(vevoId, createRendeleDto);
   }
 
   @Delete('/kosar/:vevoId')

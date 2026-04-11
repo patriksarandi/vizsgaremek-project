@@ -207,8 +207,16 @@ export class RendelesService {
     });
   }
 
-  create(createRendelesDto: CreateRendelesDto) {
-    return 'This action adds a new rendele';
+  async createRendeles(vevoId: number, dto: CreateRendelesDto) {
+    const ujRendeles = await this.db.rendeles.create({
+      data: {
+        VevoID: vevoId,
+        RendelesiDatum: dto.rendelesiDatum || new Date(),
+        Statusz: 'Aktív',
+        RendelesiVegosszeg: 0,
+      },
+    });
+    return ujRendeles;
   }
 
   async removeKosarTetel(id: number) {
