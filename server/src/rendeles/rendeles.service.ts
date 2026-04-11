@@ -227,7 +227,20 @@ export class RendelesService {
         },
       });
 
+      let osszeg = 0;
       for (const tetel of kosar.Tetelek) {
+        const tetelAr = Number(tetel.Termek.TermekAr);
+        osszeg += tetelAr * tetel.TetelMennyiseg;
+
+        if (tetel.Termek.Keszlet < tetel.TetelMennyiseg) {
+          throw new BadRequestException(`Nincs elég készlet: ${tetel.Termek.TermekNev}`);
+        }
+
+        await tx.termek.update({
+          where: { TermekID: tetel.TermekID},
+          data: { Keszlet: { decrement: tetel.TetelMennyiseg }}
+        });
+
         await tx.rendeltTermek.create({
           data: {
             RendelesID: ujRendeles.RendelesID,
@@ -237,6 +250,12 @@ export class RendelesService {
           },
         });
       }
+
+      await tx.rendeles.update({
+        where: { RendelesID: ujRendeles.RendelesID },
+        data: { RendelesiVegosszeg: osszeg }
+      })
+
       return ujRendeles;
     });
   }
