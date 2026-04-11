@@ -60,6 +60,29 @@ const CartPage = () => {
     }
   };
 
+  const handleRendeles = async (vevoId: number) => {
+    try {
+      const response = await fetch("http://localhost:7777/rendeles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify({
+          VevoID: vevoId
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Hiba történt a rendelés leadása során.")
+      } else {
+        const data = await response.json();
+        console.log("Sikeres rendelés: ", data)
+        setKosarTetelek([])
+        alert("Köszönjük! A rendelést rögzítettük.")
+      }
+    } catch (error) {
+      throw new Error("Hiba történt", error.message)
+    }
+  }
+
   const handleKosarTetel = async (
     kosarId: number,
     termekId: number,
@@ -132,7 +155,7 @@ const CartPage = () => {
                 <Col>*Összeg*</Col>
               </Row>
               <Row>
-                <Button>Megrendelés</Button>
+                <Button onClick={() => handleRendeles(user.VevoID)}>Megrendelés</Button>
               </Row>
             </Container>
           </Container>
