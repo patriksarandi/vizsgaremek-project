@@ -7,7 +7,7 @@ import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
-  const { user } = Autentikacio();
+  const { user, getAuthHeader } = Autentikacio();
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({
     min: 0,
@@ -24,7 +24,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     try {
       const response = await fetch("http://localhost:7777/rendeles/kosartetel", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
         body: JSON.stringify({
           kosarId: kosarId,
           termekId: termekId,
@@ -93,7 +93,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     return matchesName && matchesPrice && matchesCategory && matchesBrands;
   });
 
-  if (!user) {
+  if (!user || !getAuthHeader) {
     return (
       <Container className="mt-5">
         <Alert variant="warning">Kérlek jelentkezz be!</Alert>

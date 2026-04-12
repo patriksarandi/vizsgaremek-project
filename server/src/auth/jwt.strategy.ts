@@ -7,7 +7,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor() {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoeExpiration: false,
+            ignoreExpiration: false,
             secretOrKey: 'TITKOS-KULCS'
         })
     }

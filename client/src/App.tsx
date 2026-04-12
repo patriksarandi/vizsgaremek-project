@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import SignInPage from "./pages/SignInPage";
 import MarketplacePage from "./pages/MarketPlacePage";
 import ProductPage from "./pages/ProductPage";
@@ -15,8 +15,11 @@ import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import ProfileFelhasznaloi from "./pages/ProfilePage/ProfileFelhasznaloi";
 import ProfileMegrendelesek from "./pages/ProfilePage/ProfileMegrendelesek";
 import CartPage from "./pages/CartPage";
+import { Autentikacio } from "./components/AuthContext";
 
 const App = () => {
+  const { user, getAuthHeader } = Autentikacio();
+
   const [productsData, setProductsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([])
   const [productsBrands, setProductsBrands] = useState([])
@@ -47,10 +50,18 @@ const App = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch("http://localhost:7777/vevo");
+      const response = await fetch("http://localhost:7777/vevo", {
+        method: "GET",
+        headers: { 
+          ...getAuthHeader(),
+          "Content-Type": "application/json", 
+        },
+      });
+
       if (!response.ok) throw new Error("Hiba a vevők betöltésénél.")
       const data = await response.json();
       setCustomersData(data);
+
     } catch (error: any) {
       console.error("Vevő fetch hiba:", error.message)
     }
@@ -97,7 +108,7 @@ const App = () => {
         <Route path="profile" element={<ProfileFelhasznaloi/>}/>
         <Route path="megrendelesek" element={<ProfileMegrendelesek/>}/>
       </Route>
-      <Route path="/admin/dashboard" element={<AdminPage/>}>
+      <Route path="/admin/dashboard" element={user?.role === 'ADMIN' ? <AdminPage/> : <Navigate to="/signin"/>}>
         <Route path="felhasznalok" element={<AdminFelhasznalokPage customersData={customersData}/>}/>
         <Route path="kategoriak" element={<AdminKategoriakPage categoriesData={categoriesData}/>}/>
         <Route path="termekek" element={<AdminTermekekPage termekAdatok={productsData}/>}/>
