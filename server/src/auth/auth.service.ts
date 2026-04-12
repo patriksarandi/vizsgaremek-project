@@ -7,39 +7,42 @@ import { PrismaService } from 'src/prisma.service';
 import { VevoService } from 'src/vevo/vevo.service';
 import * as bcrypt from 'bcrypt';
 import { SignUpDto } from './dto/signup-dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private vevoService: VevoService,
-    private db: PrismaService
-) {}
+    private db: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
   async signIn(email: string, password: string): Promise<any> {
-    try {
-        const customer = await this.vevoService.findByEmail(email);
+    const customer = await this.vevoService.findByEmail(email);
 
-        if (!customer) {
-        throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!');
-        }
+    if (!customer || !(await bcrypt.compare(password, customer.VevoJelszo))) {
+      throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!');
+    }
 
-        const isPasswordMatching = await bcrypt.compare(password, customer.VevoJelszo)
+    const payload = {
+      sub: customer.VevoID,
+      email: customer.VevoEmail,
+      role: customer.Role
+    }
 
-        if (!isPasswordMatching) {
-            throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!')
-        }
-
-        const { ...result } = customer;
-        return result;
-    } catch (e) {
-        console.error("Hiba történt:", e);
-        throw e
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      user: {
+        id: customer.VevoID,
+        email: customer.VevoEmail,
+        name: customer.VevoNev
+      }
     }
   }
 
   async signUp(dto: SignUpDto): Promise<any> {
     const existingUser = await this.db.vevo.findFirst({
-        where: { VevoEmail: dto.email }
+      where: { VevoEmail: dto.email },
     });
     if (existingUser) {
       throw new ConflictException('Ez az e-mail cím vagy név már foglalt!');
@@ -59,11 +62,15 @@ export class AuthService {
       data: {
         KosarID: ujVevo.VevoID,
         Vevo: {
-          connect: {VevoID: ujVevo.VevoID}
-        }
-      }
-    })
+          connect: { VevoID: ujVevo.VevoID },
+        },
+      },
+    });
 
-    return {ujVevo, vevoFizetesiKosara, message: "Fizetési kosár létrehozva:", };
+    return {
+      ujVevo,
+      vevoFizetesiKosara,
+      message: 'Fizetési kosár létrehozva:',
+    };
   }
 }

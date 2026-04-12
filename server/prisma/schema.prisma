@@ -50,8 +50,15 @@ model Vevo {
   Role        VevoRole        @default(USER)
   Kosar       FizetesiKosar?
   Rendelesek  Rendeles[]
+  Tokens Token[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Token {
+  token String @id
+  vevo   Vevo   @relation(fields: [vevoId], references: [VevoID], onDelete: Cascade)
+  vevoId Int
 }
 
 model FizetesiKosar {
