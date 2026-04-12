@@ -16,6 +16,7 @@ const CartPage = () => {
   const { user, logout } = Autentikacio();
 
   const [kosarTetelek, setKosarTetelek] = useState([]);
+  const [rendelesiOsszeg, setRendelesiOsszeg] = useState(0)
 
   const getKosarTetelek = async () => {
     if (!user?.VevoID) return;
@@ -29,8 +30,10 @@ const CartPage = () => {
 
       if (data && data.Tetelek) {
         setKosarTetelek(data.Tetelek);
+        setRendelesiOsszeg(data.Vegosszeg || 0);
       } else {
         setKosarTetelek([]);
+        setRendelesiOsszeg(0);
       }
     } catch (error: any) {
       console.error(error.message);
@@ -66,7 +69,7 @@ const CartPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({
-          VevoID: vevoId
+          vevoId: Number(vevoId)
         }),
       });
       
@@ -152,10 +155,12 @@ const CartPage = () => {
             <Container>
               <Row>
                 <Col>Összesen</Col>
-                <Col>*Összeg*</Col>
+                <Col>
+                  <b>{rendelesiOsszeg} Ft</b>
+                </Col>
               </Row>
               <Row>
-                <Button onClick={() => handleRendeles(user.VevoID)}>Megrendelés</Button>
+                <Button disabled={kosarTetelek.length == 0} onClick={() => handleRendeles(user.VevoID)}>Megrendelés</Button>
               </Row>
             </Container>
           </Container>

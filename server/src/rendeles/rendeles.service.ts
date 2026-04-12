@@ -54,8 +54,13 @@ export class RendelesService {
 
     if (!kosar) return { message: 'A kosár nem található!' };
 
+    const vegosszeg = kosar.Tetelek.reduce((sum, tetel) => {
+      return sum + (Number(tetel.Termek.TermekAr) * tetel.TetelMennyiseg);
+    }, 0)
+
     return {
       ...kosar,
+      Vegosszeg: vegosszeg,
       Tetelek: kosar.Tetelek.map((tetel) => ({
         ...tetel,
         Termek: {
