@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
+import { UseGuards, Request } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { VevoService } from './vevo.service';
 import { CreateVevoDto } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
@@ -21,8 +23,10 @@ export class VevoController {
     return this.vevoService.create(createVevoDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  findAll() {
+  findAll(@Request() req) {
+    console.log("Lekérte: ", req.user)
     return this.vevoService.findAll();
   }
 

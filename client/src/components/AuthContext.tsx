@@ -17,9 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
-
     if (!savedUser || savedUser === "null") return null;
-
 
     try {
       return JSON.parse(savedUser);
@@ -29,27 +27,29 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  const login = (userData) => {
-    if (userData) {
+  const login = (userData, token) => {
+    if (userData && token) {
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", token);
       navigate("/")
     }
   };
 
   const logout = () => {
-    if (user) {
-      console.log(`${user.VevoNev} kijelentkezett.`);
-    }
-
-    localStorage.removeItem("user");
+    localStorage.removeItem("user")
+    localStorage.removeItem("token");
     setUser(null);
-
     navigate("/signin");
   };
 
+  const getAuthHeader = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}`} : {};
+  }
+
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, getAuthHeader }}>
       {children}
     </AuthContext.Provider>
   );

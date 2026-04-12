@@ -22,21 +22,22 @@ const SignInPage = () => {
     try {
       const response = await fetch("http://localhost:7777/auth/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json",},
         body: JSON.stringify(signinData),
       });
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+        throw new Error(data.message || `Hiba: ${response.status}`);
       }
 
+      localStorage.setItem("token", data.access_token);
+
+
       login(data.user || data);
-      navigate("/");
-      
+      navigate("/");    
       console.log("Login successful:", data);
+
     } catch (error: any) {
       setError(error.message);
       throw new Error(error.message);
