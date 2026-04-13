@@ -17,7 +17,7 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
   return (
     <Navbar className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="/">OnFret</Navbar.Brand>
+        <Navbar.Brand href="/marketplace">OnFret</Navbar.Brand>
         <Nav className="me-auto">
           <Form>
             <Form.Control
@@ -37,7 +37,7 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
 
             <Dropdown.Menu>
               <Dropdown.Item>
-                <Link to="profile/profile">Felhasználói fiók</Link>
+                <Link to="/profile/profile">Felhasználói fiók</Link>
               </Dropdown.Item>
               <Dropdown.Item>
                 <Button onClick={logout}>Kijelentkezés</Button>

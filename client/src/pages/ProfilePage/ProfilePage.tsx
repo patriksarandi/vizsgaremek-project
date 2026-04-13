@@ -10,7 +10,7 @@ const ProfilePage = () => {
     <>
       <Navbar expand="lg" bg="dark" className="border-bottom border-secondary">
         <Container fluid>
-          <Navbar.Brand style={{ color: "white", fontWeight: "bold" }} href="/">
+          <Navbar.Brand style={{ color: "white", fontWeight: "bold" }} href="/marketplace">
             OnFret
           </Navbar.Brand>
           <Nav className="ms-auto">

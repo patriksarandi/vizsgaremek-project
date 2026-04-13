@@ -7,7 +7,7 @@ import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
-  const { user, getAuthHeader } = Autentikacio();
+  const { user, loading, getAuthHeader } = Autentikacio();
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({
     min: 0,
@@ -22,15 +22,18 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     tetelMennyiseg: number,
   ) => {
     try {
-      const response = await fetch("http://localhost:7777/rendeles/kosartetel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeader() },
-        body: JSON.stringify({
-          kosarId: kosarId,
-          termekId: termekId,
-          tetelMennyiseg: tetelMennyiseg,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:7777/rendeles/kosartetel",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...getAuthHeader() },
+          body: JSON.stringify({
+            kosarId: kosarId,
+            termekId: termekId,
+            tetelMennyiseg: tetelMennyiseg,
+          }),
+        },
+      );
       if (!response.ok) {
         console.error("Hiba történt:", response.status);
         return;
@@ -93,7 +96,9 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     return matchesName && matchesPrice && matchesCategory && matchesBrands;
   });
 
-  if (!user || !getAuthHeader) {
+  if (loading) return null;
+
+  if (!user) {
     return (
       <Container className="mt-5">
         <Alert variant="warning">Kérlek jelentkezz be!</Alert>
@@ -122,14 +127,14 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
           </Col>
           <Col xs={8} md={9} lg={10}>
             <Row className="g-4">
-              {filteredProducts.map((p) => (
+              {filteredProducts.length > 0 ? (filteredProducts.map((p) => (
                 <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
                   <ProductComponent
                     product={p}
                     handleKosarTetel={handleKosarTetel}
                   />
                 </Col>
-              ))}
+              ))) : "Nem található a keresésnek megfelelő termék."}
             </Row>
           </Col>
         </Row>

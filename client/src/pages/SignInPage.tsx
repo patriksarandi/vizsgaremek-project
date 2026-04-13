@@ -31,11 +31,9 @@ const SignInPage = () => {
         throw new Error(data.message || `Hiba: ${response.status}`);
       }
 
-      localStorage.setItem("token", data.access_token);
+      login(data.user, data.access_token);
 
-
-      login(data.user || data);
-      navigate("/");    
+      navigate("/marketplace");    
       console.log("Login successful:", data);
 
     } catch (error: any) {

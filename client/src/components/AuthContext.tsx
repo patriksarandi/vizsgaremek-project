@@ -14,7 +14,7 @@ export const Autentikacio = () => {
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     if (!savedUser || savedUser === "null") return null;
@@ -22,22 +22,26 @@ export const AuthProvider = ({ children }) => {
     try {
       return JSON.parse(savedUser);
     } catch (error) {
-        console.error("Hibás adat:", error)
+      console.error("Hibás adat:", error);
       return null;
     }
   });
+
+  useEffect(() => {
+    setLoading(false);
+  }, [])
 
   const login = (userData, token) => {
     if (userData && token) {
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("token", token);
-      navigate("/")
+      navigate("/");
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("user")
+    localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser(null);
     navigate("/signin");
@@ -45,11 +49,13 @@ export const AuthProvider = ({ children }) => {
 
   const getAuthHeader = () => {
     const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}`} : {};
-  }
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, getAuthHeader }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, logout, getAuthHeader, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
