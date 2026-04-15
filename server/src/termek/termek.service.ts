@@ -17,10 +17,10 @@ export class TermekService {
     try {
       const ujTermek = await this.db.termek.create({
         data: {
-          KategoriaID: dto.kategoriaId,
-          TermekNev: dto.termekNev,
-          TermekAr: dto.termekAr,
-          Keszlet: dto.keszlet,
+          KategoriaID: dto.KategoriaID,
+          TermekNev: dto.TermekNev,
+          TermekAr: dto.TermekAr,
+          Keszlet: dto.Keszlet,
           Brand: "Ismeretlen"
         },
       });

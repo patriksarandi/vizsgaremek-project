@@ -33,7 +33,7 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {
-        id: customer.VevoID,
+        VevoID: customer.VevoID,
         email: customer.VevoEmail,
         name: customer.VevoNev
       }
@@ -51,11 +51,11 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const ujVevo = await this.vevoService.create({
-      vevoNev: dto.name,
-      vevoEmail: dto.email,
-      vevoJelszo: hashedPassword,
-      vevoRole: dto.role,
-      cim: '-',
+      VevoNev: dto.name,
+      VevoEmail: dto.email,
+      VevoJelszo: hashedPassword,
+      Role: dto.role,
+      Cim: '-',
     });
 
     const vevoFizetesiKosara = await this.db.fizetesiKosar.create({

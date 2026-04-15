@@ -19,7 +19,7 @@ export class RendelesController {
 
   @Post('/kosar')
   createFizetesiKosar(@Body() fizetesiKosarDto: FizetesiKosarDto) {
-    const vevoId = fizetesiKosarDto.vevoId;
+    const vevoId = fizetesiKosarDto.VevoID;
 
     if (!vevoId) {
       throw new BadRequestException('A VevoID megadása kötelező');
@@ -42,7 +42,7 @@ export class RendelesController {
   @Post('/kosartetel')
   async createKosarTetel(@Body() dto: KosarTetelDto) {
     try {
-      return await this.rendelesService.createKosarTetel(dto, dto.vevoId);
+      return await this.rendelesService.createKosarTetel(dto, dto.VevoID);
     } catch (error: any) {
       throw new BadRequestException('Nem sikerült a tétel a kosárhoz adni.');
     }

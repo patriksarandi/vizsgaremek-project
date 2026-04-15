@@ -13,11 +13,11 @@ export class RendelesService {
 
   async createFizetesiKosar(dto: FizetesiKosarDto) {
     const ujFizetesiKosar = await this.db.fizetesiKosar.upsert({
-      where: { VevoID: dto.vevoId },
+      where: { VevoID: dto.VevoID },
       update: {},
       create: {
-        KosarID: dto.vevoId,
-        VevoID: dto.vevoId,
+        KosarID: dto.VevoID,
+        VevoID: dto.VevoID,
       },
     });
 
@@ -55,8 +55,8 @@ export class RendelesService {
     if (!kosar) return { message: 'A kosár nem található!' };
 
     const vegosszeg = kosar.Tetelek.reduce((sum, tetel) => {
-      return sum + (Number(tetel.Termek.TermekAr) * tetel.TetelMennyiseg);
-    }, 0)
+      return sum + Number(tetel.Termek.TermekAr) * tetel.TetelMennyiseg;
+    }, 0);
 
     return {
       ...kosar,
@@ -86,7 +86,7 @@ export class RendelesService {
 
   async createKosarTetel(dto: KosarTetelDto, vevoId: number) {
     const termek = await this.db.termek.findUnique({
-      where: { TermekID: dto.termekId },
+      where: { TermekID: dto.TermekID },
     });
 
     if (!termek) {
@@ -96,13 +96,13 @@ export class RendelesService {
     const meglevo = await this.db.kosarTetel.findUnique({
       where: {
         KosarID_TermekID: {
-          KosarID: dto.kosarId,
-          TermekID: dto.termekId,
+          KosarID: dto.KosarID,
+          TermekID: dto.TermekID,
         },
       },
     });
 
-    const ujOsszMennyiseg = (meglevo?.TetelMennyiseg || 0) + dto.tetelMennyiseg;
+    const ujOsszMennyiseg = (meglevo?.TetelMennyiseg || 0) + dto.TetelMennyiseg;
 
     if (termek.Keszlet < ujOsszMennyiseg) {
       throw new BadRequestException(
@@ -113,19 +113,19 @@ export class RendelesService {
     const ujKosarTetel = await this.db.kosarTetel.upsert({
       where: {
         KosarID_TermekID: {
-          KosarID: dto.kosarId,
-          TermekID: dto.termekId,
+          KosarID: dto.KosarID,
+          TermekID: dto.TermekID,
         },
       },
       update: {
         TetelMennyiseg: {
-          increment: dto.tetelMennyiseg,
+          increment: dto.TetelMennyiseg,
         },
       },
       create: {
-        KosarID: dto.kosarId,
-        TermekID: dto.termekId,
-        TetelMennyiseg: dto.tetelMennyiseg,
+        KosarID: dto.KosarID,
+        TermekID: dto.TermekID,
+        TetelMennyiseg: dto.TetelMennyiseg,
       },
     });
 
@@ -169,6 +169,7 @@ export class RendelesService {
         KosarID: vevoId,
         TermekID: termekId,
       },
+      include: { Termek: true }
     });
 
     if (!meglevo) {
@@ -176,6 +177,12 @@ export class RendelesService {
     }
 
     const ujMennyiseg = meglevo.TetelMennyiseg + valtozas;
+
+    if (valtozas > 0 && meglevo.Termek.Keszlet < ujMennyiseg) {
+      alert("Nincs több készleten!")
+      throw new BadRequestException('Nincs több készleten!')
+    }
+
 
     if (ujMennyiseg <= 0) {
       return await this.db.kosarTetel.delete({
@@ -223,10 +230,18 @@ export class RendelesService {
     }
 
     return await this.db.$transaction(async (tx) => {
+      for (const tetel of kosar.Tetelek) {
+        if (tetel.Termek.Keszlet < tetel.TetelMennyiseg) {
+          throw new BadRequestException(
+            `Sajnos a(z) ${tetel.Termek.TermekNev} termékből nincs elég készleten (Elérhető: ${tetel.Termek.Keszlet})`,
+          );
+        }
+      }
+
       const ujRendeles = await tx.rendeles.create({
         data: {
           VevoID: vevoId,
-          RendelesiDatum: dto.rendelesiDatum || new Date(),
+          RendelesiDatum: dto.RendelesiDatum || new Date(),
           Statusz: 'Aktív',
           RendelesiVegosszeg: 0,
         },
@@ -237,13 +252,9 @@ export class RendelesService {
         const tetelAr = Number(tetel.Termek.TermekAr);
         osszeg += tetelAr * tetel.TetelMennyiseg;
 
-        if (tetel.Termek.Keszlet < tetel.TetelMennyiseg) {
-          throw new BadRequestException(`Nincs elég készlet: ${tetel.Termek.TermekNev}`);
-        }
-
         await tx.termek.update({
-          where: { TermekID: tetel.TermekID},
-          data: { Keszlet: { decrement: tetel.TetelMennyiseg }}
+          where: { TermekID: tetel.TermekID },
+          data: { Keszlet: { decrement: tetel.TetelMennyiseg } },
         });
 
         await tx.rendeltTermek.create({
@@ -258,19 +269,16 @@ export class RendelesService {
 
       await tx.rendeles.update({
         where: { RendelesID: ujRendeles.RendelesID },
-        data: { RendelesiVegosszeg: osszeg }
-      })
-
-      await tx.kosarTetel.deleteMany({
-        where: { KosarID: vevoId }
+        data: { RendelesiVegosszeg: osszeg },
       });
+
+      await tx.kosarTetel.deleteMany({ where: { KosarID: vevoId } });
 
       return {
         ...ujRendeles,
         success: true,
-        RendelesiVegosszeg: osszeg,
-        message: "Rendelés sikeresen leadva"
-      }
+        message: 'Rendelés sikeresen leadva',
+      };
     });
   }
 

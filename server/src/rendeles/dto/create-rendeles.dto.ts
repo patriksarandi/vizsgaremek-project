@@ -3,42 +3,35 @@ import { IsInt, IsNotEmpty } from "class-validator";
 export class FizetesiKosarDto {
     @IsInt({message: "A vevő azonosítója szám!"})
     @IsNotEmpty({message: "A vevő azonosítója nem lehet üres!"})
-    vevoId: number;
+    VevoID: number;
 }
 
 export class KosarTetelDto {
     @IsInt({message: "A kosár azonosítója szám!"})
     @IsNotEmpty({message: "A kosár azonosítója nem lehet üres!"})
-    kosarId: number;
+    KosarID: number;
 
     @IsInt({message: "A termék azonosítója szám!"})
     @IsNotEmpty({message: "A termék azonosítója nem lehet üres!"})
-    termekId: number;
+    TermekID: number;
 
     @IsInt({message: "A tétel mennyiség szám!"})
     @IsNotEmpty({message: "A tétel mennyiség nem lehet üres!"})
-    tetelMennyiseg: number;
+    TetelMennyiseg: number;
 
-    vevoId: number;
+    VevoID: number;
 }
 
 export class RendeltTermekDto {
-    rendelesId: number;
-    termekId: number;
-    rendeltMennyiseg: number;
-    rendeltEgysegar: number;
-}
-
-export class Fizetes {
-    rendelesId: number;
-    fizetesMod: string;
-    datum: Date;
-    allapot: string;
+    RendelesID: number;
+    TermekID: number;
+    RendeltMennyiseg: number;
+    RendeltEgysegar: number;
 }
 
 export class CreateRendelesDto {
-    vevoId: number;
-    rendelesiDatum: Date;
-    rendelesiVegosszeg: number;
-    statusz: string;
+    VevoID: number;
+    RendelesiDatum: Date;
+    RendelesiVegosszeg: number;
+    Statusz: string;
 }

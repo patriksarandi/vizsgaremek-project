@@ -3,21 +3,21 @@ import { IsInt, IsNotEmpty, IsString } from "class-validator";
 export class CreateTermekDto {
     @IsInt()
     @IsNotEmpty()
-    kategoriaId: number;
+    KategoriaID: number;
 
     @IsString()
     @IsNotEmpty()
-    termekNev: string;
+    TermekNev: string;
 
     @IsInt()
     @IsNotEmpty()
-    termekAr: number;
+    TermekAr: number;
 
     @IsInt()
     @IsNotEmpty()
-    keszlet: number;
+    Keszlet: number;
 
     @IsString()
     @IsNotEmpty()
-    brand: string;
+    Brand: string;
 }

@@ -98,8 +98,9 @@ const App = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/marketplace" />} />
       <Route path="/marketplace" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData} productsBrands={productsBrands}/>} />
-      <Route path="/" element={<SignInPage />} />
+      <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path={productUrl} element={<ProductPage />} />
       <Route path="/wishlist" element={<WishlistPage />} />

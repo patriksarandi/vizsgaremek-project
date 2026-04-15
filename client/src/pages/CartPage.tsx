@@ -13,17 +13,23 @@ import { useEffect, useState } from "react";
 import { Autentikacio } from "../components/AuthContext";
 
 const CartPage = () => {
-  const { user, logout } = Autentikacio();
+  const { user, logout, getAuthHeader } = Autentikacio();
 
   const [kosarTetelek, setKosarTetelek] = useState([]);
-  const [rendelesiOsszeg, setRendelesiOsszeg] = useState(0)
+  const [rendelesiOsszeg, setRendelesiOsszeg] = useState(0);
+
+  const vevoId = user?.id || user?.VevoID;
 
   const getKosarTetelek = async () => {
-    if (!user?.VevoID) return;
+    if (!vevoId) {
+      console.log("Még nincs felhasználói azonosító, várakozás...");
+      return;
+    }
 
     try {
       const response = await fetch(
-        `http://localhost:7777/rendeles/kosartetel/${user.VevoID}`,
+        `http://localhost:7777/rendeles/kosartetel/${vevoId}`,
+        { headers: getAuthHeader() },
       );
       if (!response) throw new Error("Nem sikerült lekérni a kosártételeket!");
       const data = await response.json();
@@ -36,7 +42,7 @@ const CartPage = () => {
         setRendelesiOsszeg(0);
       }
     } catch (error: any) {
-      console.error(error.message);
+      console.error("Hiba a kosár lekérdezésekor:", error.message);
     }
   };
 
@@ -46,9 +52,12 @@ const CartPage = () => {
         "http://localhost:7777/rendeles/kosartetel/update",
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
           body: JSON.stringify({
-            vevoId: Number(user.VevoID),
+            vevoId: Number(vevoId),
             termekId: Number(termekId),
             valtozas: Number(valtozas),
           }),
@@ -64,27 +73,29 @@ const CartPage = () => {
   };
 
   const handleRendeles = async (vevoId: number) => {
+    if (!vevoId) return;
+
     try {
       const response = await fetch("http://localhost:7777/rendeles", {
         method: "POST",
-        headers: { "Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json", ...getAuthHeader },
         body: JSON.stringify({
-          vevoId: Number(vevoId)
+          vevoId: Number(vevoId),
         }),
       });
-      
+
       if (!response.ok) {
-        throw new Error("Hiba történt a rendelés leadása során.")
+        throw new Error("Hiba történt a rendelés leadása során.");
       } else {
         const data = await response.json();
-        console.log("Sikeres rendelés: ", data)
-        setKosarTetelek([])
-        alert("Köszönjük! A rendelést rögzítettük.")
+        console.log("Sikeres rendelés: ", data);
+        setKosarTetelek([]);
+        alert("Köszönjük! A rendelést rögzítettük.");
       }
     } catch (error) {
-      throw new Error("Hiba történt", error.message)
+      throw new Error("Hiba történt", error.message);
     }
-  }
+  };
 
   const handleKosarTetel = async (
     kosarId: number,
@@ -118,7 +129,7 @@ const CartPage = () => {
 
   useEffect(() => {
     getKosarTetelek();
-  }, [user]);
+  }, [user, vevoId]);
 
   return (
     <>
@@ -128,7 +139,10 @@ const CartPage = () => {
         className="border-bottom border-secondary mb-4"
       >
         <Container fluid>
-          <Navbar.Brand style={{ color: "white", fontWeight: "bold" }} href="/marketplace">
+          <Navbar.Brand
+            style={{ color: "white", fontWeight: "bold" }}
+            href="/marketplace"
+          >
             OnFret
           </Navbar.Brand>
           <Nav className="ms-auto">
@@ -160,7 +174,12 @@ const CartPage = () => {
                 </Col>
               </Row>
               <Row>
-                <Button disabled={kosarTetelek.length == 0} onClick={() => handleRendeles(user.VevoID)}>Megrendelés</Button>
+                <Button
+                  disabled={kosarTetelek.length == 0}
+                  onClick={() => handleRendeles(user.VevoID)}
+                >
+                  Megrendelés
+                </Button>
               </Row>
             </Container>
           </Container>

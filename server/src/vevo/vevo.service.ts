@@ -11,14 +11,14 @@ export class VevoService {
     try {
       const ujVevo = await this.db.vevo.create({
         data: {
-          VevoNev: dto.vevoNev,
-          VevoEmail: dto.vevoEmail,
-          VevoJelszo: dto.vevoJelszo,
-          Role: dto.vevoRole,
-          Cim: dto.cim,
-          Keresztnev: dto.keresztnev,
-          Vezeteknev: dto.vezeteknev,
-          Telefonszam: dto.telefonszam,
+          VevoNev: dto.VevoNev,
+          VevoEmail: dto.VevoEmail,
+          VevoJelszo: dto.VevoJelszo,
+          Role: dto.Role,
+          Cim: dto.Cim,
+          Keresztnev: dto.Keresztnev,
+          Vezeteknev: dto.Vezeteknev,
+          Telefonszam: dto.Telefonszam,
         },
       });
 
@@ -137,14 +137,14 @@ export class VevoService {
       const modositottVevo = await this.db.vevo.update({
         where: { VevoID: id },
         data: {
-          VevoNev: dto.vevoNev,
-          VevoEmail: dto.vevoEmail,
-          VevoJelszo: dto.vevoJelszo,
-          Cim: dto.cim,
+          VevoNev: dto.VevoNev,
+          VevoEmail: dto.VevoEmail,
+          VevoJelszo: dto.VevoJelszo,
+          Cim: dto.Cim,
         },
       });
 
-      const { VevoJelszo, ...result } = modositottVevo;
+      const { ...result } = modositottVevo;
       return result;
     } catch (error: any) {
       if (error.code === 'P2002') {

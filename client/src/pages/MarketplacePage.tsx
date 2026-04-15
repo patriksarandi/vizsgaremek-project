@@ -28,9 +28,9 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
           method: "POST",
           headers: { "Content-Type": "application/json", ...getAuthHeader() },
           body: JSON.stringify({
-            kosarId: kosarId,
-            termekId: termekId,
-            tetelMennyiseg: tetelMennyiseg,
+            KosarID: Number(kosarId),
+            TermekID: Number(termekId),
+            TetelMennyiseg: Number(tetelMennyiseg),
           }),
         },
       );
@@ -40,7 +40,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
       }
 
       const data = await response.json();
-      console.log(data);
+      console.log("Hozzáadott termék:", data);
     } catch (error: any) {
       console.error(error.message);
     }
