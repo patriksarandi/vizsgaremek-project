@@ -1,8 +1,39 @@
 ﻿import { Button, Card } from "react-bootstrap";
 import { Autentikacio } from "./AuthContext";
+import { useState } from "react";
+import Rating from "@mui/material/Rating";
 
-const ProductComponent = ({ product, handleKosarTetel }) => {
-  const { user } = Autentikacio();
+const ProductComponent = ({ product, handleKosarTetel, termekErtekeles }) => {
+  const { user, getAuthHeader } = Autentikacio();
+  const [ertekeles, setErtekeles] = useState(termekErtekeles || 0);
+
+  const handleErtekeles = async (ertekelesiErtek: number | null) => {
+    if (ertekelesiErtek === null) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:7777/ertekeles/${user.id || user.VevoID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+          body: JSON.stringify({
+            VevoID: Number(user.id || user.VevoID),
+            TermekID: Number(product.TermekID),
+            ErtekelesSzam: Number(ertekelesiErtek),
+          }),
+        },
+      );
+
+      if (!response) throw new Error("Hiba történt");
+      setErtekeles(ertekelesiErtek);
+    } catch (error: any) {
+      console.error("Hiba történt:", error.message);
+    }
+  };
+
   const GetKategoria = (id) => {
     const kategoriak = [
       "",
@@ -23,7 +54,9 @@ const ProductComponent = ({ product, handleKosarTetel }) => {
       <Card.Img variant="top" />
       <Card.Body>
         <Card.Title>{product.TermekNev}</Card.Title>
-        <Card.Text>{GetKategoria(product.KategoriaID)}</Card.Text>
+        <Card.Text className="text-muted">
+          {GetKategoria(product.KategoriaID)}
+        </Card.Text>
         <Card.Text>
           <b>{product.TermekAr} Ft</b>
         </Card.Text>
@@ -32,19 +65,31 @@ const ProductComponent = ({ product, handleKosarTetel }) => {
             ? "Készleten: " + product.Keszlet + " db"
             : "Elfogyott"}
         </Card.Text>
+        <div className="mb-3">
+          <Rating
+            precision={1}
+            value={ertekeles}
+            onChange={(event, newValue) => {
+              console.log("New Rating:", newValue);
+              handleErtekeles(newValue);
+            }}
+          />
+        </div>
         <Button
+          className="w-100"
+          variant="primary"
           disabled={product.Keszlet === 0}
           onClick={() => {
             const kosarId = user?.VevoID || user?.id;
             const termekId = product.TermekID;
-            
+
             if (product.Keszlet < 1) {
               alert("Sajnos nincs több készleten!");
               return;
             }
 
             if (!kosarId) {
-              console.error("Hiba: Nincs felhasználói azonosító!")
+              console.error("Hiba: Nincs felhasználói azonosító!");
               return;
             }
 
@@ -59,3 +104,6 @@ const ProductComponent = ({ product, handleKosarTetel }) => {
 };
 
 export default ProductComponent;
+function getAuthHeader() {
+  throw new Error("Function not implemented.");
+}

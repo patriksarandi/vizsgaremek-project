@@ -127,14 +127,21 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
           </Col>
           <Col xs={8} md={9} lg={10}>
             <Row className="g-4">
-              {filteredProducts.length > 0 ? (filteredProducts.map((p) => (
-                <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
-                  <ProductComponent
-                    product={p}
-                    handleKosarTetel={handleKosarTetel}
-                  />
-                </Col>
-              ))) : "Nem található a keresésnek megfelelő termék."}
+              {filteredProducts.length > 0
+                ? filteredProducts.map((p) => {
+                    const jelenlegiErtekeles = p.Ertekelesek?.[0]?.ErtekelesSzam || 0;
+                  
+                  return (
+                      <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
+                        <ProductComponent
+                          product={p}
+                          handleKosarTetel={handleKosarTetel}
+                          termekErtekeles={jelenlegiErtekeles || null}
+                        />
+                      </Col>
+                    );
+                  })
+                : "Nem található a keresésnek megfelelő termék."}
             </Row>
           </Col>
         </Row>
