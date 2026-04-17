@@ -21,11 +21,11 @@ export class TermekService {
           TermekNev: dto.TermekNev,
           TermekAr: dto.TermekAr,
           Keszlet: dto.Keszlet,
-          Brand: "Ismeretlen"
+          Brand: 'Ismeretlen',
         },
       });
 
-      return ujTermek
+      return ujTermek;
     } catch (error: any) {
       throw new ConflictException(
         'Ez a termék név már szerepel az adatbázisban.',
@@ -33,12 +33,16 @@ export class TermekService {
     }
 
     throw new InternalServerErrorException(
-      'Hiba történt az új termék felvételekor.'
+      'Hiba történt az új termék felvételekor.',
     );
   }
 
   async findAll() {
-    return await this.db.termek.findMany();
+    return this.db.termek.findMany({
+      include: {
+        Ertekelesek: true, 
+      },
+    });
   }
 
   async findAllBrands() {
@@ -47,29 +51,27 @@ export class TermekService {
       select: {
         Brand: true,
       },
-    })
+    });
 
-    return brands.map(b => b.Brand)
+    return brands.map((b) => b.Brand);
   }
 
   async findOne(id: number) {
     try {
       const termek = await this.db.termek.findUnique({
         where: {
-          TermekID: id
-        }
+          TermekID: id,
+        },
       });
 
-      if (!termek) throw new NotFoundException(
-        'A termék nem található!'
-      );
+      if (!termek) throw new NotFoundException('A termék nem található!');
 
       return termek;
     } catch (error: any) {
       throw new InternalServerErrorException(
-        'Hiba történt a termék lekérdezésekor:', 
-        error.message
-      )
+        'Hiba történt a termék lekérdezésekor:',
+        error.message,
+      );
     }
   }
 
@@ -80,23 +82,19 @@ export class TermekService {
   async remove(id: number) {
     try {
       return await this.db.termek.delete({
-        where: { TermekID: id }
+        where: { TermekID: id },
       });
     } catch (error: any) {
       if (error.code === 'P2025') {
-        throw new NotFoundException(
-          'A termék nem található!'
-        )
+        throw new NotFoundException('A termék nem található!');
       }
       if (error.code === 'P2003') {
-        throw new BadRequestException(
-          'A termék nem törölhető!'
-        )
+        throw new BadRequestException('A termék nem törölhető!');
       }
       throw new InternalServerErrorException(
         'Szerver hiba a termék törlésekor:',
-        error.message
-      )
+        error.message,
+      );
     }
   }
 }

@@ -1,11 +1,16 @@
 ﻿import { Button, Card } from "react-bootstrap";
 import { Autentikacio } from "./AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
 
-const ProductComponent = ({ product, handleKosarTetel, termekErtekeles }) => {
+const ProductComponent = ({ product, handleKosarTetel, termekErtekeles, onErtekelesFrissites }) => {
   const { user, getAuthHeader } = Autentikacio();
   const [ertekeles, setErtekeles] = useState(termekErtekeles || 0);
+
+  useEffect(() => {
+    setErtekeles(termekErtekeles);
+  }, [termekErtekeles])
+
 
   const handleErtekeles = async (ertekelesiErtek: number | null) => {
     if (ertekelesiErtek === null) return;
@@ -27,8 +32,16 @@ const ProductComponent = ({ product, handleKosarTetel, termekErtekeles }) => {
         },
       );
 
-      if (!response) throw new Error("Hiba történt");
-      setErtekeles(ertekelesiErtek);
+      if (!response.ok) {
+        throw new Error("Hiba történt");
+      } else {
+        console.log("Leadott értékelés", ertekelesiErtek)
+        setErtekeles(ertekelesiErtek);
+        if (onErtekelesFrissites) {
+          onErtekelesFrissites(product.TermekID, ertekelesiErtek);
+        }
+      }
+      
     } catch (error: any) {
       console.error("Hiba történt:", error.message);
     }
@@ -50,7 +63,7 @@ const ProductComponent = ({ product, handleKosarTetel, termekErtekeles }) => {
   };
 
   return (
-    <Card className="h-100">
+    <Card className="h-100 shadow-sm">
       <Card.Img variant="top" />
       <Card.Body>
         <Card.Title>{product.TermekNev}</Card.Title>
@@ -104,6 +117,3 @@ const ProductComponent = ({ product, handleKosarTetel, termekErtekeles }) => {
 };
 
 export default ProductComponent;
-function getAuthHeader() {
-  throw new Error("Function not implemented.");
-}

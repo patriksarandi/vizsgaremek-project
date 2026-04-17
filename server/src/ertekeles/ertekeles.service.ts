@@ -34,9 +34,12 @@ export class ErtekelesService {
     })
   }
 
-  async findAllErtekeles(vevoId: number) {
+  async findAllErtekeles() {
     return this.db.ertekeles.findMany({
-      where: {VevoID: vevoId}
+      include: {
+        Termek: true,
+        Vevo: true
+      }
     })
   }
 

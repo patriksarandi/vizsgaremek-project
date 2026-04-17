@@ -3,11 +3,12 @@ import { Autentikacio } from "../components/AuthContext";
 import NavbarComponent from "../components/NavbarComponent";
 import ProductComponent from "../components/ProductComponent";
 import FilterSidebarComponent from "../components/FilterSidebarComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   const { user, loading, getAuthHeader } = Autentikacio();
+  const [products, setProducts] = useState(productsData);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({
     min: 0,
@@ -15,6 +16,20 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   });
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
+
+  const productUpdate = (termekId, ujErtekeles) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.TermekID === termekId
+          ? { ...p, Ertekelesek: [{ ErtekelesSzam: ujErtekeles }] }
+          : p,
+      ),
+    );
+  };
+
+  useEffect(() => {
+    setProducts(productsData);
+  }, [productsData]);
 
   const handleKosarTetel = async (
     kosarId: number,
@@ -80,7 +95,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     return kategoriaNev;
   };
 
-  const filteredProducts = productsData.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const matchesName = product?.TermekNev?.toLowerCase()?.includes(
       searchTerm.toLowerCase(),
     );
@@ -93,6 +108,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
       filteredCategories.includes(currentProductCategoryName);
     const matchesBrands =
       filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
+
     return matchesName && matchesPrice && matchesCategory && matchesBrands;
   });
 
@@ -129,14 +145,16 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
             <Row className="g-4">
               {filteredProducts.length > 0
                 ? filteredProducts.map((p) => {
-                    const jelenlegiErtekeles = p.Ertekelesek?.[0]?.ErtekelesSzam || 0;
-                  
-                  return (
+                    const jelenlegiErtekeles =
+                      p.Ertekelesek?.[0]?.ErtekelesSzam || 0;
+
+                    return (
                       <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
                         <ProductComponent
                           product={p}
                           handleKosarTetel={handleKosarTetel}
                           termekErtekeles={jelenlegiErtekeles || null}
+                          onErtekelesFrissites={productUpdate}
                         />
                       </Col>
                     );
