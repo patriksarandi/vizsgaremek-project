@@ -2,112 +2,90 @@
 import "./FilterSidebar.css";
 import { useEffect, useState } from "react";
 
-const FilterSidebarComponent = ({ filteredCategories, setFilteredCategories, categoriesData, priceRange, setPriceRange, productsBrands, filteredBrands, setFilteredBrands, }) => {
-  const [minAr, setMinAr] = useState(Number(priceRange.min))
-  const [maxAr, setMaxAr] = useState(Number(priceRange.max))
+const FilterSidebarComponent = ({
+  filteredCategories,
+  setFilteredCategories,
+  categoriesData,
+  priceRange,
+  setPriceRange,
+  productsBrands,
+  filteredBrands,
+  setFilteredBrands,
+}) => {
+  const handleMinChange = (e) => {
+    const ertek = Math.min(Number(e.target.value), priceRange.max - 1);
+    setPriceRange((prev) => ({ ...prev, min: ertek}))
+  }
 
-  useEffect(() => {
-    if (priceRange.min !== undefined && minAr===0) setMinAr(Number(priceRange.min))
-    if (priceRange.max !== undefined && maxAr===0) setMaxAr(Number(priceRange.max))
-  }, [priceRange.min, priceRange.max])
-  
+  const handleMaxChange = (e) => {
+    const ertek = Math.max(Number(e.target.value), priceRange.min + 1);
+    setPriceRange((prev) => ({ ...prev, max: ertek}))
+  }
+
   return (
     <>
-      <div>
+      <Container className="filter-sidebar">
         <h2>Szűrés</h2>
-        <Container>
-          <hr />
-          <Form>
-            <Form.Label>Termék Ár</Form.Label>
-            <Row className="align-items-center g-2">
-              <Col>
-                <Form.Control min="0" type="number" value={minAr} onChange={(e) => setMinAr(Number(e.target.value))}></Form.Control>
-              </Col>
-              <Col xs="auto">
-                <Form.Label>-</Form.Label>
-              </Col>
-              <Col>
-                <Form.Control max="1000000" type="number" value={maxAr} onChange={(e) => setMaxAr(Number(e.target.value))}></Form.Control>
-              </Col>
-              <Col xs="auto">
-                <Form.Label>Ft</Form.Label>
-              </Col>
-            </Row>
-            <div className="slider-container">
-              <input
-                type="range"
-                min="0"
-                max="99999"
+        <hr/>
+
+        <Form.Group>
+          <Form.Label>Termék Ár</Form.Label>
+          <Row className="align-items-center g-2 mb-3">
+            <Col>
+              <Form.Control
+                type="number"
                 value={priceRange.min}
-                onChange={(e) => {
-                  const val = Math.min(
-                    Number(e.target.value),
-                    priceRange.max - 1,
-                  );
-                  setPriceRange((prev) => ({ ...prev, min: val }));
-                }}
-                className="thumb thumb--left"
+                onChange={handleMinChange}
               />
-              <input
-                type="range"
-                min="0"
-                max="1000000"
+            </Col>
+            <Col xs="auto">-</Col>
+            <Col>
+              <Form.Control
+                type="number"
                 value={priceRange.max}
-                onChange={(e) => {
-                  const value = Math.max(
-                    Number(e.target.value),
-                    priceRange.min + 1,
-                  );
-                  setPriceRange((prev) => ({ ...prev, max: value }));
-                }}
-                className="thumb thumb--right"
+                onChange={handleMaxChange}
               />
-              <div className="slider">
-                <div className="slider__track" />
-                <div
-                  className="slider__range"
-                  style={{ left: "10", width: "100" }}
-                />
-              </div>
-            </div>
-          </Form>
-          <hr />
-          <Form>
-            <Form.Label>Kategória</Form.Label>
-            {categoriesData?.map(c => (
-              <Form.Check 
+            </Col>
+            <Col xs="auto">Ft</Col>
+          </Row>
+        </Form.Group>
+        <hr/>
+
+        <Form.Group>
+          <Form.Label>Kategória</Form.Label>
+          {categoriesData?.map((c) => (
+            <Form.Check
               key={c.KategoriaID}
-              label={c.Nev} 
-              name="kategoria" 
-              value={c.Nev}
+              label={c.Nev}
               onChange={(e) => {
-                const { value, checked } = e.target;
-                setFilteredCategories(prev => checked ? [...prev, value] : prev.filter(cat => cat !== value))
+                const { checked } = e.target;
+                setFilteredCategories(prev =>
+                  checked ? [...prev, c.Nev] : prev.filter(calt => cat !== c.Nev)
+                );
               }}
               />
-            ))}
-          </Form>
-        </Container>
-        <Container>
-          <hr />
-          <Form>
-            <Form.Label>Márka</Form.Label>
-            {productsBrands?.map(brand => (
-              <Form.Check
-                key={brand}
-                type="checkbox"
-                label={brand}
-                name="brand"
-                value={brand}
-                onChange={(e) => {
-                  const {value, checked} = e.target;
-                  setFilteredBrands(prev => checked ? [...prev, value] : prev.filter(brand => brand !== value))
-                }}
-                />
-            ))}
-          </Form>
-        </Container>
-      </div>
+          ))}
+        </Form.Group>
+        <hr/>
+
+        <Form.Group>
+          <Form.Label>Márka</Form.Label>
+          {productsBrands?.map((brand) => (
+            <Form.Check
+              key={brand}
+              type="checkbox"
+              label={brand}
+              onChange={(e) => {
+                const { checked } = e.target;
+                setFilteredBrands(prev =>
+                  checked ? [...prev, brand] : prev.filter(b => b !== brand)
+                )
+              }}
+            />
+          ))}
+        </Form.Group>
+
+      </Container>
     </>
   );
 };
