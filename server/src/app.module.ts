@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { KategoriaModule } from './kategoria/kategoria.module';
 import { TermekModule } from './termek/termek.module';
 import { RendelesModule } from './rendeles/rendeles.module';
+import { ErtekelesModule } from './ertekeles/ertekeles.module';
 
 @Module({
-  imports: [VevoModule, AuthModule, KategoriaModule, TermekModule, RendelesModule],
+  imports: [VevoModule, AuthModule, KategoriaModule, TermekModule, RendelesModule, ErtekelesModule],
   controllers: [AppController],
   providers: [AppService],
 })

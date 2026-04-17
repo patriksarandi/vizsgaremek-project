@@ -27,17 +27,17 @@ export class AuthService {
     const payload = {
       sub: customer.VevoID,
       email: customer.VevoEmail,
-      role: customer.Role
-    }
+      role: customer.Role,
+    };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {
         VevoID: customer.VevoID,
         email: customer.VevoEmail,
-        name: customer.VevoNev
-      }
-    }
+        name: customer.VevoNev,
+      },
+    };
   }
 
   async signUp(dto: SignUpDto): Promise<any> {
@@ -60,7 +60,6 @@ export class AuthService {
 
     const vevoFizetesiKosara = await this.db.fizetesiKosar.create({
       data: {
-        KosarID: ujVevo.VevoID,
         Vevo: {
           connect: { VevoID: ujVevo.VevoID },
         },
