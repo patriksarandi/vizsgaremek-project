@@ -16,7 +16,7 @@ export class ErtekelesController {
 
   @Get(':vevoId/osszes')
   findAllErtekeles(@Param('vevoId', ParseIntPipe) vevoId: number) {
-    return this.ertekelesService.findAllErtekeles();
+    return this.ertekelesService.findAllErtekeles(vevoId);
   }
 
   @Delete(':termekId')

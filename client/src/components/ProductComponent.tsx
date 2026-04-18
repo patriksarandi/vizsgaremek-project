@@ -3,14 +3,18 @@ import { Autentikacio } from "./AuthContext";
 import { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
 
-const ProductComponent = ({ product, handleKosarTetel, termekErtekeles, onErtekelesFrissites }) => {
+const ProductComponent = ({
+  product,
+  handleKosarTetel,
+  termekErtekeles,
+  onErtekelesFrissites,
+}) => {
   const { user, getAuthHeader } = Autentikacio();
   const [ertekeles, setErtekeles] = useState(termekErtekeles || 0);
 
   useEffect(() => {
     setErtekeles(termekErtekeles);
-  }, [termekErtekeles])
-
+  }, [termekErtekeles]);
 
   const handleErtekeles = async (ertekelesiErtek: number | null) => {
     if (ertekelesiErtek === null) return;
@@ -35,13 +39,12 @@ const ProductComponent = ({ product, handleKosarTetel, termekErtekeles, onErteke
       if (!response.ok) {
         throw new Error("Hiba történt");
       } else {
-        console.log("Leadott értékelés", ertekelesiErtek)
+        console.log("Leadott értékelés", ertekelesiErtek);
         setErtekeles(ertekelesiErtek);
         if (onErtekelesFrissites) {
           onErtekelesFrissites(product.TermekID, ertekelesiErtek);
         }
       }
-      
     } catch (error: any) {
       console.error("Hiba történt:", error.message);
     }

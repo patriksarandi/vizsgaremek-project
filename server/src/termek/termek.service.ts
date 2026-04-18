@@ -37,10 +37,19 @@ export class TermekService {
     );
   }
 
-  async findAll() {
+  async findAll(vevoId?: number) {
     return this.db.termek.findMany({
       include: {
-        Ertekelesek: true, 
+        Kategoria: true,
+        Ertekelesek: {
+          where: {
+            VevoID: vevoId,
+          },
+          select: {
+            ErtekelesSzam: true,
+            VevoID: true,
+          },
+        },
       },
     });
   }

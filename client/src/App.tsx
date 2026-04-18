@@ -18,7 +18,7 @@ import CartPage from "./pages/CartPage";
 import { Autentikacio } from "./components/AuthContext";
 
 const App = () => {
-  const { user, getAuthHeader } = Autentikacio();
+  const { user, loading, getAuthHeader } = Autentikacio();
 
   const [productsData, setProductsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([])
@@ -26,8 +26,12 @@ const App = () => {
   const [customersData, setCustomersData] = useState([])
 
   const fetchProducts = async () => {
+    const token = localStorage.getItem("token");
+
     try {
-      const response = await fetch("http://localhost:7777/termek");
+      const response = await fetch("http://localhost:7777/termek", {
+        headers: { "Content-Type": "application/json", ...getAuthHeader(), "Authorization": `Bearer ${token}`}
+      });
       if (!response.ok) throw new Error("Hiba a termékek betöltésénél.")
       const data = await response.json();
       setProductsData(data);
@@ -82,6 +86,8 @@ const App = () => {
   }
 
   useEffect(() => {
+    if (loading) return;
+
     const loadAllData = async () => {
       await Promise.all([
         fetchProducts(),
@@ -92,7 +98,7 @@ const App = () => {
     };
 
     loadAllData();
-  }, [user]);
+  }, [user, loading]);
 
   const productUrl = "product";
 

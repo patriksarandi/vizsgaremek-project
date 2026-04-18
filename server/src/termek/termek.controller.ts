@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+} from '@nestjs/common';
 import { TermekService } from './termek.service';
 import { CreateTermekDto } from './dto/create-termek.dto';
 import { UpdateTermekDto } from './dto/update-termek.dto';
@@ -18,8 +27,9 @@ export class TermekController {
   }
 
   @Get()
-  findAll() {
-    return this.termekService.findAll();
+  async findAll(@Req() req: any) {
+    const vevoId = req.user?.id;
+    return this.termekService.findAll(vevoId ? Number(vevoId) : undefined);
   }
 
   @Get(':id')

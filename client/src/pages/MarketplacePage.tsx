@@ -21,7 +21,15 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     setProducts((prev) =>
       prev.map((p) =>
         p.TermekID === termekId
-          ? { ...p, Ertekelesek: [{ ErtekelesSzam: ujErtekeles }] }
+          ? {
+              ...p,
+              Ertekelesek: [
+                {
+                  ErtekelesSzam: ujErtekeles,
+                  VevoID: user.id || user.VevoID,
+                },
+              ],
+            }
           : p,
       ),
     );
@@ -145,8 +153,14 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
             <Row className="g-4">
               {filteredProducts.length > 0
                 ? filteredProducts.map((p) => {
-                    const jelenlegiErtekeles =
-                      p.Ertekelesek?.[0]?.ErtekelesSzam || 0;
+                    const sajatErtekeles = p.Ertekelesek?.find(
+                      (e) =>
+                        String(e.VevoID) === String(user.id || user.VevoID),
+                    );
+
+                    const jelenlegiErtekeles = sajatErtekeles
+                      ? sajatErtekeles.ErtekelesSzam
+                      : 0;
 
                     return (
                       <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
