@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateVevoDto } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -145,14 +150,22 @@ export class VevoService {
 
   async remove(id: number) {
     try {
-      await this.db.vevo.delete({ where: { VevoID: id } });
-      return { message: `A(z) ${id} azonosítójú vevő törölve.` };
+      return await this.db.vevo.delete({
+        where: { VevoID: id },
+      });
     } catch (error: any) {
-      if (error.code === 'P2025') throw new Error('Vevő nem található');
       if (error.code === 'P2003') {
-        throw new Error('A vevőnek vannak rendelései, nem törölhető!');
+        throw new BadRequestException(
+          'A felhasználó nem törölhető, mert rendelések vagy értékelések kapcsolódnak hozzá!',
+        );
       }
-      throw new Error('Szerver hiba a törléskor.');
+      if (error.code === 'P2025') {
+        throw new NotFoundException('A keresett felhasználó nem létezik.');
+      }
+
+      throw new InternalServerErrorException(
+        'Váratlan hiba történt a törlés során.',
+      );
     }
   }
 }

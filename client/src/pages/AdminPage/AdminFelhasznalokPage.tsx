@@ -1,55 +1,78 @@
-﻿import { useState } from "react";
-import { Container, Table, Button } from "react-bootstrap";
+﻿import { Container, Table, Button } from "react-bootstrap";
+import { Autentikacio } from "../../components/AuthContext";
 
 const AdminFelhasznalokPage = ({ customersData }) => {
-  const [vevoNev, setVevoNev] = useState<string>("");
-  const [vevoEmail, setVevoEmail] = useState<string>("");
-  const [cim, setCim] = useState<string>("");
+  const { getAuthHeader } = Autentikacio();
 
-  const handleDelete = async (url: string) => {
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Biztosan törölni szeretnéd?")) return;
+
     try {
+      const url = `http://localhost:7777/vevo/${id}`;
       const response = await fetch(url, {
         method: "DELETE",
+        headers: {
+          ...getAuthHeader(),
+        },
       });
-      if (!response) throw new Error("Sikertelen törlés.");
 
       const data = await response.json();
-    } catch (error: any) {
-      throw new Error(error.message);
-    }
-  };
 
+      if (!response.ok) {
+        throw new Error(data.message || "Ismeretlen hiba történt.");
+      }
+
+      alert("Sikeres törlés!");
+      window.location.reload();
+    } catch (error: any) {
+      alert("Hiba: " + error.message);
+    }
+  }; // <--- Itt zárul le a handleDelete függvény!
+
+  // A return-nek a függvényen KÍVÜL kell lennie, hogy a komponens kirajzolódjon
   return (
-    <Container>
-      <Table>
-        <thead>
-          <th>Művelet</th>
-          <th>Vevő név</th>
-          <th>Vevő Email</th>
-          <th>Vevő Cím</th>
-          <th>Regisztrált</th>
+    <Container className="mt-4">
+      <h2 className="mb-4">Regisztrált Felhasználók</h2>
+      <Table striped bordered hover responsive className="shadow-sm">
+        <thead className="table-dark">
+          <tr>
+            <th>Művelet</th>
+            <th>Név</th>
+            <th>E-mail</th>
+            <th>Cím</th>
+            <th>Regisztráció ideje</th>
+          </tr>
         </thead>
         <tbody>
-          {customersData?.map((f) => (
-            <tr key={f.VevoID}>
-              <td>
-                <Button
-                  onClick={() => {
-                    const felhasznaloId = f.VevoID;
-                    const url = `http://localhost:7777/vevo/${felhasznaloId}`;
-                    handleDelete(url);
-                  }}
-                  variant="danger"
-                >
-                  Törlés
-                </Button>
+          {customersData && customersData.length > 0 ? (
+            customersData.map((f) => (
+              <tr key={f.VevoID}>
+                <td>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(f.VevoID)}
+                  >
+                    Törlés
+                  </Button>
+                </td>
+                <td>{f.VevoNev}</td>
+                <td>{f.VevoEmail}</td>
+                <td>{f.Cim || "Nincs megadva"}</td>
+                <td>
+                  {f.createdAt
+                    ? new Date(f.createdAt).toLocaleDateString("hu-HU")
+                    : "N/A"}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={5} className="text-center text-muted">
+                Nincsenek felhasználók.
               </td>
-              <td>{f.VevoNev}</td>
-              <td>{f.VevoEmail}</td>
-              <td>{f.Cim}</td>
-              <td>{f.createdAt}</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </Container>

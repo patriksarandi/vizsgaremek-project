@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateTermekDto {
     @IsInt()
@@ -18,6 +18,6 @@ export class CreateTermekDto {
     Keszlet: number;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     Brand: string;
 }

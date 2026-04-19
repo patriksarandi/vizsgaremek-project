@@ -1,141 +1,169 @@
 ﻿import { useState } from "react";
 import { Form, Container, Table, Button } from "react-bootstrap";
-
-interface TermekProps {
-  kategoriaId: number;
-  termekNev: string;
-  termekAr: number;
-  keszlet: number;
-}
+import { Autentikacio } from "../../components/AuthContext";
 
 const AdminTermekekPage = ({ termekAdatok }) => {
-  const [kategoriaId, setKategoriaId] = useState(0);
-  const [termekNev, setTermekNev] = useState("");
-  const [termekAr, setTermekAr] = useState(0);
-  const [keszlet, setKeszlet] = useState(0);
+  const [kategoriaId, setKategoriaId] = useState<number>(0);
+  const [termekNev, setTermekNev] = useState<string>("");
+  const [termekAr, setTermekAr] = useState<number>(0);
+  const [keszlet, setKeszlet] = useState<number>(0);
+  const [brand, setBrand] = useState<string>("Ismeretlen");
+  const { getAuthHeader } = Autentikacio();
   const termekAddUrl = "http://localhost:7777/termek";
 
-  const handleAdd = async (dto: TermekProps | KategoriaProps, url) => {
+  const handleAdd = async (dto, url) => {
+    const ujTermekDto = {
+      KategoriaID: Number(kategoriaId),
+      TermekNev: termekNev,
+      TermekAr: termekAr,
+      Keszlet: Number(keszlet),
+      Brand: brand,
+    };
+
     try {
-      const response = await fetch(url, {
+      const response = await fetch(termekAddUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dto),
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        body: JSON.stringify(ujTermekDto),
       });
 
       if (!response)
         throw new Error("Nem sikerült a termék hozzáadása.", response.status);
 
       const data = await response.json();
+
+      setTermekNev("");
+      setTermekAr(0);
+      setKeszlet(0);
+      setKategoriaId(0);
+
       console.log("Server:", data);
     } catch (error: any) {
+      alert("Hiba", error.message);
       console.error("Hiba a küldés során:", error.message);
     }
   };
 
-  const handleDelete = async (url: string) => {
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Biztosan törölni szeretnéd ezt a terméket?")) return;
+
     try {
+      const url = `http://localhost:7777/termek/${id}`;
       const response = await fetch(url, {
         method: "DELETE",
+        headers: {
+          ...getAuthHeader(),
+        },
       });
+
       if (!response) throw new Error("Sikertelen törlés.");
+      console.log("Termék törölve!");
 
       const data = await response.json();
     } catch (error: any) {
-      throw new Error(error.message);
+      alert(error.message);
     }
   };
 
-  const ujTermek: TermekProps = {
-    kategoriaId: Number(kategoriaId),
-    termekNev: termekNev,
-    termekAr: Number(termekAr),
-    keszlet: Number(keszlet),
-  };
-
   return (
-    <Container>
-      <Table>
-        <tr>
-          <td>
-            <Form>
+    <Container className="mt-4">
+      <h2 className="mb-4">Termékek kezelése</h2>
+
+      <Table bordered hover className="shadow-sm mb-5">
+        <thead className="table-dark">
+          <tr>
+            <th>Kategória ID</th>
+            <th>Termék Név</th>
+            <th>Márka (Brand)</th>
+            <th>Ár (Ft)</th>
+            <th>Készlet</th>
+            <th>Művelet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
               <Form.Control
                 type="number"
-                placeholder="Kategória ID"
                 value={kategoriaId}
                 onChange={(e) => setKategoriaId(Number(e.target.value))}
               />
-            </Form>
-          </td>
-          <td>
-            <Form>
+            </td>
+            <td>
               <Form.Control
                 type="text"
-                placeholder="Termék név"
+                placeholder="Pl: Gitár"
                 value={termekNev}
                 onChange={(e) => setTermekNev(e.target.value)}
               />
-            </Form>
-          </td>
-          <td>
-            <Form>
+            </td>
+            <td>
+              <Form.Control
+                type="text"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              />
+            </td>
+            <td>
               <Form.Control
                 type="number"
-                placeholder="Termék ár"
                 value={termekAr}
                 onChange={(e) => setTermekAr(Number(e.target.value))}
               />
-            </Form>
-          </td>
-          <td>
-            <Form>
+            </td>
+            <td>
               <Form.Control
                 type="number"
-                placeholder="Készlet"
                 value={keszlet}
                 onChange={(e) => setKeszlet(Number(e.target.value))}
               />
-            </Form>
-          </td>
-          <td>
-            <Button
-              onClick={() => {
-                handleAdd(ujTermek, termekAddUrl);
-              }}
-            >
-              Hozzáad
-            </Button>
-          </td>
-        </tr>
+            </td>
+            <td>
+              <Button variant="success" className="w-100" onClick={handleAdd}>
+                Hozzáad
+              </Button>
+            </td>
+          </tr>
+        </tbody>
       </Table>
 
-      <Table>
-        <thead>
-          <th>Művelet</th>
-          <th>Termék Név</th>
-          <th>Termék Ár</th>
-          <th>Készlet</th>
+      <h3 className="mb-3">Aktuális készlet</h3>
+      <Table striped bordered hover responsive>
+        <thead className="table-secondary">
+          <tr>
+            <th>ID</th>
+            <th>Termék Név</th>
+            <th>Ár</th>
+            <th>Készlet</th>
+            <th className="text-center">Műveletek</th>
+          </tr>
         </thead>
         <tbody>
-          {termekAdatok.map((t) => (
-            <tr key={t.TermekID}>
-              <td>
-                <Button
-                  onClick={() => {
-                    const termekId = t.TermekID;
-                    const url = `http://localhost:7777/termek/${termekId}`;
-                    handleDelete(url);
-                  }}
-                  variant="danger"
-                >
-                  Törlés
-                </Button>
+          {termekAdatok && termekAdatok.length > 0 ? (
+            termekAdatok.map((t) => (
+              <tr key={t.TermekID}>
+                <td>{t.TermekID}</td>
+                <td>{t.TermekNev}</td>
+                <td>{t.TermekAr.toLocaleString()} Ft</td>
+                <td>{t.Keszlet} db</td>
+                <td className="text-center">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(t.TermekID)}
+                  >
+                    Törlés
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={5} className="text-center text-muted">
+                Nincsenek megjeleníthető termékek.
               </td>
-              <td>{t.TermekNev}</td>
-              <td>{t.TermekAr}</td>
-              <td>{t.Keszlet}</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </Container>
