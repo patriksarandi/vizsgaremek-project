@@ -84,57 +84,41 @@ export class RendelesService {
     });
   }
 
-  async createKosarTetel(dto: KosarTetelDto, vevoId: number) {
-    const termek = await this.db.termek.findUnique({
-      where: { TermekID: dto.TermekID },
+  async createKosarTetel(dto: KosarTetelDto, vevoid: number) {
+    const vevoId = Number(vevoid || dto.KosarID);
+
+    const kosar = await this.db.fizetesiKosar.upsert({
+      where: { VevoID: vevoId },
+      update: {},
+      create: { VevoID: vevoId },
     });
 
-    if (!termek) {
-      throw new NotFoundException('Ilyen termék nem létezik');
+    const termek = await this.db.termek.findUnique({where: {TermekID: dto.TermekID}});
+    const meglevoTetel = await this.db.kosarTetel.findUnique({
+      where: { KosarID_TermekID: { KosarID: kosar.KosarID, TermekID: dto.TermekID}}
+    });
+
+    const jelenlegiMennyiseg = meglevoTetel ? meglevoTetel.TetelMennyiseg : 0;
+    const ujMennyiseg = jelenlegiMennyiseg + Number(dto.TetelMennyiseg);
+
+    if (termek.Keszlet < ujMennyiseg) {
+      throw new BadRequestException('Nincs elég készleten a kért mennyiséghez!')
     }
 
-    const meglevo = await this.db.kosarTetel.findUnique({
+    return await this.db.kosarTetel.upsert({
       where: {
         KosarID_TermekID: {
-          KosarID: dto.KosarID,
+          KosarID: kosar.KosarID,
           TermekID: dto.TermekID,
         },
       },
-    });
-
-    const ujOsszMennyiseg = (meglevo?.TetelMennyiseg || 0) + dto.TetelMennyiseg;
-
-    if (termek.Keszlet < ujOsszMennyiseg) {
-      throw new BadRequestException(
-        `Nincs elég a készleten. Elérhető: ${termek.Keszlet}`,
-      );
-    }
-
-    const ujKosarTetel = await this.db.kosarTetel.upsert({
-      where: {
-        KosarID_TermekID: {
-          KosarID: dto.KosarID,
-          TermekID: dto.TermekID,
-        },
-      },
-      update: {
-        TetelMennyiseg: {
-          increment: dto.TetelMennyiseg,
-        },
-      },
+      update: { TetelMennyiseg: { increment: Number(dto.TetelMennyiseg) },},
       create: {
-        KosarID: dto.KosarID,
+        KosarID: kosar.KosarID,
         TermekID: dto.TermekID,
-        TetelMennyiseg: dto.TetelMennyiseg,
+        TetelMennyiseg: Number(dto.TetelMennyiseg),
       },
     });
-
-    console.log(ujKosarTetel);
-
-    return {
-      message: 'Sikeresen létrehozott kosártétel.',
-      adat: ujKosarTetel,
-    };
   }
 
   async getTermekKeszletMennyiseg(termekId: number) {
@@ -164,12 +148,20 @@ export class RendelesService {
     termekId: number,
     valtozas: number,
   ) {
-    const meglevo = await this.db.kosarTetel.findFirst({
+    const kosar = await this.db.fizetesiKosar.findUnique({
+      where: { VevoID: vevoId },
+    });
+
+    if (!kosar) throw new NotFoundException('Nincs kosara a felhasználónak!');
+
+    const meglevo = await this.db.kosarTetel.findUnique({
       where: {
-        KosarID: vevoId,
-        TermekID: termekId,
+        KosarID_TermekID: {
+          KosarID: kosar.KosarID,
+          TermekID: termekId,
+        },
       },
-      include: { Termek: true }
+      include: { Termek: true },
     });
 
     if (!meglevo) {
@@ -178,44 +170,21 @@ export class RendelesService {
 
     const ujMennyiseg = meglevo.TetelMennyiseg + valtozas;
 
-    if (valtozas > 0 && meglevo.Termek.Keszlet < ujMennyiseg) {
-      alert("Nincs több készleten!")
-      throw new BadRequestException('Nincs több készleten!')
-    }
-
-
     if (ujMennyiseg <= 0) {
       return await this.db.kosarTetel.delete({
-        where: {
-          KosarID_TermekID: {
-            KosarID: vevoId,
-            TermekID: termekId,
-          },
-        },
+        where: { KosarTetelID: meglevo.KosarTetelID },
       });
     }
 
-    if (valtozas > 0) {
-      const termek = await this.db.termek.findUnique({
-        where: { TermekID: termekId },
-      });
-
-      if (termek && termek.Keszlet < ujMennyiseg) {
-        throw new BadRequestException(
-          `Nincs elég készleten. Elérhető: ${termek.Keszlet}`,
-        );
-      }
+    if (valtozas > 0 && meglevo.Termek.Keszlet < ujMennyiseg) {
+      throw new BadRequestException(
+        `Nincs elég készleten! (Elérhető: ${meglevo.Termek.Keszlet})`,
+      );
     }
 
     return await this.db.kosarTetel.update({
-      where: {
-        KosarTetelID: meglevo.KosarTetelID,
-      },
-      data: {
-        TetelMennyiseg: {
-          increment: valtozas,
-        },
-      },
+      where: { KosarTetelID: meglevo.KosarTetelID },
+      data: { TetelMennyiseg: ujMennyiseg },
     });
   }
 

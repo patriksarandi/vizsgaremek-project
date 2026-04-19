@@ -21,10 +21,7 @@ const CartPage = () => {
   const vevoId = user?.id || user?.VevoID;
 
   const getKosarTetelek = async () => {
-    if (!vevoId) {
-      console.log("Még nincs felhasználói azonosító, várakozás...");
-      return;
-    }
+    if (!vevoId) return;
 
     try {
       const response = await fetch(
@@ -41,8 +38,9 @@ const CartPage = () => {
         setKosarTetelek([]);
         setRendelesiOsszeg(0);
       }
-    } catch (error: any) {
-      console.error("Hiba a kosár lekérdezésekor:", error.message);
+
+    } catch (error) {
+      console.error("Hiba a kosár lekérdezésekor:", error);
     }
   };
 

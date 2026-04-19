@@ -11,7 +11,7 @@ const ProductComponent = ({
   onErtekelesFrissites,
 }) => {
   const { user, getAuthHeader } = Autentikacio();
-  const [ertekeles, setErtekeles] = useState(termekErtekeles || 0);
+  const [ertekeles, setErtekeles] = useState(termekErtekeles ?? 0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +20,8 @@ const ProductComponent = ({
 
   const handleErtekeles = async (ertekelesiErtek: number | null) => {
     if (ertekelesiErtek === null) return;
+
+    const biztosErtek = ertekelesiErtek ?? 0;
 
     try {
       const response = await fetch(
@@ -33,7 +35,7 @@ const ProductComponent = ({
           body: JSON.stringify({
             VevoID: Number(user.id || user.VevoID),
             TermekID: Number(product.TermekID),
-            ErtekelesSzam: Number(ertekelesiErtek),
+            ErtekelesSzam: Number(biztosErtek),
           }),
         },
       );
@@ -125,7 +127,7 @@ const ProductComponent = ({
             <Rating
               size="small"
               precision={1}
-              value={ertekeles}
+              value={ertekeles ?? 0}
               onChange={(event, newValue) => handleErtekeles(newValue)}
             />
             <span className="ms-2 small text-muted">({ertekeles})</span>

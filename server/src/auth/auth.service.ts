@@ -36,6 +36,7 @@ export class AuthService {
         VevoID: customer.VevoID,
         email: customer.VevoEmail,
         name: customer.VevoNev,
+        Role: customer.Role
       },
     };
   }

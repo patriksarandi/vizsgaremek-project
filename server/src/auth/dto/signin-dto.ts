@@ -8,4 +8,5 @@ export class SignInDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
 }

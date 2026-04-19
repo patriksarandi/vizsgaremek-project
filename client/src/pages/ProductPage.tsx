@@ -10,23 +10,21 @@
 } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Autentikacio } from "../components/AuthContext";
+import { useState } from "react";
 
 const ProductPage = ({ productsData }) => {
-  const { termekNev } = useParams();
+    const { termekNev } = useParams()
   const { user, getAuthHeader, logout } = Autentikacio();
-
+  const [mennyiseg, SetMennyiseg] = useState(1)
   const product = productsData.find((p) => p.TermekNev === termekNev);
-  const kosarId = user?.VevoID || user?.id;
 
-  const handleKosarTetel = async (kosarId, termekId, tetelMennyiseg) => {
-    if (!kosarId) {
-      alert("Kérjük, jelentkezz be a vásárláshoz!");
-      return;
-    }
+  const handleKosarTetel = async () => {
+    const vevoId = Number(user?.VevoID || user?.id);
+    const termekId = Number(product?.TermekID);
 
-    if (product.Keszlet < 1) {
-      alert("Sajnos ez a termék elfogyott.");
-      return;
+    if (!vevoId || !termekId) {
+        alert("Hiba: Hiányzó felhasználói vagy termék adatok!");
+        return;
     }
 
     try {
@@ -36,15 +34,16 @@ const ProductPage = ({ productsData }) => {
           method: "POST",
           headers: { "Content-Type": "application/json", ...getAuthHeader() },
           body: JSON.stringify({
-            KosarID: Number(kosarId),
-            TermekID: Number(termekId),
-            TetelMennyiseg: Number(tetelMennyiseg),
+            KosarID: vevoId,
+            TermekID: termekId,
+            TetelMennyiseg: 1
           }),
         },
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         alert("Sikeresen a kosárhoz adva!");
       } else {
         console.error("Szerver hiba:", response.status);
@@ -137,9 +136,9 @@ const ProductPage = ({ productsData }) => {
                 className="w-100 py-3 fw-bold"
                 variant="primary"
                 disabled={product.Keszlet === 0}
-                onClick={() => handleKosarTetel(kosarId, product.TermekID, 1)}
+                onClick={handleKosarTetel}
               >
-                <i className="bi bi-cart-plus me-2"></i> Kosárba teszem
+                <i className="bi bi-cart-plus me-2"></i> Kosárba
               </Button>
             </div>
           </Col>

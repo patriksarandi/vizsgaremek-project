@@ -9,7 +9,6 @@
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Autentikacio } from "./AuthContext";
-import { useRef, useState } from "react";
 
 const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
   const { user, logout } = Autentikacio();
@@ -59,11 +58,19 @@ const NavbarComponent = ({ searchTerm, setSearchTerm }) => {
                 className="w-100 rounded-pill"
               >
                 <i className="bi bi-person me-2"></i>
-                {user?.VevoNev}
+                {user?.name ? user?.name : "Felhasználói fiók"}
               </Dropdown.Toggle>
               <Dropdown.Menu className="shadow border-0 w-100">
                 <Dropdown.Item as={Link} to="/profile">
                   Profil
+                </Dropdown.Item>
+                {isAdmin && (
+                  <Dropdown.Item as={Link} to="/admin/dashboard">
+                    <i className="bi bi-speedometer2 me-2">Kezelőfelület</i> 
+                  </Dropdown.Item>
+                )}
+                <Dropdown.Item as={Link} to="/kosar">
+                  <i className="bi bi-speedometer2 me-2">Kosár</i>
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={logout} className="text-danger">

@@ -114,7 +114,7 @@ const App = () => {
         <Route path="profile" element={<ProfileFelhasznaloi/>}/>
         <Route path="megrendelesek" element={<ProfileMegrendelesek/>}/>
       </Route>
-      <Route path="/admin/dashboard" element={user?.role === 'ADMIN' ? <AdminPage/> : <Navigate to="/signin"/>}>
+      <Route path="/admin/dashboard" element={user?.Role === 'ADMIN' ? <AdminPage/> : <Navigate to="/signin"/>}>
         <Route path="felhasznalok" element={<AdminFelhasznalokPage customersData={customersData}/>}/>
         <Route path="kategoriak" element={<AdminKategoriakPage categoriesData={categoriesData}/>}/>
         <Route path="termekek" element={<AdminTermekekPage termekAdatok={productsData}/>}/>

@@ -52,12 +52,19 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchesName = product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase());
-    const matchesPrice = Number(product?.TermekAr) >= priceRange.min && Number(product?.TermekAr) <= priceRange.max;
+    const matchesName = product?.TermekNev?.toLowerCase()?.includes(
+      searchTerm.toLowerCase(),
+    );
+    const matchesPrice =
+      Number(product?.TermekAr) >= priceRange.min &&
+      Number(product?.TermekAr) <= priceRange.max;
     const currentProductCategoryName = CategoryById(product?.KategoriaID);
-    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(currentProductCategoryName);
-    
-    const matchesBrands = filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
+    const matchesCategory =
+      filteredCategories.length === 0 ||
+      filteredCategories.includes(currentProductCategoryName);
+
+    const matchesBrands =
+      filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
 
     return matchesName && matchesPrice && matchesCategory && matchesBrands;
   });
@@ -73,7 +80,11 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     setFilteredBrands,
   };
 
-  if (loading) return null;
+  if (loading) {
+    <Container className="mt-5">
+      <p>Betöltés</p>
+    </Container>;
+  }
 
   if (!user) {
     return (
@@ -113,7 +124,6 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
                     <ProductComponent
                       product={p}
                       onErtekelesFrissites={productUpdate}
-                      
                     />
                   </Col>
                 ))
