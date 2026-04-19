@@ -2,6 +2,7 @@
 import { Autentikacio } from "./AuthContext";
 import { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
+import { useNavigate } from "react-router-dom";
 
 const ProductComponent = ({
   product,
@@ -11,6 +12,7 @@ const ProductComponent = ({
 }) => {
   const { user, getAuthHeader } = Autentikacio();
   const [ertekeles, setErtekeles] = useState(termekErtekeles || 0);
+  const navigate = useNavigate()
 
   useEffect(() => {
     setErtekeles(termekErtekeles);
@@ -114,6 +116,7 @@ const ProductComponent = ({
         >
           Kosárba
         </Button>
+        <Button className="w-100" onClick={() => navigate(`/termek/${product.TermekNev}`)}>Megnézem</Button>
       </Card.Body>
     </Card>
   );

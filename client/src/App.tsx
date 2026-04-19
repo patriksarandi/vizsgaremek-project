@@ -24,6 +24,7 @@ const App = () => {
   const [categoriesData, setCategoriesData] = useState([])
   const [productsBrands, setProductsBrands] = useState([])
   const [customersData, setCustomersData] = useState([])
+  const [productUrl, setProductUrl] = useState("");
 
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
@@ -100,7 +101,6 @@ const App = () => {
     loadAllData();
   }, [user, loading]);
 
-  const productUrl = "product";
 
   return (
     <Routes>
@@ -108,7 +108,6 @@ const App = () => {
       <Route path="/marketplace" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData} productsBrands={productsBrands}/>} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
-      <Route path={productUrl} element={<ProductPage />} />
       <Route path="/wishlist" element={<WishlistPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/profile" element={<ProfilePage />}>
@@ -120,6 +119,7 @@ const App = () => {
         <Route path="kategoriak" element={<AdminKategoriakPage categoriesData={categoriesData}/>}/>
         <Route path="termekek" element={<AdminTermekekPage termekAdatok={productsData}/>}/>
       </Route>
+      <Route path="/termek/:termekNev" element={<ProductPage productsData={productsData}/>}></Route>
       <Route path="/kosar" element={<CartPage/>}/>
     </Routes>
   );
