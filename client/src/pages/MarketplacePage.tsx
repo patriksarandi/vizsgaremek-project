@@ -1,4 +1,4 @@
-﻿import { Alert, Button, Col, Container, Row } from "react-bootstrap";
+﻿import { Alert, Button, Col, Container, Offcanvas, Row } from "react-bootstrap";
 import { Autentikacio } from "../components/AuthContext";
 import NavbarComponent from "../components/NavbarComponent";
 import ProductComponent from "../components/ProductComponent";
@@ -10,12 +10,14 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   const { user, loading, getAuthHeader } = Autentikacio();
   const [products, setProducts] = useState(productsData);
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState({
-    min: 0,
-    max: 1000000,
-  });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
+
+  useEffect(() => {
+    setProducts(productsData);
+  }, [productsData]);
 
   const productUpdate = (termekId, ujErtekeles) => {
     setProducts((prev) =>
@@ -35,90 +37,41 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     );
   };
 
-  useEffect(() => {
-    setProducts(productsData);
-  }, [productsData]);
-
-  const handleKosarTetel = async (
-    kosarId: number,
-    termekId: number,
-    tetelMennyiseg: number,
-  ) => {
-    try {
-      const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", ...getAuthHeader() },
-          body: JSON.stringify({
-            KosarID: Number(kosarId),
-            TermekID: Number(termekId),
-            TetelMennyiseg: Number(tetelMennyiseg),
-          }),
-        },
-      );
-      if (!response.ok) {
-        console.error("Hiba történt:", response.status);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Hozzáadott termék:", data);
-    } catch (error: any) {
-      console.error(error.message);
-    }
-  };
-
-  const CategoryById = (kategoriaId: number) => {
-    let kategoriaNev = "";
-    switch (kategoriaId) {
-      case 1:
-        kategoriaNev = "Gitár";
-        break;
-      case 2:
-        kategoriaNev = "BasszusGitár";
-        break;
-      case 3:
-        kategoriaNev = "Billentyűs";
-        break;
-      case 4:
-        kategoriaNev = "Ütős";
-        break;
-      case 5:
-        kategoriaNev = "Fúvós";
-        break;
-      case 6:
-        kategoriaNev = "Vonós";
-        break;
-      case 7:
-        kategoriaNev = "Stúdió";
-        break;
-      case 8:
-        kategoriaNev = "Tartozékok";
-        break;
-      default:
-        break;
-    }
-
-    return kategoriaNev;
+  const CategoryById = (kategoriaId) => {
+    const kategoriak = {
+      1: "Gitár",
+      2: "BasszusGitár",
+      3: "Billentyűs",
+      4: "Ütős",
+      5: "Fúvós",
+      6: "Vonós",
+      7: "Stúdió",
+      8: "Tartozékok",
+    };
+    return kategoriak[kategoriaId] || "";
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchesName = product?.TermekNev?.toLowerCase()?.includes(
-      searchTerm.toLowerCase(),
-    );
-    const matchesPrice =
-      Number(product?.TermekAr) >= priceRange.min &&
-      Number(product?.TermekAr) <= priceRange.max;
+    const matchesName = product?.TermekNev?.toLowerCase()?.includes(searchTerm.toLowerCase());
+    const matchesPrice = Number(product?.TermekAr) >= priceRange.min && Number(product?.TermekAr) <= priceRange.max;
     const currentProductCategoryName = CategoryById(product?.KategoriaID);
-    const matchesCategory =
-      filteredCategories.length === 0 ||
-      filteredCategories.includes(currentProductCategoryName);
-    const matchesBrands =
-      filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
+    const matchesCategory = filteredCategories.length === 0 || filteredCategories.includes(currentProductCategoryName);
+    
+    const matchesBrands = filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
 
     return matchesName && matchesPrice && matchesCategory && matchesBrands;
   });
+
+  const filterProps = {
+    filteredCategories,
+    setFilteredCategories,
+    categoriesData,
+    priceRange,
+    setPriceRange,
+    productsBrands,
+    filteredBrands,
+    setFilteredBrands,
+  };
 
   if (loading) return null;
 
@@ -133,51 +86,67 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
   return (
     <>
       <NavbarComponent searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <Container fluid className="mt-4">
-        <Row flex-nowrap="true">
-          <Col xs={3} md={2} lg={2} className="border-end">
-            <div className="sticky-top" style={{ top: "20px" }}>
-              <FilterSidebarComponent
-                filteredCategories={filteredCategories}
-                setFilteredCategories={setFilteredCategories}
-                categoriesData={categoriesData}
-                priceRange={priceRange}
-                setPriceRange={setPriceRange}
-                productsBrands={productsBrands}
-                filteredBrands={filteredBrands}
-                setFilteredBrands={setFilteredBrands}
-              />
+
+      <Container fluid className="mt-4 px-lg-5">
+        <Row>
+          <Col lg={3} xl={2} className="d-none d-lg-block border-end">
+            <div className="sticky-top" style={{ top: "90px" }}>
+              <FilterSidebarComponent {...filterProps} />
             </div>
           </Col>
-          <Col xs={8} md={9} lg={10}>
-            <Row className="g-4">
-              {filteredProducts.length > 0
-                ? filteredProducts.map((p) => {
-                    const sajatErtekeles = p.Ertekelesek?.find(
-                      (e) =>
-                        String(e.VevoID) === String(user.id || user.VevoID),
-                    );
 
-                    const jelenlegiErtekeles = sajatErtekeles
-                      ? sajatErtekeles.ErtekelesSzam
-                      : 0;
+          <Col xs={12} lg={9} xl={10}>
+            <div className="d-lg-none mb-3">
+              <Button
+                variant="outline-dark"
+                className="w-100 py-2 d-flex align-items-center justify-content-center shadow-sm"
+                onClick={() => setShowMobileFilter(true)}
+              >
+                <i className="bi bi-sliders2 me-2"></i> Szűrés és válogatás
+              </Button>
+            </div>
 
-                    return (
-                      <Col key={p.TermekID} xs={12} sm={6} md={4} lg={3}>
-                        <ProductComponent
-                          product={p}
-                          handleKosarTetel={handleKosarTetel}
-                          termekErtekeles={jelenlegiErtekeles || null}
-                          onErtekelesFrissites={productUpdate}
-                        />
-                      </Col>
-                    );
-                  })
-                : "Nem található a keresésnek megfelelő termék."}
+            <Row className="g-3 g-md-4">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((p) => (
+                  <Col key={p.TermekID} xs={12} sm={6} md={4} xl={3}>
+                    <ProductComponent
+                      product={p}
+                      onErtekelesFrissites={productUpdate}
+                      
+                    />
+                  </Col>
+                ))
+              ) : (
+                <Col className="text-center mt-5 text-muted">
+                  Nincs a szűrésnek megfelelő termék.
+                </Col>
+              )}
             </Row>
           </Col>
         </Row>
       </Container>
+
+      <Offcanvas
+        show={showMobileFilter}
+        onHide={() => setShowMobileFilter(false)}
+        placement="start"
+      >
+        <Offcanvas.Header closeButton className="border-bottom">
+          <Offcanvas.Title className="fw-bold">Szűrés</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <FilterSidebarComponent {...filterProps} />
+
+          <Button
+            variant="dark"
+            className="w-100 mt-4 py-2 fw-bold d-lg-none"
+            onClick={() => setShowMobileFilter(false)}
+          >
+            Kész
+          </Button>
+        </Offcanvas.Body>
+      </Offcanvas>
     </>
   );
 };

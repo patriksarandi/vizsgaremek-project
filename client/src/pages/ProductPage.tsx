@@ -19,7 +19,6 @@ const ProductPage = ({ productsData }) => {
   const kosarId = user?.VevoID || user?.id;
 
   const handleKosarTetel = async (kosarId, termekId, tetelMennyiseg) => {
-    // 1. Validációk még a hálózati kérés előtt
     if (!kosarId) {
       alert("Kérjük, jelentkezz be a vásárláshoz!");
       return;
@@ -46,7 +45,7 @@ const ProductPage = ({ productsData }) => {
 
       if (response.ok) {
         const data = await response.json();
-        alert("Sikeresen a kosárhoz adva!"); // Visszajelzés a felhasználónak
+        alert("Sikeresen a kosárhoz adva!");
       } else {
         console.error("Szerver hiba:", response.status);
       }

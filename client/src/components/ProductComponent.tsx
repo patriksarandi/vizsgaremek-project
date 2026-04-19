@@ -1,4 +1,4 @@
-﻿import { Button, Card } from "react-bootstrap";
+﻿import { Badge, Button, Card } from "react-bootstrap";
 import { Autentikacio } from "./AuthContext";
 import { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
@@ -12,7 +12,7 @@ const ProductComponent = ({
 }) => {
   const { user, getAuthHeader } = Autentikacio();
   const [ertekeles, setErtekeles] = useState(termekErtekeles || 0);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     setErtekeles(termekErtekeles);
@@ -68,32 +68,77 @@ const ProductComponent = ({
   };
 
   return (
-    <Card className="h-100 shadow-sm">
-      <Card.Img variant="top" />
-      <Card.Body>
-        <Card.Title>{product.TermekNev}</Card.Title>
-        <Card.Text className="text-muted">
-          {GetKategoria(product.KategoriaID)}
-        </Card.Text>
-        <Card.Text>
-          <b>{product.TermekAr} Ft</b>
-        </Card.Text>
-        <Card.Text>
-          {product.Keszlet
-            ? "Készleten: " + product.Keszlet + " db"
-            : "Elfogyott"}
-        </Card.Text>
-        <div className="mb-3">
-          <Rating
-            precision={1}
-            value={ertekeles}
-            onChange={(event, newValue) => {
-              console.log("New Rating:", newValue);
-              handleErtekeles(newValue);
-            }}
-          />
+    <Card className="h-100 border-0 shadow-sm hover-shadow transition">
+      <div
+        className="d-flex align-items-center justify-content-center bg-light text-secondary"
+        style={{ height: "180px", cursor: "pointer" }}
+        onClick={() => navigate(`/termek/${product.TermekNev}`)}
+      >
+        <div className="text-center opacity-50">
+          <i className="bi bi-music-note-beamed display-4"></i>
+          <p className="small mb-0 mt-2">Nincs kép</p>
         </div>
-        <Button className="w-100" onClick={() => navigate(`/termek/${product.TermekNev}`)}>Megnézem</Button>
+      </div>
+
+      <Card.Body className="d-flex flex-column">
+        <div className="mb-2">
+          <small
+            className="text-primary fw-bold text-uppercase"
+            style={{ fontSize: "0.75rem" }}
+          >
+            {product.Brand}
+          </small>
+          <Card.Title
+            className="h5 mb-1 text-truncate"
+            title={product.TermekNev}
+          >
+            {product.TermekNev}
+          </Card.Title>
+          <Card.Text className="text-muted small mb-2">
+            {GetKategoria(product.KategoriaID)}
+          </Card.Text>
+        </div>
+
+        <div className="mt-auto">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0 fw-bold">
+              {new Intl.NumberFormat("hu-HU").format(product.TermekAr)} Ft
+            </h5>
+            {product.Keszlet > 0 ? (
+              <Badge
+                bg="success-subtle"
+                className="text-success border border-success-subtle"
+              >
+                Készleten
+              </Badge>
+            ) : (
+              <Badge
+                bg="danger-subtle"
+                className="text-danger border border-danger-subtle"
+              >
+                Elfogyott
+              </Badge>
+            )}
+          </div>
+
+          <div className="d-flex align-items-center mb-3">
+            <Rating
+              size="small"
+              precision={1}
+              value={ertekeles}
+              onChange={(event, newValue) => handleErtekeles(newValue)}
+            />
+            <span className="ms-2 small text-muted">({ertekeles})</span>
+          </div>
+
+          <Button
+            variant="primary"
+            className="w-100 fw-bold py-2 shadow-sm"
+            onClick={() => navigate(`/termek/${product.TermekNev}`)}
+          >
+            Részletek
+          </Button>
+        </div>
       </Card.Body>
     </Card>
   );
