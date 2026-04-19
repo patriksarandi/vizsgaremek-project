@@ -27,6 +27,20 @@ export class RendelesService {
     };
   }
 
+  async findRendelesekByVevo(vevoId: number) {
+  return await this.db.rendeles.findMany({
+    where: { VevoID: vevoId },
+    include: {
+      RendeltTermek: {
+        include: {
+          Termek: true, 
+        },
+      },
+    },
+    orderBy: { RendelesiDatum: 'desc' },
+  });
+}
+
   async findKosarByVevo(vevoId: number) {
     return await this.db.kosarTetel.findMany({
       where: {

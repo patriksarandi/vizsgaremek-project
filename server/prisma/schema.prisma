@@ -109,7 +109,7 @@ model Rendeles {
   RendelesiVegosszeg Decimal         @db.Decimal(10, 2)
   Statusz           String          @default("Feldolgozás alatt") @db.VarChar(50)
   Vevo              Vevo            @relation(fields: [VevoID], references: [VevoID])
-  Termekek          RendeltTermek[]
+  RendeltTermek          RendeltTermek[]
   Fizetesek         Fizetes[]
 }
 

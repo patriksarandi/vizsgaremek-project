@@ -8,10 +8,12 @@ import {
   BadRequestException,
   ParseIntPipe,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { RendelesService } from './rendeles.service';
 import { CreateRendelesDto, KosarTetelDto } from './dto/create-rendeles.dto';
 import { FizetesiKosarDto } from './dto/create-rendeles.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('rendeles')
 export class RendelesController {
@@ -39,6 +41,12 @@ export class RendelesController {
     return this.rendelesService.findAllFizetesiKosar();
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Get('user/:id')
+  async findByUser(@Param('id', ParseIntPipe) id: number) {
+    return this.rendelesService.findRendelesekByVevo(id);
+  }
+
   @Post('/kosartetel')
   async createKosarTetel(@Body() dto: KosarTetelDto) {
     try {
@@ -64,7 +72,10 @@ export class RendelesController {
   }
 
   @Post()
-  createRendeles(@Body('vevoId', ParseIntPipe) vevoId: number, @Body() createRendeleDto: CreateRendelesDto) {
+  createRendeles(
+    @Body('vevoId', ParseIntPipe) vevoId: number,
+    @Body() createRendeleDto: CreateRendelesDto,
+  ) {
     return this.rendelesService.createRendeles(vevoId, createRendeleDto);
   }
 
@@ -79,7 +90,6 @@ export class RendelesController {
     @Body('termekId') termekId: number,
     @Body('valtozas') valtozas: number,
   ) {
-    
     console.log('Beérkező adatok:', { vevoId, termekId, valtozas });
 
     if (
