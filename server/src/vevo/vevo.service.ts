@@ -55,28 +55,13 @@ export class VevoService {
   }
 
   async updateNev(id: number, dto: UpdateVevoDto) {
-    try {
-      console.log('Módosítás ID:', id);
-      console.log('Adatok:', dto);
-      const exists = await this.findOne(id);
-
-      if (!exists) {
-        throw new NotFoundException(`Nincs ilyen vevő: ${id}`);
-      }
-
-      const result = await this.db.vevo.updateMany({
-        where: { VevoID: id },
-        data: {
-          Keresztnev: dto.keresztnev,
-          Vezeteknev: dto.vezeteknev,
-        },
-      });
-
-      return result;
-    } catch (error: any) {
-      console.error('Hiba a service-ben:', error.message);
-      throw error;
-    }
+    return await this.db.vevo.update({
+      where: { VevoID: id },
+      data: {
+        Keresztnev: dto.keresztnev,
+        Vezeteknev: dto.vezeteknev,
+      },
+    });
   }
 
   async updateTelefonszam(id: number, dto: UpdateVevoDto) {
@@ -128,6 +113,10 @@ export class VevoService {
   async updateSzallitasiCim(id: number, dto: UpdateVevoDto) {
     await this.findOne(id);
 
+    return await this.db.vevo.update({
+      where: { VevoID: id },
+      data: { Cim: dto.Cim },
+    });
   }
 
   async update(id: number, dto: UpdateVevoDto) {

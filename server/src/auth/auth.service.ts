@@ -24,6 +24,8 @@ export class AuthService {
       throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!');
     }
 
+    console.log('Bejelentkező vevő adatai az adatbázisból:', customer);
+
     const payload = {
       sub: customer.VevoID,
       email: customer.VevoEmail,
@@ -34,9 +36,13 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
       user: {
         VevoID: customer.VevoID,
-        email: customer.VevoEmail,
-        name: customer.VevoNev,
-        Role: customer.Role
+        VevoEmail: customer.VevoEmail,
+        VevoNev: customer.VevoNev,
+        Role: customer.Role,
+        VezetekNev: customer.VezetekNev,
+        KeresztNev: customer.KeresztNev,
+        Telefonszam: customer.Telefonszam,
+        Cim: customer.Cim,
       },
     };
   }

@@ -1,176 +1,149 @@
 ﻿import { Button, Form } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
 import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
 
 const ProfileFelhasznaloi = () => {
-  const { user, setUser, logout } = Autentikacio();
+  const { user, loading, setUser, logout, getAuthHeader } = Autentikacio();
+  const vezeteknevRef = useRef(null);
+  const keresztnevRef = useRef(null);
+  const telefonszamRef = useRef(null);
+  const emailRef = useRef(null);
+  const utcaRef = useRef(null);
+  const varosRef = useRef(null);
+  const irszamRef = useRef(null);
 
-  const vezeteknevRef = useRef(user.Vezeteknev);
-  const keresztnevRef = useRef(user.Keresztnev);
-  const telefonszamRef = useRef(user.Telefonszam);
-  const emailRef = useRef(user.VevoEmail);
+  if (loading) {
+    return <p>Betöltés...</p>;
+  }
+
+  if (!user) {
+    return <p>Kérjük, jelentkezzen be a profil megtekintéséhez!</p>;
+  }
+
+  const updateLocalUser = (updatedData) => {
+    const frissitettUser = { ...user, ...updatedData };
+    setUser(frissitettUser);
+    localStorage.setItem("user", JSON.stringify(frissitettUser));
+  };
 
   const handleUpdateNev = async () => {
-    try {
-      if (!vezeteknevRef.current?.value || !keresztnevRef.current?.value) {
-        console.error("Minden mezőt ki kell tölteni!");
-        return;
-      }
+    const ujVezeteknev = vezeteknevRef.current.value;
+    const ujKeresztnev = keresztnevRef.current.value;
 
+    try {
       const response = await fetch(
         `http://localhost:7777/vevo/${user.VevoID}/teljes-nev`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
+            ...getAuthHeader(),
           },
           body: JSON.stringify({
-            vezeteknev: vezeteknevRef.current.value,
-            keresztnev: keresztnevRef.current.value,
+            vezeteknev: ujVezeteknev,
+            keresztnev: ujKeresztnev,
           }),
         },
       );
 
       if (response.ok) {
-        const data = await response.json();
-
-        const frissitettUser = {
-          ...user,
-          Vezeteknev: vezeteknevRef.current.value,
-          Keresztnev: keresztnevRef.current.value,
-        };
-
-        localStorage.setItem("user", JSON.stringify(frissitettUser));
-        setUser(frissitettUser);
-
-        alert("Név sikeresen módosítva");
-      } else {
-        const errorData = await response.json();
-        console.error("Szerver hiba:", errorData);
+        updateLocalUser({ Vezeteknev: ujVezeteknev, Keresznev: ujKeresztnev });
+        alert("Sikeresen elmetve az adatbázisba.");
       }
-    } catch (error: any) {
-      console.error("Fetch hiba: ", error.message);
-      alert(error.message);
+    } catch (error) {
+      console.error("Hálózati hiba:", error);
     }
   };
 
   const handleUpdateTelefonszam = async () => {
     try {
-      if (!telefonszamRef.current?.value) {
-        console.error("Hiányos mező");
-        return;
-      }
-
+      const tel = telefonszamRef.current.value;
       const response = await fetch(
         `http://localhost:7777/vevo/${user.VevoID}/telefonszam`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            telefonszam: telefonszamRef.current.value,
-          }),
+          headers: { "Content-Type": "application/json", ...getAuthHeader() },
+          body: JSON.stringify({ telefonszam: tel }),
         },
       );
 
       if (response.ok) {
-        const data = await response.json();
-
-        const frissitettUser = {
-          ...user,
-          Telefonszam: telefonszamRef.current.value,
-        };
-
-        localStorage.setItem("user", JSON.stringify(frissitettUser));
-        setUser(frissitettUser);
-
-        alert("Telefonszám sikeresen módosítva");
-        console.log("Sikeresen módosított telefonszám", data)
-      } else {
-        const errorData = await response.json();
-        console.error("Szerver hiba:", errorData);
+        updateLocalUser({ Telefonszam: tel });
+        alert("Telefonszám módosítva");
       }
-    } catch (error: any) {
-      console.error("Fetch hiba: ", error.message);
-      alert(error.message);
+    } catch (error) {
+      console.error("Hiba:", error);
     }
   };
 
   const handleUpdateEmail = async () => {
     try {
-      if (!emailRef.current?.value) {
-        console.error("Hiányos mező");
-        return;
-      }
-
+      const mail = emailRef.current.value;
       const response = await fetch(
         `http://localhost:7777/vevo/${user.VevoID}/email`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            vevoEmail: emailRef.current.value,
-          }),
+          headers: { "Content-Type": "application/json", ...getAuthHeader() },
+          body: JSON.stringify({ vevoEmail: mail }),
         },
       );
 
       if (response.ok) {
-        const data = await response.json();
-
-        const frissitettUser = {
-          ...user,
-          VevoEmail: emailRef.current.value,
-        };
-
-        localStorage.setItem("user", JSON.stringify(frissitettUser));
-        setUser(frissitettUser);
-
-        alert("Email sikeresen módosítva");
-      } else {
-        const errorData = await response.json();
-        console.error("Szerver hiba:", errorData);
+        updateLocalUser({ VevoEmail: mail });
+        alert("Email módosítva");
       }
-    } catch (error: any) {
-      console.error("Fetch hiba: ", error.message);
-      alert(error.message);
+    } catch (error) {
+      alert("Hiba történt az email módosításakor.");
+    }
+  };
+
+  const handleUpdateCim = async () => {
+    try {
+      const teljesCim = `${irszamRef.current.value} ${varosRef.current.value}, ${utcaRef.current.value}`;
+
+      const response = await fetch(
+        `http://localhost:7777/vevo/${user.VevoID}/cim`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", ...getAuthHeader() },
+          body: JSON.stringify({ Cim: teljesCim }),
+        },
+      );
+
+      if (response.ok) {
+        updateLocalUser({ Cim: teljesCim });
+        alert("Cím sikeresen mentve");
+      }
+    } catch (error) {
+      console.error("Cím hiba:", error);
     }
   };
 
   const handleFiokTorlese = async () => {
-    if (!window.confirm("Biztosan törölni szeretnéd a fiókodat? Ez a folyamat nem vonható vissza!")) {
-      return;
-    }
+    if (!window.confirm("Biztosan törölni szeretnéd a fiókodat?")) return;
 
     try {
-      const response = await fetch(`http://localhost:7777/vevo/${user.VevoID}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-      });
+      const response = await fetch(
+        `http://localhost:7777/vevo/${user.VevoID}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        },
+      );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        alert(errorData.message || "Sikertelen törlése");
-        return;
-      } 
-
-      alert("Fiók sikeresen törölve!")
-      logout();
-
-    } catch (error: any) {
+        alert("Fiók sikeresen törölve!");
+        logout();
+      }
+    } catch (error) {
       console.error("Törlési hiba", error);
-      alert("Hálózati hiba történt a törlés során.");
     }
-  }
+  };
+
+  const cimReszek = user.Cim ? user.Cim.split(/[ ,]+/) : ["", "", ""];
 
   return (
-    <>
+    <div key={user.VevoID}>
       <h4>Elérhetőségek</h4>
       <Form>
         <Form.Group className="mb-3">
@@ -192,7 +165,9 @@ const ProfileFelhasznaloi = () => {
           <Form.Control ref={telefonszamRef} defaultValue={user.Telefonszam} />
         </Form.Group>
 
-        <Button onClick={handleUpdateTelefonszam}>Telefonszám Módosítása</Button>
+        <Button onClick={handleUpdateTelefonszam}>
+          Telefonszám Módosítása
+        </Button>
       </Form>
 
       <hr />
@@ -205,33 +180,38 @@ const ProfileFelhasznaloi = () => {
         <Button onClick={handleUpdateEmail}>E-mail Módosítása</Button>
       </Form>
 
-      <hr/>
+      <hr />
       <h4>Számlázási cím</h4>
-      <Form>
+      <Form className="mb-4">
         <Form.Group className="mb-3">
-          <Form.Label>Utca és házszám</Form.Label>
-          <Form.Control></Form.Control>
+          <Form.Label>Irányítószám</Form.Label>
+          <Form.Control ref={irszamRef} defaultValue={cimReszek[0]} />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Város</Form.Label>
-          <Form.Control></Form.Control>
+          <Form.Control ref={varosRef} defaultValue={cimReszek[1]} />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Irányítószám</Form.Label>
-          <Form.Control></Form.Control>
+          <Form.Label>Utca és házszám</Form.Label>
+          <Form.Control
+            ref={utcaRef}
+            defaultValue={cimReszek.slice(2).join(" ")}
+          />
         </Form.Group>
-        <Button>Megadás</Button>
+        <Button onClick={handleUpdateCim}>Cím Mentése</Button>
       </Form>
 
-      <hr/>
+      <hr />
       <h4>A fiók felfüggesztése</h4>
       <Form>
         <Form.Group className="mb-3">
-          <Form.Label>A fiók törlése után már nem vonható vissza a folyamat.</Form.Label>
+          <Form.Label>
+            A fiók törlése után már nem vonható vissza a folyamat.
+          </Form.Label>
         </Form.Group>
         <Button onClick={handleFiokTorlese}>Fiók törlése</Button>
       </Form>
-    </>
+    </div>
   );
 };
 

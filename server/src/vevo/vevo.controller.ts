@@ -26,7 +26,7 @@ export class VevoController {
   @UseGuards(AuthGuard('jwt'))
   @Get()
   findAll(@Request() req) {
-    console.log("Lekérte: ", req.user)
+    console.log('Lekérte: ', req.user);
     return this.vevoService.findAll();
   }
 
@@ -35,24 +35,38 @@ export class VevoController {
     return this.vevoService.findOne(id);
   }
 
-  @Get('search/:email') 
+  @Get('search/:email')
   findByEmail(@Param('email') email: string) {
     return this.vevoService.findByEmail(email);
   }
 
   @Patch(':id/teljes-nev')
-  async updateTeljesNev(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVevoDto) {
-    return await this.vevoService.updateNev(id, dto)
+  async updateTeljesNev(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateVevoDto,
+  ) {
+    const result = await this.vevoService.updateNev(id, dto);
+    return {
+      success: true,
+      message: 'A név módosítása sikeresen megtörtént.',
+      data: result,
+    };
   }
 
   @Patch(':id/telefonszam')
-  async updateTelefonszam(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVevoDto) {
-    return await this.vevoService.updateTelefonszam(id, dto)
+  async updateTelefonszam(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateVevoDto,
+  ) {
+    return await this.vevoService.updateTelefonszam(id, dto);
   }
 
   @Patch(':id/email')
-  async updateEmail(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVevoDto) {
-    return await this.vevoService.updateEmail(id, dto)
+  async updateEmail(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateVevoDto,
+  ) {
+    return await this.vevoService.updateEmail(id, dto);
   }
 
   @Delete(':id')

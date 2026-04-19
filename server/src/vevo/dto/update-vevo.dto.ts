@@ -1,20 +1,24 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateVevoDto } from './create-vevo.dto';
-import { IsEmail, IsPhoneNumber, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsOptional, IsPhoneNumber, IsString, MinLength } from 'class-validator';
 
 export class UpdateVevoDto extends PartialType(CreateVevoDto) {
+    @IsOptional()
     @IsString()
     @MinLength(2)
-    vezeteknev: string;
+    vezeteknev?: string;
 
+    @IsOptional()
     @IsString()
     @MinLength(2)
-    keresztnev: string;
+    keresztnev?: string;
 
+    @IsOptional()
     @IsString()
     @IsPhoneNumber('HU')
-    telefonszam: string;
+    telefonszam?: string;
 
+    @IsOptional()
     @IsEmail()
-    vevoEmail: string;
+    vevoEmail?: string;
 }
