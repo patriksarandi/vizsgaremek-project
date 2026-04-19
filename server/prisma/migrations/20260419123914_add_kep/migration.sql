@@ -1,0 +1,14 @@
+-- AlterTable
+ALTER TABLE `termek` ADD COLUMN `Kep` VARCHAR(191) NULL;
+
+-- CreateTable
+CREATE TABLE `TermekKep` (
+    `KepID` INTEGER NOT NULL AUTO_INCREMENT,
+    `Url` VARCHAR(191) NOT NULL,
+    `TermekID` INTEGER NOT NULL,
+
+    PRIMARY KEY (`KepID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `TermekKep` ADD CONSTRAINT `TermekKep_TermekID_fkey` FOREIGN KEY (`TermekID`) REFERENCES `Termek`(`TermekID`) ON DELETE RESTRICT ON UPDATE CASCADE;

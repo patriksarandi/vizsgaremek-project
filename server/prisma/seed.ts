@@ -37,7 +37,7 @@ async function main() {
     kategoriak[nev] = kat.KategoriaID;
   }
 
-  // 3. Termékek (Most már a kötelező Brand mezővel!)
+  // 3. Termékek
   const termekek = [
     {
       TermekNev: 'Fender Stratocaster Electric Guitar',
@@ -45,6 +45,7 @@ async function main() {
       Keszlet: 3,
       Brand: 'Fender',
       KategoriaID: kategoriak['Gitár'],
+      Kep: '/images/guitar1.jpg'
     },
     {
       TermekNev: 'Ibanez SR300EB Bass Guitar',
@@ -52,6 +53,7 @@ async function main() {
       Keszlet: 5,
       Brand: 'Ibanez',
       KategoriaID: kategoriak['BasszusGitár'],
+      Kep: '/images/bass1.jpg'
     },
     {
       TermekNev: 'Yamaha P-145 Digital Piano',
@@ -59,6 +61,7 @@ async function main() {
       Keszlet: 4,
       Brand: 'Yamaha',
       KategoriaID: kategoriak['Billentyűs'],
+      Kep: '/images/keyboard1.jpg'
     },
     {
       TermekNev: 'Pearl Roadshow Drum Kit',
@@ -66,6 +69,7 @@ async function main() {
       Keszlet: 2,
       Brand: 'Pearl',
       KategoriaID: kategoriak['Ütős'],
+      Kep: '/images/drum1.jpg'
     },
     {
       TermekNev: 'Yamaha YAS-280 Saxophone',
@@ -73,6 +77,7 @@ async function main() {
       Keszlet: 2,
       Brand: 'Yamaha',
       KategoriaID: kategoriak['Fúvós'],
+      Kep: '/images/wind1.jpg'
     },
     {
       TermekNev: 'Stentor Student I Violin 4/4',
@@ -80,6 +85,7 @@ async function main() {
       Keszlet: 6,
       Brand: 'Stentor',
       KategoriaID: kategoriak['Vonós'],
+      Kep: '/images/string1.jpg'
     },
     {
       TermekNev: 'Focusrite Scarlett 2i2 Audio Interface',
@@ -87,6 +93,7 @@ async function main() {
       Keszlet: 10,
       Brand: 'Focusrite',
       KategoriaID: kategoriak['Stúdió'],
+      Kep: '/images/studio1.jpg'
     },
     {
       TermekNev: 'Ernie Ball Regular Slinky Guitar Strings',
@@ -94,13 +101,14 @@ async function main() {
       Keszlet: 50,
       Brand: 'Ernie Ball',
       KategoriaID: kategoriak['Tartozékok'],
+      Kep: '/images/accessories1.jpg'
     }
   ];
 
   for (let i = 0; i < termekek.length; i++) {
     await prisma.termek.upsert({
       where: { TermekID: i + 1 },
-      update: termekek[i], // Frissítjük is, ha már létezik
+      update: termekek[i],
       create: termekek[i],
     });
   }

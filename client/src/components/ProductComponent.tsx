@@ -93,29 +93,6 @@ const ProductComponent = ({
             }}
           />
         </div>
-        <Button
-          className="w-100"
-          variant="primary"
-          disabled={product.Keszlet === 0}
-          onClick={() => {
-            const kosarId = user?.VevoID || user?.id;
-            const termekId = product.TermekID;
-
-            if (product.Keszlet < 1) {
-              alert("Sajnos nincs több készleten!");
-              return;
-            }
-
-            if (!kosarId) {
-              console.error("Hiba: Nincs felhasználói azonosító!");
-              return;
-            }
-
-            handleKosarTetel(kosarId, termekId, 1);
-          }}
-        >
-          Kosárba
-        </Button>
         <Button className="w-100" onClick={() => navigate(`/termek/${product.TermekNev}`)}>Megnézem</Button>
       </Card.Body>
     </Card>

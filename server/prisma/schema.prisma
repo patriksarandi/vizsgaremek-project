@@ -29,9 +29,19 @@ model Termek {
   Keszlet      Int             @default(0)
   Kategoria    Kategoria       @relation(fields: [KategoriaID], references: [KategoriaID])
   Brand        String
+  Kep          String?
+  
   KosarTetelek KosarTetel[]
   Rendelesek   RendeltTermek[]
   Ertekelesek  Ertekeles[]
+  Kepek TermekKep[]
+}
+
+model TermekKep {
+  KepID Int @id @default(autoincrement())
+  Url String
+  TermekID  Int
+  Termek Termek @relation(fields: [TermekID], references: [TermekID])
 }
 
 enum VevoRole {
