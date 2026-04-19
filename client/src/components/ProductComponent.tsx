@@ -15,7 +15,9 @@ const ProductComponent = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    setErtekeles(termekErtekeles);
+    if (termekErtekeles !== undefined) {
+      setErtekeles(termekErtekeles);
+    }
   }, [termekErtekeles]);
 
   const handleErtekeles = async (ertekelesiErtek: number | null) => {
@@ -78,7 +80,7 @@ const ProductComponent = ({
       >
         <div className="text-center opacity-50">
           <i className="bi bi-music-note-beamed display-4"></i>
-          <p className="small mb-0 mt-2">Nincs kép</p>
+          <p className="small mb-0 mt-2">A kép jelenleg nem elérhető</p>
         </div>
       </div>
 
@@ -127,7 +129,7 @@ const ProductComponent = ({
             <Rating
               size="small"
               precision={1}
-              value={ertekeles ?? 0}
+              value={ertekeles || 0}
               onChange={(event, newValue) => handleErtekeles(newValue)}
             />
             <span className="ms-2 small text-muted">({ertekeles})</span>

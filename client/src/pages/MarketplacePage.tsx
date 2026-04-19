@@ -6,7 +6,12 @@ import FilterSidebarComponent from "../components/FilterSidebarComponent";
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
+const MarketplacePage = ({
+  productsData,
+  categoriesData,
+  productsBrands,
+  userRatings,
+}) => {
   const { user, loading, getAuthHeader } = Autentikacio();
   const [products, setProducts] = useState(productsData);
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,22 +24,18 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
     setProducts(productsData);
   }, [productsData]);
 
-  const productUpdate = (termekId, ujErtekeles) => {
+  const productUpdate = async (termekId, ujErtekeles) => {
     setProducts((prev) =>
       prev.map((p) =>
         p.TermekID === termekId
-          ? {
-              ...p,
-              Ertekelesek: [
-                {
-                  ErtekelesSzam: ujErtekeles,
-                  VevoID: user.id || user.VevoID,
-                },
-              ],
-            }
+          ? { ...p, ideiglenesErtekeles: ujErtekeles }
           : p,
       ),
     );
+
+    if (onRatingUpdate) {
+      await onRatingUpdate();
+    }
   };
 
   const CategoryById = (kategoriaId) => {
@@ -123,6 +124,7 @@ const MarketplacePage = ({ productsData, categoriesData, productsBrands }) => {
                   <Col key={p.TermekID} xs={12} sm={6} md={4} xl={3}>
                     <ProductComponent
                       product={p}
+                      termekErtekeles={userRatings[p.TermekID] || 0}
                       onErtekelesFrissites={productUpdate}
                     />
                   </Col>

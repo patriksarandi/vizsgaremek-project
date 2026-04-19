@@ -25,6 +25,7 @@ const App = () => {
   const [productsBrands, setProductsBrands] = useState([])
   const [customersData, setCustomersData] = useState([])
   const [productUrl, setProductUrl] = useState("");
+  const [userRatings, setUserRatings] = useState({});
 
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
@@ -86,6 +87,28 @@ const App = () => {
     }
   }
 
+  const fetchUserRatings = async () => {
+    if (!user) return;
+
+    try {
+      const vevoId = user.id || user.VevoID;
+      const response = await fetch(`http://localhost:7777/ertekeles/${vevoId}/osszes`, {
+        headers: getAuthHeader(),
+      })
+
+      if (response.ok) {
+        const data = await response.json();
+        const ratings = {};
+        data.forEach((r) => {
+          ratings[r.TermekID] = r.ErtekelesSzam;
+        });
+        setUserRatings(ratings)
+      }
+    } catch (error) {
+      console.error("Értékelés lekérdezési hiba:", error)
+    }
+  }
+
   useEffect(() => {
     if (loading) return;
 
@@ -94,7 +117,8 @@ const App = () => {
         fetchProducts(),
         fetchCategories(),
         fetchBrands(),
-        fetchCustomers()
+        fetchCustomers(),
+        fetchUserRatings()
       ])
     };
 
@@ -105,7 +129,7 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/marketplace" />} />
-      <Route path="/marketplace" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData} productsBrands={productsBrands}/>} />
+      <Route path="/marketplace" element={<MarketplacePage productsData={productsData} categoriesData={categoriesData} productsBrands={productsBrands} userRatings={userRatings} onRatingUpdate={fetchUserRatings}/>} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/wishlist" element={<WishlistPage />} />

@@ -80,7 +80,7 @@ const ProductPage = ({ productsData }) => {
               <div className="text-center">
                 <div className="display-1 text-secondary opacity-25"></div>
                 <p className="text-muted mt-3 italic">
-                  Illusztráció nem elérhető
+                  A kép jelenleg nem elérhető
                 </p>
               </div>
             </Card>
