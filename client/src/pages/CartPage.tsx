@@ -11,64 +11,15 @@ import CartItem from "../components/CartItem";
 import NavbarComponent from "../components/NavbarComponent";
 import { useEffect, useState } from "react";
 import { Autentikacio } from "../components/AuthContext";
+import { useKosar } from "../components/CartContext";
 
 const CartPage = () => {
   const { user, logout, getAuthHeader } = Autentikacio();
-
-  const [kosarTetelek, setKosarTetelek] = useState([]);
+  const { kosarTetelek, emptyKosar, refreshKosar, updateTermekMennyiseg } =
+    useKosar();
   const [rendelesiOsszeg, setRendelesiOsszeg] = useState(0);
 
   const vevoId = user?.id || user?.VevoID;
-
-  const getKosarTetelek = async () => {
-    if (!vevoId) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:7777/rendeles/kosartetel/${vevoId}`,
-        { headers: getAuthHeader() },
-      );
-      if (!response) throw new Error("Nem sikerült lekérni a kosártételeket!");
-      const data = await response.json();
-
-      if (data && data.Tetelek) {
-        setKosarTetelek(data.Tetelek);
-        setRendelesiOsszeg(data.Vegosszeg || 0);
-      } else {
-        setKosarTetelek([]);
-        setRendelesiOsszeg(0);
-      }
-
-    } catch (error) {
-      console.error("Hiba a kosár lekérdezésekor:", error);
-    }
-  };
-
-  const updateTermekMennyiseg = async (termekId: number, valtozas: number) => {
-    try {
-      const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel/update",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...getAuthHeader(),
-          },
-          body: JSON.stringify({
-            vevoId: Number(vevoId),
-            termekId: Number(termekId),
-            valtozas: Number(valtozas),
-          }),
-        },
-      );
-
-      if (response.ok) {
-        getKosarTetelek();
-      }
-    } catch (error: any) {
-      console.error("Hiba a módosítás során:", error);
-    }
-  };
 
   const handleRendeles = async (vevoId: number) => {
     if (!vevoId) return;
@@ -76,57 +27,31 @@ const CartPage = () => {
     try {
       const response = await fetch("http://localhost:7777/rendeles", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeader },
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
         body: JSON.stringify({
           vevoId: Number(vevoId),
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Hiba történt a rendelés leadása során.");
-      } else {
-        const data = await response.json();
-        console.log("Sikeres rendelés: ", data);
-        setKosarTetelek([]);
-        alert("Köszönjük! A rendelést rögzítettük.");
-      }
-    } catch (error) {
-      throw new Error("Hiba történt", error.message);
-    }
-  };
+      const data = await response.json();
 
-  const handleKosarTetel = async (
-    kosarId: number,
-    termekId: number,
-    tetelMennyiseg: number,
-  ) => {
-    try {
-      const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            kosarId: kosarId,
-            termekId: termekId,
-            tetelMennyiseg: tetelMennyiseg,
-          }),
-        },
-      );
       if (!response.ok) {
-        console.error("Hiba történt:", response.status);
+        alert(data.message || "Hiba történt a rendelés során.");
         return;
       }
 
-      const data = await response.json();
-      console.log(data);
-    } catch (error: any) {
-      console.error(error.message);
+      console.log("Sikeres rendelés: ", data);
+      emptyKosar();
+      alert("Köszönjük! A rendelést rögzítettük.");
+
+    } catch (error) {
+      console.error("Hiba történt", error);
+      alert("Nem sikerült elérni a szervert!")
     }
   };
 
   useEffect(() => {
-    getKosarTetelek();
+    refreshKosar();
   }, [user, vevoId]);
 
   return (

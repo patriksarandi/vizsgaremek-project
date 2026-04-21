@@ -5,6 +5,7 @@ import ProductComponent from "../components/ProductComponent";
 import FilterSidebarComponent from "../components/FilterSidebarComponent";
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useKosar } from "../components/CartContext";
 
 const MarketplacePage = ({
   productsData,
@@ -13,12 +14,16 @@ const MarketplacePage = ({
   userRatings,
 }) => {
   const { user, loading, getAuthHeader } = Autentikacio();
+  const { kosarTetelek, refreshKosar } = useKosar()
   const [products, setProducts] = useState(productsData);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+
+  console.log("Kosár tételek:", kosarTetelek)
+
 
   useEffect(() => {
     setProducts(productsData);

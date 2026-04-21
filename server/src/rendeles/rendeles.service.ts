@@ -255,7 +255,7 @@ export class RendelesService {
         data: { RendelesiVegosszeg: osszeg },
       });
 
-      await tx.kosarTetel.deleteMany({ where: { KosarID: vevoId } });
+      await tx.kosarTetel.deleteMany({ where: { KosarID: kosar.KosarID } });
 
       return {
         ...ujRendeles,

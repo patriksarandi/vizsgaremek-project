@@ -1,13 +1,8 @@
 ﻿import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Autentikacio } from "./AuthContext";
 
-const CartItem = ({
-  tetel,
-  updateTermekMennyiseg,
-}: {
-  tetel: any;
-}) => {
-  const { user } = Autentikacio();
+const CartItem = ({ tetel, updateTermekMennyiseg }: { tetel: any }) => {
+  const termekId = tetel.TermekID || tetel.Termek?.TermekID;
 
   if (!tetel || !tetel.Termek) return null;
 
@@ -23,11 +18,11 @@ const CartItem = ({
         <Button 
             variant="outline-secondary"
             size="sm"
-            onClick={() => updateTermekMennyiseg(tetel.TermekID, -1)}>-</Button>
+            onClick={() => termekId && updateTermekMennyiseg(termekId, -1)}>-</Button>
         <Button
             variant="outline-primary"
             size="sm"
-            onClick={() => updateTermekMennyiseg(tetel.TermekID, 1)}
+            onClick={() => termekId && updateTermekMennyiseg(termekId, 1)}
         >
           +
         </Button>

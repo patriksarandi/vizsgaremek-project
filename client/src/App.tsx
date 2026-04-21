@@ -93,7 +93,7 @@ const App = () => {
     try {
       const vevoId = user.id || user.VevoID;
       const response = await fetch(`http://localhost:7777/ertekeles/${vevoId}/osszes`, {
-        headers: getAuthHeader(),
+        headers: {"Content-Type": "application/json", ...getAuthHeader()}
       })
 
       if (response.ok) {
