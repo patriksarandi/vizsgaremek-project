@@ -1,4 +1,4 @@
-﻿import { Button, Form } from "react-bootstrap";
+﻿import { Button, Form, Spinner } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
 import { useRef } from "react";
 
@@ -12,13 +12,8 @@ const ProfileFelhasznaloi = () => {
   const varosRef = useRef(null);
   const irszamRef = useRef(null);
 
-  if (loading) {
-    return <p>Betöltés...</p>;
-  }
-
-  if (!user) {
-    return <p>Kérjük, jelentkezzen be a profil megtekintéséhez!</p>;
-  }
+  if (loading) return <div className="text-center p-5"><Spinner animation="grow" /></div>;
+  if (!user) return <p className="text-center mt-5">Kérjük, jelentkezzen be!</p>;
 
   const updateLocalUser = (updatedData) => {
     const frissitettUser = { ...user, ...updatedData };

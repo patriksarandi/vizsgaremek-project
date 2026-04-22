@@ -1,81 +1,53 @@
 ﻿import { useEffect, useState } from "react";
 import { Table, Container, Badge, Spinner } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
+import { useFetchData } from "../../components/useFetchData";
 
 const ProfileMegrendelesek = () => {
-  const [rendelesek, setRendelesek] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user, getAuthHeader } = Autentikacio();
+  const { data: rendelesek, loading} = useFetchData(user ? `/rendeles/user/${user.VevoID}` : null, getAuthHeader())
 
-  useEffect(() => {
-    const fetchRendelesek = async () => {
-      if (!user) return;
-      try {
-        const response = await fetch(
-          `http://localhost:7777/rendeles/user/${user.VevoID}`,
-          {
-            headers: { ...getAuthHeader() },
-          },
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setRendelesek(data);
-        }
-      } catch (error) {
-        console.error("Hiba a rendelések betöltésekor:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRendelesek();
-  }, [user]);
-
-  if (loading)
-    return <Spinner animation="border" className="d-block mx-auto mt-5" />;
+  if (loading) return <Spinner animation="border" className="d-block mx-auto mt-5" />;
 
   return (
     <Container className="mt-4">
       <h3 className="mb-4">Korábbi megrendeléseim</h3>
-      {rendelesek.length === 0 ? (
-        <p className="text-muted text-center">
+      {!rendelesek || rendelesek.length === 0 ? (
+        <p className="text-muted text-center py-5 border rounded bg-light">
           Még nem volt leadott rendelésed.
         </p>
       ) : (
-        <Table responsive hover className="shadow-sm">
+        <Table responsive hover className="align-middle shadow-sm">
           <thead className="table-dark">
             <tr>
-              <th>Rendelés ID</th>
+              <th>Azonosító</th>
               <th>Dátum</th>
               <th>Termékek</th>
-              <th>Összeg</th>
-              <th>Státusz</th>
+              <th className="text-end">Végösszeg</th>
+              <th className="text-center">Státusz</th>
             </tr>
           </thead>
           <tbody>
             {rendelesek.map((r) => (
               <tr key={r.RendelesID}>
-                <td>#{r.RendelesID}</td>
+                <td className="fw-bold">#{r.RendelesID}</td>
+                <td>{new Date(r.RendelesiDatum).toLocaleDateString("hu-HU")}</td>
                 <td>
-                  {new Date(r.RendelesiDatum).toLocaleDateString("hu-HU")}
-                </td>
-                <td>
-                  <ul
-                    className="list-unstyled mb-0"
-                    style={{ fontSize: "0.9rem" }}
-                  >
-                    {(r.RendeltTermekek || r.RendeltTermek)?.map((rt: any) => (
+                  <ul className="list-unstyled mb-0 small">
+                    {r.RendeltTermek?.map((rt) => (
                       <li key={rt.TermekID}>
-                        {rt.RendeltMennyiseg}x {rt.Termek?.TermekNev}
+                        <i className="bi bi-caret-right-fill text-primary small me-1"></i>
+                        {rt.RendeltMennyiseg}x {rt.Termek?.TermekNev} 
+                        <span className="text-muted"> ({Number(rt.RendeltEgysegar).toLocaleString()} Ft/db)</span>
                       </li>
                     ))}
                   </ul>
                 </td>
-                <td className="fw-bold">
+                <td className="text-end fw-bold text-nowrap">
                   {Number(r.RendelesiVegosszeg).toLocaleString()} Ft
                 </td>
-                <td>
-                  <Badge bg={r.Statusz === "Aktív" ? "success" : "secondary"}>
+                <td className="text-center">
+                  <Badge bg={r.Statusz === "Teljesítve" ? "success" : "warning"} className="px-3 py-2">
                     {r.Statusz}
                   </Badge>
                 </td>
