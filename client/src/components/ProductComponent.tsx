@@ -23,7 +23,7 @@ const ProductComponent = ({
   onErtekelesFrissites,
 }) => {
   const { user, getAuthHeader } = Autentikacio();
-  const { hozzaadasAKosarhoz } = useKosar()
+  const { hozzaadasAKosarhoz } = useKosar();
   const [ertekeles, setErtekeles] = useState(termekErtekeles ?? 0);
   const navigate = useNavigate();
 
@@ -132,8 +132,7 @@ const ProductComponent = ({
               className="flex-grow-1 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center"
               onClick={() => navigate(`/termek/${product.TermekID}`)}
             >
-              <i className="bi bi-cart3 me-2"></i>{" "}
-              Részletek
+              <i className="bi bi-cart3 me-2"></i> Részletek
             </Button>
 
             <Button

@@ -37,13 +37,6 @@ model Termek {
   Kepek TermekKep[]
 }
 
-model TermekKep {
-  KepID Int @id @default(autoincrement())
-  Url String
-  TermekID  Int
-  Termek Termek @relation(fields: [TermekID], references: [TermekID])
-}
-
 enum VevoRole {
   USER
   ADMIN
@@ -78,11 +71,6 @@ model Ertekeles {
   @@unique([VevoID, TermekID])
 }
 
-model Token {
-  token String @id
-  vevo   Vevo   @relation(fields: [vevoId], references: [VevoID], onDelete: Cascade)
-  vevoId Int
-}
 
 model FizetesiKosar {
   KosarID Int          @id @default(autoincrement())
