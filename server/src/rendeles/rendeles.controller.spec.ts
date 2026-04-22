@@ -1,6 +1,7 @@
 ﻿import { Test, TestingModule } from "@nestjs/testing";
 import { RendelesController } from "./rendeles.controller"
 import { RendelesService } from "./rendeles.service";
+import { BadRequestException } from "@nestjs/common";
 
 describe('RendelesController', () => {
     let controller: RendelesController;
@@ -31,5 +32,21 @@ describe('RendelesController', () => {
 
     it('definiálva', () => {
         expect(controller).toBeDefined();
+    })
+
+    describe('createFizetesiKosar', () => {
+        it('hibát dob ha nincs VevoID', async () => {
+            const dto = { VevoID: undefined };
+            await expect(() => controller.createFizetesiKosar(dto as any))
+            .toThrow(BadRequestException);
+        });
+
+        it('meghívja a service-t és választ ad', async () => {
+            const dto = { VevoID: 1 };
+            mockRendelesService.createFizetesiKosar.mockResolvedValue({ id: 1 });
+            const result = await controller.createFizetesiKosar(dto as any);
+            expect(service.createFizetesiKosar).toHaveBeenCalledWith(dto);
+            expect(result.message).toBe('A fizetési kosár sikeresen létrehozva');
+        })
     })
 })
