@@ -49,7 +49,6 @@ export class TermekService {
         .split(' ')
         .filter((word) => word.length > 0);
 
-     
       where.AND = searchWords.map((word) => ({
         OR: [
           { TermekNev: { contains: word } },
@@ -64,14 +63,19 @@ export class TermekService {
     }
 
     if (query.category) {
-      const categoryValue = query.category;
-      const isNumeric = !isNaN(Number(categoryValue));
+      const categoryList = String(query.category)
+        .split(',')
+        .map((id) => id.trim());
 
-      if (isNumeric) {
-        where.KategoriaID = Number(categoryValue);
+      const numericIds = categoryList
+        .map((id) => Number(id))
+        .filter((id) => !isNaN(id));
+
+      if (numericIds.length > 0) {
+        where.KategoriaID = { in: numericIds };
       } else {
         where.Kategoria = {
-          Nev: categoryValue,
+          Nev: { in: categoryList },
         };
       }
     }
