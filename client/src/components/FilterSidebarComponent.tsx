@@ -22,6 +22,18 @@ const FilterSidebarComponent = ({
     setPriceRange((prev) => ({ ...prev, max: ertek }));
   };
 
+  const handleCategoryChange = (id) => {
+    setFilteredCategories((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
+  };
+
+  const handleBrandChange = (brand) => {
+    setFilteredBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
+    );
+  };
+
   return (
     <>
       <Container className="filter-sidebar">
@@ -51,25 +63,21 @@ const FilterSidebarComponent = ({
         </Form.Group>
         <hr />
 
-        <Form.Group>
-          <Form.Label>Kategória</Form.Label>
-          {categoriesData?.map((c) => (
-            <Form.Check
-              key={c.KategoriaID}
-              label={c.Nev}
-              
-              checked={filteredCategories.includes(c.Nev)}
-              onChange={(e) => {
-                const { checked } = e.target;
-                setFilteredCategories(
-                  (prev) =>
-                    checked
-                      ? [...prev, c.Nev]
-                      : prev.filter((item) => item !== c.Nev),
-                );
-              }}
-            />
-          ))}
+        <Form.Group className="mb-4">
+          <Form.Label className="fw-bold">Kategória</Form.Label>
+          <div className="filter-group-scroll">
+            {categoriesData?.map((c) => (
+              <Form.Check
+                key={c.KategoriaID}
+                type="checkbox"
+                id={`cat-${c.KategoriaID}`}
+                label={c.Nev}
+                checked={filteredCategories.includes(c.KategoriaID)}
+                onChange={() => handleCategoryChange(c.KategoriaID)}
+                className="mb-1"
+              />
+            ))}
+          </div>
         </Form.Group>
         <hr />
 
@@ -80,12 +88,8 @@ const FilterSidebarComponent = ({
               key={brand}
               type="checkbox"
               label={brand}
-              onChange={(e) => {
-                const { checked } = e.target;
-                setFilteredBrands((prev) =>
-                  checked ? [...prev, brand] : prev.filter((b) => b !== brand),
-                );
-              }}
+              checked={filteredBrands.includes(brand)}
+              onChange={() => handleBrandChange(brand)}
             />
           ))}
         </Form.Group>

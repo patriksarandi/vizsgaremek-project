@@ -29,7 +29,11 @@ export class TermekController {
   @Get()
   async findAll(@Req() req: any) {
     const vevoId = req.user?.id;
-    return this.termekService.findAll(vevoId ? Number(vevoId) : undefined);
+    
+    return this.termekService.findAll({
+      ...req.query,
+      vevoId: vevoId ? Number(vevoId) : undefined,
+    });
   }
 
   @Get(':id')

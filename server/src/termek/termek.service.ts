@@ -39,17 +39,73 @@ export class TermekService {
     }
   }
 
-  async findAll(vevoId?: number) {
+  async findAll(query: any) {
+    const page = Number(query.page || 1);
+    const limit = Number(query.limit || 10);
+    const where: any = {};
+
+    if (query.search) {
+      const searchWords = query.search
+        .split(' ')
+        .filter((word) => word.length > 0);
+
+     
+      where.AND = searchWords.map((word) => ({
+        OR: [
+          { TermekNev: { contains: word } },
+          { Brand: { contains: word } },
+          {
+            Kategoria: {
+              Nev: { contains: word },
+            },
+          },
+        ],
+      }));
+    }
+
+    if (query.category) {
+      const categoryValue = query.category;
+      const isNumeric = !isNaN(Number(categoryValue));
+
+      if (isNumeric) {
+        where.KategoriaID = Number(categoryValue);
+      } else {
+        where.Kategoria = {
+          Nev: categoryValue,
+        };
+      }
+    }
+
+    if (query.brand) {
+      const brandList = String(query.brand).split(',');
+      where.Brand = { in: brandList };
+    }
+
+    if (query.minPrice || query.maxPrice) {
+      where.TermekAr = {};
+
+      if (query.minPrice) {
+        where.TermekAr.gte = Number(query.minPrice);
+      }
+
+      if (query.maxPrice) {
+        where.TermekAr.lte = Number(query.maxPrice);
+      }
+    }
+
+    console.log('Beérkező query:', query);
+    console.log('Generált where objektum:', JSON.stringify(where, null, 2));
+
     return this.db.termek.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { TermekAr: 'asc' },
       include: {
         Kategoria: true,
         Ertekelesek: {
-          where: {
-            VevoID: vevoId,
-          },
           select: {
             ErtekelesSzam: true,
-            VevoID: true,
           },
         },
       },

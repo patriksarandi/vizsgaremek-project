@@ -14,7 +14,7 @@ const MarketplacePage = ({
   userRatings,
 }) => {
   const { user, loading, getAuthHeader } = Autentikacio();
-  const { kosarTetelek, refreshKosar } = useKosar()
+  const { kosarTetelek, refreshKosar } = useKosar();
   const [products, setProducts] = useState(productsData);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
@@ -22,12 +22,41 @@ const MarketplacePage = ({
   const [filteredBrands, setFilteredBrands] = useState([]);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
 
-  console.log("Kosár tételek:", kosarTetelek)
-
+  //console.log("Kosár tételek:", kosarTetelek);
 
   useEffect(() => {
-    setProducts(productsData);
-  }, [productsData]);
+    const fetchFilteredProducts = async () => {
+      try {
+        const params = new URLSearchParams();
+
+        if (searchTerm) params.append("search", searchTerm);
+        if (priceRange.min) params.append("minPrice", priceRange.min);
+        if (priceRange.max) params.append("maxPrice", priceRange.max);
+
+        if (filteredCategories.length > 0) {
+          params.append("category", filteredCategories.join(","));
+        }
+
+        if (filteredBrands.length > 0) {
+          params.append("brand", filteredBrands.join(","));
+        }
+
+        const response = await fetch(`http://localhost:7777/termek?${params}`, {
+          headers: { ...getAuthHeader() },
+        });
+
+        const data = await response.json();
+        setProducts(data.data || data);
+      } catch (error) {
+        console.error("Szűrési hiba:", error);
+      }
+    };
+
+    if (user && !loading) {
+      fetchFilteredProducts();
+    }
+  }, [searchTerm, priceRange, filteredCategories, filteredBrands, user, loading, getAuthHeader]);
+
 
   const productUpdate = async (termekId, ujErtekeles) => {
     setProducts((prev) =>
@@ -42,38 +71,6 @@ const MarketplacePage = ({
       await onRatingUpdate();
     }
   };
-
-  const CategoryById = (kategoriaId) => {
-    const kategoriak = {
-      1: "Gitár",
-      2: "BasszusGitár",
-      3: "Billentyűs",
-      4: "Ütős",
-      5: "Fúvós",
-      6: "Vonós",
-      7: "Stúdió",
-      8: "Tartozékok",
-    };
-    return kategoriak[kategoriaId] || "";
-  };
-
-  const filteredProducts = products.filter((product) => {
-    const matchesName = product?.TermekNev?.toLowerCase()?.includes(
-      searchTerm.toLowerCase(),
-    );
-    const matchesPrice =
-      Number(product?.TermekAr) >= priceRange.min &&
-      Number(product?.TermekAr) <= priceRange.max;
-    const currentProductCategoryName = CategoryById(product?.KategoriaID);
-    const matchesCategory =
-      filteredCategories.length === 0 ||
-      filteredCategories.includes(currentProductCategoryName);
-
-    const matchesBrands =
-      filteredBrands.length === 0 || filteredBrands.includes(product?.Brand);
-
-    return matchesName && matchesPrice && matchesCategory && matchesBrands;
-  });
 
   const filterProps = {
     filteredCategories,
@@ -92,7 +89,7 @@ const MarketplacePage = ({
     </Container>;
   }
 
-  if (!user || loading) {
+  if (!user) {
     return (
       <Container className="mt-5">
         <Alert variant="warning">Kérlek jelentkezz be!</Alert>
@@ -124,8 +121,8 @@ const MarketplacePage = ({
             </div>
 
             <Row className="g-3 g-md-4">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((p) => (
+              {products && products.length > 0 ? (
+                products.map((p) => (
                   <Col key={p.TermekID} xs={12} sm={6} md={4} xl={3}>
                     <ProductComponent
                       product={p}
