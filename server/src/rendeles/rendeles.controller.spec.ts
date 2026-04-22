@@ -79,4 +79,14 @@ describe('RendelesController', () => {
       expect(service.updateKosarTetelMennyiseg).toHaveBeenCalledWith(1, 101, 1);
     });
   });
+
+  describe('createRendeles', () => {
+    it('meghívja a szervizt a vevoId-val', async () => {
+        const body = { vevoId: 5, adat: 'valami' };
+        mockRendelesService.createRendeles.mockResolvedValue({ id: 99 });
+        const result = await controller.createRendeles(body);
+        expect(service.createRendeles).toHaveBeenCalledWith(5, body);
+        expect(result).toEqual({id:99})
+    })
+  })
 });
