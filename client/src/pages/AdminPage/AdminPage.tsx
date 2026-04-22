@@ -1,10 +1,8 @@
 ﻿import { Col, Container, Dropdown, Nav, Navbar, Row } from "react-bootstrap";
-import React, { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { Autentikacio } from "../../components/AuthContext";
 
 const AdminPage = () => {
-  //const [selectedPage, setSelectedPage] = useState("");
   const { logout } = Autentikacio()
 
   return (

@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { RendelesService } from './rendeles.service';
 import { CreateRendelesDto, KosarTetelDto } from './dto/create-rendeles.dto';
@@ -73,11 +74,9 @@ export class RendelesController {
   }
 
   @Post()
-  createRendeles(
-    @Body('vevoId', ParseIntPipe) vevoId: number,
-    @Body() createRendeleDto: CreateRendelesDto,
-  ) {
-    return this.rendelesService.createRendeles(vevoId, createRendeleDto);
+  async createRendeles(@Body() body: any) {
+    const vevoId = Number(body.vevoId || body.VevoID);
+    return this.rendelesService.createRendeles(vevoId, body);
   }
 
   @Delete('/kosar/:vevoId')

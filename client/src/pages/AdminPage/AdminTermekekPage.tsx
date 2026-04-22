@@ -1,6 +1,7 @@
 ﻿import { useState } from "react";
 import { Form, Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
+import { useFetchData } from "../../components/useFetchData";
 
 const AdminTermekekPage = ({ termekAdatok }) => {
   const [kategoriaId, setKategoriaId] = useState<number>(0);
@@ -9,38 +10,56 @@ const AdminTermekekPage = ({ termekAdatok }) => {
   const [keszlet, setKeszlet] = useState<number>(0);
   const [brand, setBrand] = useState<string>("Ismeretlen");
   const { getAuthHeader } = Autentikacio();
-  const termekAddUrl = "http://localhost:7777/termek";
+  const {
+    data: termekek,
+    loading,
+    refresh,
+  } = useFetchData("/termek", getAuthHeader());
 
   const handleAdd = async (dto, url) => {
+    if (!termekNev.trim() || kategoriaId === 0) {
+      alert("Kérlek töltsd ki a nevet és a kategória ID-t!");
+      return;
+    }
+
     const ujTermekDto = {
       KategoriaID: Number(kategoriaId),
       TermekNev: termekNev,
-      TermekAr: termekAr,
+      TermekAr: Number(termekAr),
       Keszlet: Number(keszlet),
-      Brand: brand,
+      Brand: brand || "Ismeretlen",
     };
 
     try {
-      const response = await fetch(termekAddUrl, {
+      const response = await fetch("http://localhost:7777/termek", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
         body: JSON.stringify(ujTermekDto),
       });
 
-      if (!response)
-        throw new Error("Nem sikerült a termék hozzáadása.", response.status);
-
-      const data = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        // Ha a message egy tömb, írjuk ki az első elemét (pl. "TermekAr must be a number")
+        const specificError = Array.isArray(errorData.message)
+          ? errorData.message[0]
+          : errorData.message;
+        console.error("A konkrét mező hiba:", specificError);
+        throw new Error(specificError || `Hiba: ${response.status}`);
+      }
 
       setTermekNev("");
       setTermekAr(0);
       setKeszlet(0);
       setKategoriaId(0);
+      setBrand("");
 
-      console.log("Server:", data);
-    } catch (error: any) {
+      alert("Termék sikeresen hozzáadva!");
+      refresh();
+    } catch (error) {
       alert("Hiba", error.message);
-      console.error("Hiba a küldés során:", error.message);
     }
   };
 
@@ -48,22 +67,29 @@ const AdminTermekekPage = ({ termekAdatok }) => {
     if (!window.confirm("Biztosan törölni szeretnéd ezt a terméket?")) return;
 
     try {
-      const url = `http://localhost:7777/termek/${id}`;
-      const response = await fetch(url, {
+      const response = await fetch(`http://localhost:7777/termek/${id}`, {
         method: "DELETE",
         headers: {
+          "Content-Type": "application/json",
           ...getAuthHeader(),
         },
       });
 
-      if (!response) throw new Error("Sikertelen törlés.");
-      console.log("Termék törölve!");
+      if (!response.ok) throw new Error("Sikertelen törlés.");
 
-      const data = await response.json();
-    } catch (error: any) {
+      alert("Termék törölve!");
+      refresh();
+    } catch (error) {
       alert(error.message);
     }
   };
+
+  if (loading)
+    return (
+      <Container className="mt-4">
+        <p>Betöltés...</p>
+      </Container>
+    );
 
   return (
     <Container className="mt-4">
@@ -139,8 +165,8 @@ const AdminTermekekPage = ({ termekAdatok }) => {
           </tr>
         </thead>
         <tbody>
-          {termekAdatok && termekAdatok.length > 0 ? (
-            termekAdatok.map((t) => (
+          {termekek && termekek.length > 0 ? (
+            termekek.map((t) => (
               <tr key={t.TermekID}>
                 <td>{t.TermekID}</td>
                 <td>{t.TermekNev}</td>

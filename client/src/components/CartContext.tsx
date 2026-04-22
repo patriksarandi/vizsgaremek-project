@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useEffect, useState } from "react";
+﻿import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { Autentikacio } from "./AuthContext";
 
 const CartContext = createContext();
@@ -91,7 +91,14 @@ export const CartProvider = ({ children }) => {
     else setKosarTetelek([]);
   }, [user]);
 
-  const osszeg = kosarTetelek.reduce((acc, tetel) => acc + (tetel.TermekAr * tetel.TetelMennyiseg), 0)
+  const osszeg = useMemo(() => {
+    return kosarTetelek.reduce((acc, tetel) => {
+      const ar = Number(tetel.Termek?.TermekAr || 0);
+      const mennyiseg = Number(tetel.TetelMennyiseg || 0);
+      return acc + (ar * mennyiseg);
+    }, 0);
+  }, [kosarTetelek]);
+
 
   return (
     <CartContext.Provider

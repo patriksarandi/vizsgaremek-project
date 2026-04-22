@@ -3,27 +3,32 @@ import { Autentikacio } from "./AuthContext";
 import { useEffect, useState } from "react";
 import Rating from "@mui/material/Rating";
 import { useNavigate } from "react-router-dom";
+import { useKosar } from "./CartContext";
+
+export const KATEGORIAK = [
+  "",
+  "Gitár",
+  "Basszus Gitár",
+  "Billentyűs",
+  "Ütős",
+  "Fúvós",
+  "Vonós",
+  "Stúdió",
+  "Tartozékok",
+];
 
 const ProductComponent = ({
   product,
-  handleKosarTetel,
   termekErtekeles,
   onErtekelesFrissites,
 }) => {
   const { user, getAuthHeader } = Autentikacio();
+  const { hozzaadasAKosarhoz } = useKosar()
   const [ertekeles, setErtekeles] = useState(termekErtekeles ?? 0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (termekErtekeles !== undefined) {
-      setErtekeles(termekErtekeles);
-    }
-  }, [termekErtekeles]);
-
   const handleErtekeles = async (ertekelesiErtek: number | null) => {
-    if (ertekelesiErtek === null) return;
-
-    const biztosErtek = ertekelesiErtek ?? 0;
+    if (ertekelesiErtek === null || !user) return;
 
     try {
       const response = await fetch(
@@ -37,39 +42,25 @@ const ProductComponent = ({
           body: JSON.stringify({
             VevoID: Number(user.id || user.VevoID),
             TermekID: Number(product.TermekID),
-            ErtekelesSzam: Number(biztosErtek),
+            ErtekelesSzam: Number(ertekelesiErtek),
           }),
         },
       );
 
-      if (!response.ok) {
-        throw new Error("Hiba történt");
-      } else {
-        console.log("Leadott értékelés", ertekelesiErtek);
+      if (response.ok) {
         setErtekeles(ertekelesiErtek);
-        if (onErtekelesFrissites) {
-          onErtekelesFrissites(product.TermekID, ertekelesiErtek);
-        }
+        onErtekelesFrissites?.(product.TermekID, ertekelesiErtek);
       }
-    } catch (error: any) {
-      console.error("Hiba történt:", error.message);
+    } catch (error) {
+      console.error("Hiba történt:", error);
     }
   };
 
-  const GetKategoria = (id) => {
-    const kategoriak = [
-      "",
-      "Gitár",
-      "Basszus Gitár",
-      "Billentyűs",
-      "Ütős",
-      "Fúvós",
-      "Vonós",
-      "Stúdió",
-      "Tartozékok",
-    ];
-    return kategoriak[id] || "Ismeretlen";
-  };
+  useEffect(() => {
+    if (termekErtekeles !== undefined) {
+      setErtekeles(termekErtekeles);
+    }
+  }, [termekErtekeles]);
 
   return (
     <Card className="h-100 border-0 shadow-sm hover-shadow transition">
@@ -99,7 +90,7 @@ const ProductComponent = ({
             {product.TermekNev}
           </Card.Title>
           <Card.Text className="text-muted small mb-2">
-            {GetKategoria(product.KategoriaID)}
+            {KATEGORIAK[product.KategoriaID] || "Ismeretlen"}
           </Card.Text>
         </div>
 
@@ -135,13 +126,26 @@ const ProductComponent = ({
             <span className="ms-2 small text-muted">({ertekeles})</span>
           </div>
 
-          <Button
-            variant="primary"
-            className="w-100 fw-bold py-2 shadow-sm"
-            onClick={() => navigate(`/termek/${product.TermekID}`)}
-          >
-            Részletek
-          </Button>
+          <div className="d-flex gap-2">
+            <Button
+              variant="primary"
+              className="flex-grow-1 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center"
+              onClick={() => navigate(`/termek/${product.TermekID}`)}
+            >
+              <i className="bi bi-cart3 me-2"></i>{" "}
+              Részletek
+            </Button>
+
+            <Button
+              variant="outline-secondary"
+              className="py-2 shadow-sm d-flex align-items-center justify-content-center"
+              style={{ width: "45px", flexShrink: 0 }}
+              onClick={() => hozzaadasAKosarhoz(product.TermekID, 1)}
+              title="Kosárba"
+            >
+              <i className="bi bi-cart-plus"></i>
+            </Button>
+          </div>
         </div>
       </Card.Body>
     </Card>

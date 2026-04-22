@@ -1,35 +1,28 @@
 ﻿import { Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
+import { useFetchData } from "../../components/useFetchData";
 
 const AdminFelhasznalokPage = ({ customersData }) => {
   const { getAuthHeader } = Autentikacio();
+  const { data: customers, loading, refresh } = useFetchData("/vevo", getAuthHeader())
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Biztosan törölni szeretnéd?")) return;
 
-    try {
-      const url = `http://localhost:7777/vevo/${id}`;
-      const response = await fetch(url, {
+    const response = await fetch(`http://localhost:7777/vevo/${id}`, {
         method: "DELETE",
-        headers: {
-          ...getAuthHeader(),
-        },
+        headers: getAuthHeader()
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Ismeretlen hiba történt.");
+      if (response.ok) {
+        alert("Sikeres törlés!");
+        refresh();
       }
 
-      alert("Sikeres törlés!");
-      window.location.reload();
-    } catch (error: any) {
-      alert("Hiba: " + error.message);
-    }
-  }; // <--- Itt zárul le a handleDelete függvény!
+      if (loading) return <p>Betöltés...</p>
+  };
 
-  // A return-nek a függvényen KÍVÜL kell lennie, hogy a komponens kirajzolódjon
+ 
   return (
     <Container className="mt-4">
       <h2 className="mb-4">Regisztrált Felhasználók</h2>
@@ -44,8 +37,8 @@ const AdminFelhasznalokPage = ({ customersData }) => {
           </tr>
         </thead>
         <tbody>
-          {customersData && customersData.length > 0 ? (
-            customersData.map((f) => (
+          {customers && customers.length > 0 ? (
+            customers.map((f) => (
               <tr key={f.VevoID}>
                 <td>
                   <Button

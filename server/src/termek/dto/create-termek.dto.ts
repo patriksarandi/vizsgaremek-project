@@ -9,7 +9,7 @@ export class CreateTermekDto {
     @IsNotEmpty({ message: 'A termék nevének megadása kötelező!' })
     TermekNev: string;
 
-    @IsString({ message: 'A termék ára szám kell legyen!' })
+    @IsInt({ message: 'A termék ára szám kell legyen!' })
     @Min(0, { message: 'A termék ára nem lehet negatív'})
     @IsNotEmpty({ message: 'Az ár megadása kötelező!' })
     TermekAr: number;

@@ -1,55 +1,56 @@
 ﻿import { useState } from "react";
 import { Form, Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
+import { useFetchData } from "../../components/useFetchData";
 
 const AdminKategoriakPage = ({ categoriesData }) => {
   const [kategoriaNev, setKategoriaNev] = useState<string>("");
   const { getAuthHeader } = Autentikacio();
-  const kategoriaAddUrl = "http://localhost:7777/kategoria";
+  const { data: categories, loading, refresh } = useFetchData("/kategoria", getAuthHeader())
 
   const handleAdd = async () => {
     if (!kategoriaNev.trim()) {
       alert("Kérlek, adj meg egy kategória nevet!");
+      return;
     }
 
     try {
       const response = await fetch("http://localhost:7777/kategoria", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+        headers: getAuthHeader(),
         body: JSON.stringify({ kategoriaNev: kategoriaNev }),
       });
 
       if (!response.ok) throw new Error("Nem sikerült a kategória hozzáadása.");
 
-      const data = await response.json();
-      console.log("Server:", data);
-      console.log("Sikeresen hozzáadva!");
+      alert("Sikeres hozzáadás!");
+      setKategoriaNev("");
+      refresh();
     } catch (error: any) {
       console.error("Hiba a küldés során:", error.message);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Biztosan törölni szeretnéd ezt a kategóriát?")) {
-      return;
-    }
+    if (!window.confirm("Biztosan törölni szeretnéd ezt a kategóriát?")) return;
 
     try {
-      const response = await fetch(`${kategoriaAddUrl}/${id}`, {
+      const response = await fetch(`http://localhost:7777/kategoria/${id}`, {
         method: "DELETE",
-        headers: {
-          ...getAuthHeader(),
-        },
+        headers: getAuthHeader()
       });
-      if (!response) {
-        throw new Error("Sikertelen törlés.");
+      
+      if (response.ok) {
+        alert("Kategória törölve!");
+        refresh();
       }
 
-      alert("Kategória törölve!");
-    } catch (error: any) {
-      throw new Error(error.message);
+    } catch (error) {
+      alert("Hiba a törlés során.")
     }
   };
+
+  if (loading) return <Container className="mt-4"><p>Betöltés...</p></Container>
 
   return (
     <Container className="mt-4">
@@ -88,8 +89,8 @@ const AdminKategoriakPage = ({ categoriesData }) => {
           </tr>
         </thead>
         <tbody>
-          {categoriesData && categoriesData.length > 0 ? (
-            categoriesData.map((k) => (
+          {categories && categories.length > 0 ? (
+            categories.map((k) => (
               <tr key={k.KategoriaID}>
                 <td>
                   <Button

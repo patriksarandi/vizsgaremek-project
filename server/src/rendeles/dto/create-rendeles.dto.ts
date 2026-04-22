@@ -1,4 +1,5 @@
-import { IsInt, IsNotEmpty } from "class-validator";
+import { Type } from "class-transformer";
+import { IsDate, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Min } from "class-validator";
 
 export class FizetesiKosarDto {
     @IsInt({message: "A vevő azonosítója szám!"})
@@ -16,6 +17,8 @@ export class KosarTetelDto {
     TermekID: number;
 
     @IsInt({message: "A tétel mennyiség szám!"})
+    @Min(1, { message: 'Legalább 1 terméket a kosárba kell tenni!'})
+    @IsPositive()
     @IsNotEmpty({message: "A tétel mennyiség nem lehet üres!"})
     TetelMennyiseg: number;
 
@@ -23,15 +26,29 @@ export class KosarTetelDto {
 }
 
 export class RendeltTermekDto {
+    @IsInt()
     RendelesID: number;
+
+    @IsInt()
     TermekID: number;
+
+    @IsInt()
+    @Min(1)
     RendeltMennyiseg: number;
+
+    @IsPositive()
     RendeltEgysegar: number;
 }
 
 export class CreateRendelesDto {
+    @IsInt()
     VevoID: number;
+
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
     RendelesiDatum: Date;
+
+    @IsPositive()
     RendelesiVegosszeg: number;
-    Statusz: string;
 }

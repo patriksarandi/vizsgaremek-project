@@ -1,39 +1,50 @@
-﻿import {
-  Button,
-  Col,
-  Container,
-  Dropdown,
-  Nav,
-  Navbar,
-  Row,
-} from "react-bootstrap";
+﻿import { Button, Col, Container, Row } from "react-bootstrap";
 import CartItem from "../components/CartItem";
 import NavbarComponent from "../components/NavbarComponent";
-import { useEffect, useState } from "react";
 import { Autentikacio } from "../components/AuthContext";
 import { useKosar } from "../components/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const { user, logout, getAuthHeader } = Autentikacio();
-  const { kosarTetelek, osszeg, emptyKosar, updateTermekMennyiseg } = useKosar();
-  const [rendelesiOsszeg, setRendelesiOsszeg] = useState(0);
+  const navigate = useNavigate();
+  const { kosarTetelek, osszeg, emptyKosar, updateTermekMennyiseg } =
+    useKosar();
 
-  const vevoId = user?.id || user?.VevoID;
+  const handleRendeles = async () => {
+    if (!user || kosarTetelek.length === 0) return;
 
-  const handleRendeles = async (vevoId: number) => {
+    // const osszeg = kosarTetelek.reduce((total, tetel) => {
+    //   return (
+    //     total + Number(tetel.Termek?.TermekAr) * Number(tetel.TetelMennyiseg)
+    //   );
+    // }, 0);
+
     try {
       const response = await fetch("http://localhost:7777/rendeles", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeader() },
-        body: JSON.stringify({vevoId: Number(vevoId)}),
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({
+          vevoId: user.VevoID,
+          RendelesiVegosszeg: osszeg,
+          RendelesiDatum: new Date().toISOString(),
+        }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        alert("Sikeres rendelés!");
         emptyKosar();
-        alert("Köszönjük! A rendelést rögzítettük.");
+        navigate("/profile");
+      } else {
+        alert(`Szerver hiba: ${data.message}`);
       }
     } catch (error) {
-      alert("Hálózati hiba")
+      console.error("Hiba:", error);
     }
   };
 
@@ -53,21 +64,31 @@ const CartPage = () => {
                 />
               ))
             ) : (
-              <div className="alert alert-info">A kosár tartalma üres.</div>
+              <div className="alert alert-info shadow-sm">
+                A kosár tartalma jelenleg üres.
+              </div>
             )}
           </Col>
+
           <Col lg={4}>
-            <div className="p-4 border rounded shadow-sm bg-light">
+            <div
+              className="p-4 border rounded shadow-sm bg-light sticky-top"
+              style={{ top: "20px" }}
+            >
               <h4 className="mb-3">Összegzés</h4>
-              <div className="d-flex justify-content-between mb-3">
-                <span>Végösszeg:</span>
-                <b className="fs-5">{osszeg.toLocaleString()} Ft</b>
+              <hr />
+              <div className="d-flex justify-content-between mb-4">
+                <span className="text-muted">Végösszeg:</span>
+                <strong className="fs-4 text-primary">
+                  {Number(osszeg.toLocaleString())} Ft
+                </strong>
               </div>
               <Button
-                variant="primary"
-                className="w-100"
+                variant="success"
+                size="lg"
+                className="w-100 fw-bold"
                 disabled={kosarTetelek.length === 0}
-                onClick={() => handleRendeles(vevoId)}
+                onClick={handleRendeles}
               >
                 Megrendelés elküldése
               </Button>
