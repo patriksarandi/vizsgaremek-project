@@ -5,6 +5,9 @@ export const useFetchData = (endpoint, headers) => {
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
+    if (!endpoint) return;
+
+    setLoading(true);
     try {
       const response = await fetch(`http://localhost:7777${endpoint}`, {
         method: "GET",

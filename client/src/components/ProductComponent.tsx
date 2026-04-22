@@ -29,10 +29,11 @@ const ProductComponent = ({
 
   const handleErtekeles = async (ertekelesiErtek: number | null) => {
     if (ertekelesiErtek === null || !user) return;
+    const vevoId = user.VevoID || user.id;
 
     try {
       const response = await fetch(
-        `http://localhost:7777/ertekeles/${user.id || user.VevoID}`,
+        `http://localhost:7777/ertekeles/${vevoId}`,
         {
           method: "PATCH",
           headers: {
@@ -40,7 +41,7 @@ const ProductComponent = ({
             ...getAuthHeader(),
           },
           body: JSON.stringify({
-            VevoID: Number(user.id || user.VevoID),
+            VevoID: Number(vevoId),
             TermekID: Number(product.TermekID),
             ErtekelesSzam: Number(ertekelesiErtek),
           }),
@@ -52,12 +53,13 @@ const ProductComponent = ({
         onErtekelesFrissites?.(product.TermekID, ertekelesiErtek);
       }
     } catch (error) {
-      console.error("Hiba történt:", error);
+      const hiba = await response.json();
+      console.error("Hiba történt:", hiba);
     }
   };
 
   useEffect(() => {
-    if (termekErtekeles !== undefined) {
+    if (termekErtekeles !== undefined && termekErtekeles !== ertekeles) {
       setErtekeles(termekErtekeles);
     }
   }, [termekErtekeles]);

@@ -1,14 +1,20 @@
-﻿import { useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Autentikacio } from "../components/AuthContext";
 
 const SignInPage = () => {
-  const { login } = Autentikacio();
+  const { user, login } = Autentikacio();
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/")
+    }
+  })
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -33,7 +39,7 @@ const SignInPage = () => {
 
       login(data.user, data.access_token);
 
-      navigate("/marketplace");
+      navigate("/");
       console.log("Login successful:", data);
     } catch (error: any) {
       setError(error.message);

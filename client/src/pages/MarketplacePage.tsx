@@ -6,16 +6,20 @@ import FilterSidebarComponent from "../components/FilterSidebarComponent";
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useKosar } from "../components/CartContext";
+import { useProducts } from "../components/ProductContext";
 
-const MarketplacePage = ({
-  productsData = [],
-  categoriesData = [],
-  productsBrands = [],
-  userRatings = {},
-}) => {
+const MarketplacePage = ({ userRatings = {} }) => {
   const { user, loading, getAuthHeader } = Autentikacio();
   const { kosarTetelek, refreshKosar } = useKosar();
-  const [products, setProducts] = useState(productsData);
+
+  const {
+    products: contextProducts,
+    brands: contextBrands,
+    categories: contextCategories,
+    refresh,
+  } = useProducts();
+
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -24,19 +28,30 @@ const MarketplacePage = ({
 
   //console.log("Kosár tételek:", kosarTetelek);
 
+  const productUpdate = async (termekId, ujErtekeles) => {
+    // 1. Azonnali UI frissítés a helyi listában
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.TermekID === termekId
+          ? { ...p, ideiglenesErtekeles: ujErtekeles } // Ezt adjuk át a ProductComponentnek
+          : p,
+      ),
+    );
+
+    // 2. Opcionális: A Context frissítése a háttérben
+    await refresh();
+  };
+
   useEffect(() => {
     const fetchFilteredProducts = async () => {
       try {
         const params = new URLSearchParams();
-
         if (searchTerm) params.append("search", searchTerm);
         if (priceRange.min) params.append("minPrice", priceRange.min);
         if (priceRange.max) params.append("maxPrice", priceRange.max);
-
         if (filteredCategories.length > 0) {
           params.append("category", filteredCategories.join(","));
         }
-
         if (filteredBrands.length > 0) {
           params.append("brand", filteredBrands.join(","));
         }
@@ -65,27 +80,13 @@ const MarketplacePage = ({
     getAuthHeader,
   ]);
 
-  const productUpdate = async (termekId, ujErtekeles) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.TermekID === termekId
-          ? { ...p, ideiglenesErtekeles: ujErtekeles }
-          : p,
-      ),
-    );
-
-    if (onRatingUpdate) {
-      await onRatingUpdate();
-    }
-  };
-
   const filterProps = {
     filteredCategories,
     setFilteredCategories,
-    categoriesData,
+    categoriesData: contextCategories,
     priceRange,
     setPriceRange,
-    productsBrands,
+    productsBrands: contextBrands,
     filteredBrands,
     setFilteredBrands,
   };
@@ -134,8 +135,14 @@ const MarketplacePage = ({
                 products.map((p) => (
                   <Col key={p.TermekID} xs={12} sm={6} md={4} xl={3}>
                     <ProductComponent
+                      key={p.TermekID}
                       product={p}
-                      termekErtekeles={userRatings[p.TermekID] || 0}
+                      termekErtekeles={
+                        p.ideiglenesErtekeles ??
+                        p.ertekelesek?.[0]?.ErtekelesSzam ??
+                        userRatings[p.TermekID] ??
+                        0
+                      }
                       onErtekelesFrissites={productUpdate}
                     />
                   </Col>
