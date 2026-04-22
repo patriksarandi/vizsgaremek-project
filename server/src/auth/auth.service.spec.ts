@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { VevoService } from '../vevo/vevo.service';
 import { PrismaService } from '../prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
@@ -45,7 +45,7 @@ describe('AuthService', () => {
   });
 
   describe('signIn', () => {
-    it('Helytelen jelszó esetén UnauthorizedException hibaüzenet', async () => {
+    it('Helytelen jelszó esetén hibaüzenet', async () => {
       mockVevoService.findByEmail.mockResolvedValue({ VevoJelszo: 'hashed_pw' });
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
 
@@ -69,4 +69,29 @@ describe('AuthService', () => {
       expect(result.user.VevoEmail).toBe('t@e.hu');
     });
   });
+
+  describe('signUp', () => {
+    it('Foglalt email esetén hibaüzenetet dob', async () => {
+        mockPrismaService.vevo.findFirst.mockResolvedValue({ id: 1 });
+
+        await expect(service.signUp({ email: 'hibas@email.hu'} as any))
+        .rejects.toThrow(ConflictException);
+    });
+
+    it ('Sikeres regisztrációnál menti a vevőt és inicializálja a kosarat', async () => {
+        mockPrismaService.vevo.findFirst.mockResolvedValue(null);
+        mockPrismaService.vevo.create.mockResolvedValue({ VevoID: 10 });
+
+        const result = await service.signUp({
+            email: 'masik@gmail.hu',
+            password: '123',
+            name: 'Teszt Elek'
+        } as any);
+
+        expect(result.message).toBe('Sikeres regisztráció!');
+        expect(mockPrismaService.fizetesiKosar.create).toHaveBeenCalledWith({
+            data: { VevoID: 10}
+        })
+    })
+  })
 });
