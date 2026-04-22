@@ -87,12 +87,12 @@ const MarketplacePage = ({
   };
 
   if (loading) {
-    <Container className="mt-5">
+    <Container className="mt-5 text-center">
       <p>Betöltés</p>
     </Container>;
   }
 
-  if (!user) {
+  if (!user || loading) {
     return (
       <Container className="mt-5">
         <Alert variant="warning">Kérlek jelentkezz be!</Alert>

@@ -11,6 +11,7 @@
 import { useParams } from "react-router-dom";
 import { Autentikacio } from "../components/AuthContext";
 import { useState } from "react";
+import NavbarComponent from "../components/NavbarComponent";
 
 const ProductPage = ({ productsData }) => {
     const { termekNev } = useParams()
@@ -61,14 +62,7 @@ const ProductPage = ({ productsData }) => {
 
   return (
     <>
-      <Navbar expand="lg" className="border-bottom mb-4">
-        <Container>
-          <Navbar.Brand href="/marketplace" className="fw-bold">
-            OnFret
-          </Navbar.Brand>
-          <Nav className="ms-auto"></Nav>
-        </Container>
-      </Navbar>
+      <NavbarComponent/>
 
       <Container className="py-5">
         <Row className="gy-4">

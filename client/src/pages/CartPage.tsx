@@ -43,10 +43,9 @@ const CartPage = () => {
       console.log("Sikeres rendelés: ", data);
       emptyKosar();
       alert("Köszönjük! A rendelést rögzítettük.");
-
     } catch (error) {
       console.error("Hiba történt", error);
-      alert("Nem sikerült elérni a szervert!")
+      alert("Nem sikerült elérni a szervert!");
     }
   };
 
@@ -56,58 +55,42 @@ const CartPage = () => {
 
   return (
     <>
-      <Navbar
-        expand="lg"
-        bg="dark"
-        className="border-bottom border-secondary mb-4"
-      >
-        <Container fluid>
-          <Navbar.Brand
-            style={{ color: "white", fontWeight: "bold" }}
-            href="/marketplace"
-          >
-            OnFret
-          </Navbar.Brand>
-          <Nav className="ms-auto">
-            <Button>Kijelentkezés</Button>
-          </Nav>
-        </Container>
-      </Navbar>
-      <Row>
-        <Col>
-          {kosarTetelek.length > 0 ? (
-            kosarTetelek.map((tetel) => (
-              <CartItem
-                key={tetel.KosarTetelID}
-                tetel={tetel}
-                updateTermekMennyiseg={updateTermekMennyiseg}
-              />
-            ))
-          ) : (
-            <p>A kosár tartalma üres</p>
-          )}
-        </Col>
-        <Col>
-          <Container>
-            <Container>
-              <Row>
-                <Col>Összesen</Col>
-                <Col>
-                  <b>{rendelesiOsszeg} Ft</b>
-                </Col>
-              </Row>
-              <Row>
-                <Button
-                  disabled={kosarTetelek.length == 0}
-                  onClick={() => handleRendeles(user.VevoID)}
-                >
-                  Megrendelés
-                </Button>
-              </Row>
-            </Container>
-          </Container>
-        </Col>
-      </Row>
+      <NavbarComponent /> {/* Használd a közös Navbart, ne írd újra! */}
+      <Container className="mt-4">
+        <Row>
+          <Col lg={8}>
+            <h2 className="mb-4">Kosarad</h2>
+            {kosarTetelek.length > 0 ? (
+              kosarTetelek.map((tetel) => (
+                <CartItem
+                  key={tetel.KosarTetelID}
+                  tetel={tetel}
+                  updateTermekMennyiseg={updateTermekMennyiseg}
+                />
+              ))
+            ) : (
+              <div className="alert alert-info">A kosár tartalma üres</div>
+            )}
+          </Col>
+          <Col lg={4}>
+            <div className="p-4 border rounded shadow-sm bg-light">
+              <h4 className="mb-3">Összegzés</h4>
+              <div className="d-flex justify-content-between mb-3">
+                <span>Végösszeg:</span>
+                <b className="fs-5">{rendelesiOsszeg.toLocaleString()} Ft</b>
+              </div>
+              <Button
+                variant="primary"
+                className="w-100 py-2 fw-bold"
+                disabled={kosarTetelek.length === 0}
+                onClick={() => handleRendeles(vevoId)}
+              >
+                Megrendelés elküldése
+              </Button>
+            </div>
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 };
