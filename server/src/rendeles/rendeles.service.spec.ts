@@ -4,10 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 const mockPrisma = {
   fizetesiKosar: {
-    findUnique: jest.fn(),
     upsert: jest.fn(),
-    delete: jest.fn(),
-    findMany: jest.fn(),
+    findUnique: jest.fn(),
   },
   kosarTetel: {
     findUnique: jest.fn(),
@@ -17,11 +15,14 @@ const mockPrisma = {
   },
   termek: {
     findUnique: jest.fn(),
-    update: jest.fn(),
+    update: jest.fn(), // Ez is kell a készlet csökkentéshez
   },
   rendeles: {
     create: jest.fn(),
     findMany: jest.fn(),
+  },
+  rendeltTermek: {
+    create: jest.fn(),
   },
   $transaction: jest.fn(),
 };
@@ -82,16 +83,57 @@ describe('RendelesService', () => {
           Tetelek: [{ TetelMennyiseg: 2, Termek: { TermekAr: 1000 } }],
         };
         mockPrisma.fizetesiKosar.findUnique.mockResolvedValue(mockKosar);
-        const result = await service.findKosarTetelByVevoId(1) as any;
+        const result = (await service.findKosarTetelByVevoId(1)) as any;
 
         expect(result.Vegosszeg).toBe(2000);
       });
 
       it('hibát dob, ha nincs kosár', async () => {
         mockPrisma.fizetesiKosar.findUnique.mockResolvedValue(null);
-        const result = await service.findKosarTetelByVevoId(999) as any;
+        const result = (await service.findKosarTetelByVevoId(999)) as any;
         expect(result.message).toBe('A kosár nem található!');
       });
+    });
+  });
+
+  describe('createKosarTetel', () => {
+    it('Hibaüzenetet dob, ha nincs elég termék a készleten', async () => {
+      mockPrisma.fizetesiKosar.upsert.mockResolvedValue({ KosarID: 1 });
+      mockPrisma.termek.findUnique.mockResolvedValue({ Keszlet: 5 });
+      mockPrisma.kosarTetel.findUnique.mockResolvedValue(null);
+      const dto = { TermekID: 1, TetelMennyiseg: 10, KosarID: 1, VevoID: 1 };
+
+      await expect(service.createKosarTetel(dto, 1)).rejects.toThrow(
+        'Nincs elég készleten a kért mennyiséghez!',
+      );
+    });
+  });
+
+  describe('createRendeles', () => {
+    it('sikeres rendelésnél üríti a kosarat és csökkenti a készletet', async () => {
+      const mockKosar = {
+        KosarID: 1,
+        Tetelek: [
+          {
+            TermekID: 1,
+            TetelMennyiseg: 1,
+            Termek: { TermekAr: 100, Keszlet: 10, TermekNev: 'Teszt' },
+          },
+        ],
+      };
+
+      mockPrisma.fizetesiKosar.findUnique.mockResolvedValue(mockKosar);
+      mockPrisma.$transaction.mockImplementation(
+        async (callback) => await callback(mockPrisma),
+      );
+      mockPrisma.rendeles.create.mockResolvedValue({ RendelesID: 123 });
+
+      const result = await service.createRendeles(1, {
+        RendelesiDatum: new Date(),
+      } as any);
+
+      expect(result.RendelesID).toBe(123);
+      expect(db.kosarTetel.deleteMany).toHaveBeenCalled();
     });
   });
 });
