@@ -15,47 +15,31 @@ import { useKosar } from "../components/CartContext";
 
 const CartPage = () => {
   const { user, logout, getAuthHeader } = Autentikacio();
-  const { kosarTetelek, emptyKosar, refreshKosar, updateTermekMennyiseg } =
-    useKosar();
+  const { kosarTetelek, osszeg, emptyKosar, updateTermekMennyiseg } = useKosar();
   const [rendelesiOsszeg, setRendelesiOsszeg] = useState(0);
 
   const vevoId = user?.id || user?.VevoID;
 
   const handleRendeles = async (vevoId: number) => {
-    if (!vevoId) return;
-
     try {
       const response = await fetch("http://localhost:7777/rendeles", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeader() },
-        body: JSON.stringify({
-          vevoId: Number(vevoId),
-        }),
+        body: JSON.stringify({vevoId: Number(vevoId)}),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Hiba történt a rendelés során.");
-        return;
+      if (response.ok) {
+        emptyKosar();
+        alert("Köszönjük! A rendelést rögzítettük.");
       }
-
-      console.log("Sikeres rendelés: ", data);
-      emptyKosar();
-      alert("Köszönjük! A rendelést rögzítettük.");
     } catch (error) {
-      console.error("Hiba történt", error);
-      alert("Nem sikerült elérni a szervert!");
+      alert("Hálózati hiba")
     }
   };
 
-  useEffect(() => {
-    refreshKosar();
-  }, [user, vevoId]);
-
   return (
     <>
-      <NavbarComponent /> {/* Használd a közös Navbart, ne írd újra! */}
+      <NavbarComponent />
       <Container className="mt-4">
         <Row>
           <Col lg={8}>
@@ -69,7 +53,7 @@ const CartPage = () => {
                 />
               ))
             ) : (
-              <div className="alert alert-info">A kosár tartalma üres</div>
+              <div className="alert alert-info">A kosár tartalma üres.</div>
             )}
           </Col>
           <Col lg={4}>
@@ -77,11 +61,11 @@ const CartPage = () => {
               <h4 className="mb-3">Összegzés</h4>
               <div className="d-flex justify-content-between mb-3">
                 <span>Végösszeg:</span>
-                <b className="fs-5">{rendelesiOsszeg.toLocaleString()} Ft</b>
+                <b className="fs-5">{osszeg.toLocaleString()} Ft</b>
               </div>
               <Button
                 variant="primary"
-                className="w-100 py-2 fw-bold"
+                className="w-100"
                 disabled={kosarTetelek.length === 0}
                 onClick={() => handleRendeles(vevoId)}
               >

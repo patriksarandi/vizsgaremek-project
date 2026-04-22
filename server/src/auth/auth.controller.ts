@@ -2,6 +2,7 @@
   Body,
   Controller,
   HttpCode,
+  HttpStatus,
   Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -12,17 +13,14 @@ import { SignInDto } from './dto/signin-dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @HttpCode(200)
   @Post('signin')
+  @HttpCode(HttpStatus.OK)
   async signIn(@Body() signInDto: SignInDto) {
-    return await this.authService.signIn(
-      signInDto.email,
-      signInDto.password,
-    );
+    return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
-  @HttpCode(200)
   @Post('signup')
+  @HttpCode(HttpStatus.OK)
   async signUp(@Body() signUpDto: SignUpDto) {
     return await this.authService.signUp(signUpDto);
   }

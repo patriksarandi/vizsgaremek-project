@@ -47,6 +47,7 @@ export class RendelesController {
     return this.rendelesService.findRendelesekByVevo(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('/kosartetel')
   async createKosarTetel(@Body() dto: KosarTetelDto) {
     try {

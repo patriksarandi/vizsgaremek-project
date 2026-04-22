@@ -11,12 +11,24 @@ import {
 import { UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { VevoService } from './vevo.service';
-import { CreateVevoDto } from './dto/create-vevo.dto';
+import { CreateVevoDto, VevoRole } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
 
 @Controller('vevo')
 export class VevoController {
   constructor(private readonly vevoService: VevoService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  getProfile(@Request() req) {
+    return this.vevoService.findOne(req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('profile')
+  updateProfile(@Request() req, @Body() dto: UpdateVevoDto) {
+    return this.vevoService.update(req.user.id, dto)
+  }
 
   @Post()
   create(@Body() createVevoDto: CreateVevoDto) {
@@ -69,6 +81,7 @@ export class VevoController {
     return await this.vevoService.updateEmail(id, dto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.vevoService.remove(+id);

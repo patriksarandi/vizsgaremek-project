@@ -1,23 +1,25 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 
 export class CreateTermekDto {
-    @IsInt()
-    @IsNotEmpty()
+    @IsInt({ message: 'A kategória azonosítója egész szám kell legyen!' })
+    @IsNotEmpty({ message: 'A kategória megadása kötelező!' })
     KategoriaID: number;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: 'A termék neve szöveg kell legyen!' })
+    @IsNotEmpty({ message: 'A termék nevének megadása kötelező!' })
     TermekNev: string;
 
-    @IsInt()
-    @IsNotEmpty()
+    @IsString({ message: 'A termék ára szám kell legyen!' })
+    @Min(0, { message: 'A termék ára nem lehet negatív'})
+    @IsNotEmpty({ message: 'Az ár megadása kötelező!' })
     TermekAr: number;
 
-    @IsInt()
-    @IsNotEmpty()
+    @IsInt({ message: 'A készlet egész szám kell legyen!' })
+    @Min(0, { message: 'A termék ára nem lehet negatív!'})
+    @IsNotEmpty({ message: 'Az ár megadása kötelező!' })
     Keszlet: number;
 
-    @IsString()
+    @IsString({ message: 'A márka szöveg kell legyen!' })
     @IsOptional()
     Brand: string;
 }

@@ -10,60 +10,37 @@
 } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Autentikacio } from "../components/AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NavbarComponent from "../components/NavbarComponent";
+import { useKosar } from "../components/CartContext";
 
-const ProductPage = ({ productsData }) => {
-    const { termekNev } = useParams()
-  const { user, getAuthHeader, logout } = Autentikacio();
-  const [mennyiseg, SetMennyiseg] = useState(1)
-  const product = productsData.find((p) => p.TermekNev === termekNev);
+const ProductPage = () => {
+  const { id } = useParams();
+  const { user, getAuthHeader } = Autentikacio();
+  const { hozzaadasAKosarhoz } = useKosar()
+  const [product, setProduct] = useState(null);
 
-  const handleKosarTetel = async () => {
-    const vevoId = Number(user?.VevoID || user?.id);
-    const termekId = Number(product?.TermekID);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`http://localhost:7777/termek/${id}`);
+        if (!response.ok) throw new Error(`Nem található termék`);
 
-    if (!vevoId || !termekId) {
-        alert("Hiba: Hiányzó felhasználói vagy termék adatok!");
-        return;
-    }
-
-    try {
-      const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", ...getAuthHeader() },
-          body: JSON.stringify({
-            KosarID: vevoId,
-            TermekID: termekId,
-            TetelMennyiseg: 1
-          }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Sikeresen a kosárhoz adva!");
-      } else {
-        console.error("Szerver hiba:", response.status);
+        const data = await response.json();
+        setProduct(data);
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error("Hálózati hiba:", error.message);
-    }
-  };
+    };
 
-  if (!product) {
-    return (
-      <Container className="mt-5">Betöltés vagy nem található...</Container>
-    );
-  }
+    fetchProduct();
+  }, [id]);
+
+  if (!product) return <Container className="mt-5">Betöltés...</Container>
 
   return (
     <>
-      <NavbarComponent/>
-
+      <NavbarComponent />
       <Container className="py-5">
         <Row className="gy-4">
           <Col lg={6}>
@@ -130,7 +107,7 @@ const ProductPage = ({ productsData }) => {
                 className="w-100 py-3 fw-bold"
                 variant="primary"
                 disabled={product.Keszlet === 0}
-                onClick={handleKosarTetel}
+                onClick={() => {hozzaadasAKosarhoz(product.TermekID, 1)}}
               >
                 <i className="bi bi-cart-plus me-2"></i> Kosárba
               </Button>

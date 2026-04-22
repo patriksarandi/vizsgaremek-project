@@ -8,10 +8,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useKosar } from "../components/CartContext";
 
 const MarketplacePage = ({
-  productsData,
-  categoriesData,
-  productsBrands,
-  userRatings,
+  productsData = [],
+  categoriesData = [],
+  productsBrands = [],
+  userRatings = {},
 }) => {
   const { user, loading, getAuthHeader } = Autentikacio();
   const { kosarTetelek, refreshKosar } = useKosar();
@@ -55,8 +55,15 @@ const MarketplacePage = ({
     if (user && !loading) {
       fetchFilteredProducts();
     }
-  }, [searchTerm, priceRange, filteredCategories, filteredBrands, user, loading, getAuthHeader]);
-
+  }, [
+    searchTerm,
+    priceRange,
+    filteredCategories,
+    filteredBrands,
+    user,
+    loading,
+    getAuthHeader,
+  ]);
 
   const productUpdate = async (termekId, ujErtekeles) => {
     setProducts((prev) =>
@@ -84,9 +91,11 @@ const MarketplacePage = ({
   };
 
   if (loading) {
-    <Container className="mt-5 text-center">
-      <p>Betöltés</p>
-    </Container>;
+    return (
+      <Container className="mt-5 text-center">
+        <p>Betöltés</p>
+      </Container>
+    );
   }
 
   if (!user) {

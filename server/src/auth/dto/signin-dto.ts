@@ -1,12 +1,12 @@
 ﻿import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class SignInDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Érvénytelen e-mail formátum!'})
+  @IsNotEmpty({ message: 'Az e-mail megadása kötelező!'})
   email: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'A jelszó megadása kötelező!'})
   password: string;
 
 }

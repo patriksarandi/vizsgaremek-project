@@ -9,6 +9,11 @@ import * as bcrypt from 'bcrypt';
 import { SignUpDto } from './dto/signup-dto';
 import { JwtService } from '@nestjs/jwt';
 
+export interface AuthResponse {
+  access_token: string;
+  user: any;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,7 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<any> {
+  async signIn(email: string, password: string): Promise<AuthResponse> {
     const customer = await this.vevoService.findByEmail(email);
 
     if (!customer || !(await bcrypt.compare(password, customer.VevoJelszo))) {
@@ -48,35 +53,30 @@ export class AuthService {
   }
 
   async signUp(dto: SignUpDto): Promise<any> {
-    const existingUser = await this.db.vevo.findFirst({
-      where: { VevoEmail: dto.email },
-    });
-    if (existingUser) {
-      throw new ConflictException('Ez az e-mail cím vagy név már foglalt!');
-    }
+    return await this.db.$transaction(async (tx) => {
+      const existingUser = await tx.vevo.findFirst({
+        where: { VevoEmail: dto.email },
+      });
+      if (existingUser)
+        throw new ConflictException('Ez az e-mail cím vagy név már foglalt!');
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
+      const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    const ujVevo = await this.vevoService.create({
-      VevoNev: dto.name,
-      VevoEmail: dto.email,
-      VevoJelszo: hashedPassword,
-      Role: dto.role,
-      Cim: '-',
-    });
-
-    const vevoFizetesiKosara = await this.db.fizetesiKosar.create({
-      data: {
-        Vevo: {
-          connect: { VevoID: ujVevo.VevoID },
+      const ujVevo = await tx.vevo.create({
+        data: {
+          VevoNev: dto.name,
+          VevoEmail: dto.email,
+          VevoJelszo: hashedPassword,
+          Role: dto.role,
+          Cim: '-',
         },
-      },
-    });
+      });
 
-    return {
-      ujVevo,
-      vevoFizetesiKosara,
-      message: 'Fizetési kosár létrehozva:',
-    };
+      await tx.fizetesiKosar.create({
+        data: { VevoID: ujVevo.VevoID }
+      })
+
+      return { message: 'Sikeres regisztráció!'};
+    });
   }
 }

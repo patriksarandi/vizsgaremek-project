@@ -9,11 +9,8 @@ export const CartProvider = ({ children }) => {
   const [kosarTetelek, setKosarTetelek] = useState([]);
   const { user, getAuthHeader } = Autentikacio();
 
-  const emptyKosar = () => setKosarTetelek([]);
-
   const fetchKosarTetelek = async () => {
     const vevoId = user?.VevoID || user?.id;
-
     if (!vevoId) return;
 
     try {
@@ -25,28 +22,53 @@ export const CartProvider = ({ children }) => {
       );
       const data = await response.json();
       setKosarTetelek(data.Tetelek || data || []);
-      console.log("Kosár elemei:", data.Tetelek || data);
+      //console.log("Kosár elemei:", data.Tetelek || data);
     } catch (error: any) {
       console.error("Hiba a kosár lekérdezésekor:", error);
     }
   };
 
-  const updateTermekMennyiseg = async (termekId: number, valtozas: number) => {
+  const hozzaadasAKosarhoz = async (termekId, mennyiseg = 1) => {
+    const vevoId = user?.VevoID || user?.id;
+    if (!vevoId) return alert("Kérlek jelentkezz be a vásárláshoz!");
+
+    try {
+      const response = await fetch("http://localhost:7777/rendeles/kosartetel",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...getAuthHeader() },
+          body: JSON.stringify({
+            KosarID: Number(vevoId),
+            TermekID: Number(termekId),
+            TetelMennyiseg: Number(mennyiseg),
+          }),
+        },
+      );
+
+      if (response.ok) {
+        fetchKosarTetelek();
+        alert("Sikeresen a kosárhoz adva!");
+        return true;
+      } else {
+        const errorData = await response.json();
+        console.error("Szerver hiba:", errorData);
+      }
+    } catch (error) {
+      console.error("Kosár hiba:", error);
+    }
+    return false;
+  };
+
+  const updateTermekMennyiseg = async (termekId, valtozas) => {
     const vevoId = user?.VevoID || user?.id;
 
-    if (!vevoId || !termekId) {
-        console.error("Hiba: Hiányzó felhasználói vagy termék adatok!", {vevoId, termekId});
-        return;
-    }
-    
     try {
-      const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel/update",
+      const response = await fetch("http://localhost:7777/rendeles/kosartetel/update",
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            ...getAuthHeader(),
+            ...getAuthHeader()
           },
           body: JSON.stringify({
             vevoId: Number(vevoId),
@@ -57,58 +79,30 @@ export const CartProvider = ({ children }) => {
       );
 
       if (response.ok) {
-        refreshKosar();
+        fetchKosarTetelek()
       }
-    } catch (error: any) {
-      console.error("Hiba a módosítás során:", error);
-    }
-  };
-
-  const handleKosarTetel = async (
-    kosarId: number,
-    termekId: number,
-    tetelMennyiseg: number,
-  ) => {
-    const vevoId = user?.VevoID || user?.id;
-
-    if (!vevoId) return;
-
-    try {
-      const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            kosarId: kosarId,
-            termekId: termekId,
-            tetelMennyiseg: tetelMennyiseg,
-          }),
-        },
-      );
-      
-      if (response.ok) {
-        refreshKosar();
-      }
-
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    if (user) {
-      fetchKosarTetelek();
-    } else {
-      setKosarTetelek([]);
-    }
+    if (user) fetchKosarTetelek();
+    else setKosarTetelek([]);
   }, [user]);
 
-  const refreshKosar = () => fetchKosarTetelek();
+  const osszeg = kosarTetelek.reduce((acc, tetel) => acc + (tetel.TermekAr * tetel.TetelMennyiseg), 0)
 
   return (
     <CartContext.Provider
-      value={{ kosarTetelek, emptyKosar, fetchKosarTetelek, updateTermekMennyiseg, refreshKosar, handleKosarTetel }}
+      value={{
+        kosarTetelek,
+        osszeg,
+        hozzaadasAKosarhoz,
+        updateTermekMennyiseg,
+        refreshKosar: fetchKosarTetelek,
+        emptyKosar: () => setKosarTetelek([])
+      }}
     >
       {children}
     </CartContext.Provider>

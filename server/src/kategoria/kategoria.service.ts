@@ -6,59 +6,59 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateKategoriaDto } from './dto/create-kategoria.dto';
-import { UpdateKategoriaDto } from './dto/update-kategoria.dto';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class KategoriaService {
   constructor(private readonly db: PrismaService) {}
 
-  async create(dto: CreateKategoriaDto) {
+  async createKategoria(dto: CreateKategoriaDto) {
     try {
       return await this.db.kategoria.create({
-        data: {
-          Nev: dto.kategoriaNev,
-        },
+        data: { Nev: dto.kategoriaNev },
       });
     } catch (error: any) {
       if (error.code === 'P2002') {
-        throw new Error('Ez a kategoria már szerepel az adatbázisban!');
+        throw new ConflictException('Ez a kategoria már szerepel az adatbázisban!');
       }
-      throw new Error('Hiba történt a kategoria felvétele során.');
+      throw new InternalServerErrorException('Hiba történt a kategoria felvétele során.');
     }
   }
 
-  async findAll() {
+  async findAllKategoria() {
     return await this.db.kategoria.findMany({
+      where: { IsDeleted: false},
       orderBy: { Nev: 'asc' },
     });
   }
 
-  async findOne(id: number) {
-    const kategoria = await this.db.kategoria.findUnique({
-      where: { KategoriaID: id },
+  async findKategoriaById(id: number) {
+    const kategoria = await this.db.kategoria.findFirst({
+      where: { KategoriaID: id, IsDeleted: false },
     });
 
-    if (!kategoria) throw new Error('A kategória nem található!');
+    if (!kategoria) throw new NotFoundException('A kategória nem található!');
     return kategoria;
   }
 
-  async remove(id: number) {
+  async removeKategoria(id: number) {
+    const termekekSzama = await this.db.termek.count({
+      where: { KategoriaID: id, IsDeleted: false}
+    })
+
+    if (termekekSzama > 0) {
+      throw new BadRequestException('A kategória nem törölhető, mivel aktív termék(ek)-t tartalmaz.')
+    }
+
     try {
-      await this.db.kategoria.delete({
+      await this.db.kategoria.update({
         where: { KategoriaID: id },
+        data: { IsDeleted: true}
       });
-      return { message: 'Sikeres törlés' };
+      return { message: 'A kategória sikeresen törölve!' };
     } catch (error: any) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException('A kategória nem található!');
-      }
-      if (error.code === 'P2003') {
-        throw new BadRequestException(
-          'A kategória nem törölhető, mert termékek tartoznak hozzá!',
-        );
-      }
-      throw new InternalServerErrorException('Szerver hiba a törléskor.');
+      if (error.code === 'P2025') throw new NotFoundException('A kategória nem található!');
+      throw new InternalServerErrorException('Hiba a törlés során!')
     }
   }
 }

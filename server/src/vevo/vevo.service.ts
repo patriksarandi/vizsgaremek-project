@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -7,39 +8,35 @@ import {
 import { CreateVevoDto } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
 import { PrismaService } from 'src/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class VevoService {
   constructor(private readonly db: PrismaService) {}
 
   async create(dto: CreateVevoDto) {
+    const hashedPassword = await bcrypt.hash(dto.VevoJelszo, 10)
+
     try {
       const ujVevo = await this.db.vevo.create({
         data: {
-          VevoNev: dto.VevoNev,
-          VevoEmail: dto.VevoEmail,
-          VevoJelszo: dto.VevoJelszo,
-          Role: dto.Role,
-          Cim: dto.Cim,
-          Keresztnev: dto.Keresztnev,
-          Vezeteknev: dto.Vezeteknev,
-          Telefonszam: dto.Telefonszam,
+          ...dto,
+          VevoJelszo: hashedPassword,
+          Cim: dto.Cim || '-'
         },
       });
 
-      const { ...result } = ujVevo;
+      const { VevoJelszo, ...result } = ujVevo;
       return result;
     } catch (error: any) {
-      if (error.code === 'P2002') {
-        throw new Error('Ez az e-mail cím már regisztrálva van!');
-      }
-      throw new Error('Hiba történt a regisztráció során.');
+      if (error.code === 'P2002') throw new ConflictException('Ez az e-mail már foglalt!')
+      throw new InternalServerErrorException('Hiba történt a regisztráció során.');
     }
   }
 
   async findAll() {
     const vevok = await this.db.vevo.findMany();
-    return vevok.map(({ ...vevo }) => vevo);
+    return vevok.map(({ VevoJelszo, ...vevo }) => vevo);
   }
 
   async findOne(id: number) {

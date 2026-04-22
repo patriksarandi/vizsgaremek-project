@@ -76,7 +76,7 @@ const ProductComponent = ({
       <div
         className="d-flex align-items-center justify-content-center bg-light text-secondary"
         style={{ height: "180px", cursor: "pointer" }}
-        onClick={() => navigate(`/termek/${product.TermekNev}`)}
+        onClick={() => navigate(`/termek/${product.TermekID}`)}
       >
         <div className="text-center opacity-50">
           <i className="bi bi-music-note-beamed display-4"></i>
@@ -138,7 +138,7 @@ const ProductComponent = ({
           <Button
             variant="primary"
             className="w-100 fw-bold py-2 shadow-sm"
-            onClick={() => navigate(`/termek/${product.TermekNev}`)}
+            onClick={() => navigate(`/termek/${product.TermekID}`)}
           >
             Részletek
           </Button>

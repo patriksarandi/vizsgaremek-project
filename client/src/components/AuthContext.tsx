@@ -1,39 +1,33 @@
 ﻿import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AuthContext = createContext({});
-
-export const Autentikacio = () => {
-  const context = useContext(AuthContext);
-
-  if (context === undefined) {
-    throw new Error("Hiba történt! (useAuth)");
-  }
-  return context;
-};
+const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    if (!savedUser || savedUser === "null") return null;
-
-    try {
-      return JSON.parse(savedUser);
-    } catch (error) {
-      console.error("Hibás adat:", error);
-      return null;
-    }
-  });
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+
+    if (savedUser && token && savedUser !== null) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (error) {
+        console.error("Hibás mentett adatok, törlés...")
+        localStorage.clear();
+      }
+    }
+
     setLoading(false);
   }, [])
 
+
   const login = (userData, token) => {
-    if (userData && token) {
-      setUser(userData);
+    if (userData) {
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("token", token);
       navigate("/");
@@ -53,10 +47,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, setUser, login, logout, getAuthHeader, loading }}
-    >
+    <AuthContext.Provider value={{ user, setUser, login, logout, getAuthHeader, loading }}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const Autentikacio = () => {
+  const context = useContext(AuthContext);
+
+  if (context === undefined) {
+    throw new Error("Hiba történt! (useAuth)");
+  }
+  return context;
 };

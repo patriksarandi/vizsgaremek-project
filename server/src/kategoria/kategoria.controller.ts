@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { KategoriaService } from './kategoria.service';
 import { CreateKategoriaDto } from './dto/create-kategoria.dto';
 import { UpdateKategoriaDto } from './dto/update-kategoria.dto';
@@ -9,21 +9,21 @@ export class KategoriaController {
 
   @Post()
   create(@Body() createKategoriaDto: CreateKategoriaDto) {
-    return this.kategoriaService.create(createKategoriaDto);
+    return this.kategoriaService.createKategoria(createKategoriaDto);
   }
 
   @Get()
   findAll() {
-    return this.kategoriaService.findAll();
+    return this.kategoriaService.findAllKategoria();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.kategoriaService.findOne(+id);
+    return this.kategoriaService.findKategoriaById(+id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.kategoriaService.remove(+id);
+    return this.kategoriaService.removeKategoria(+id);
   }
 }
