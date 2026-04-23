@@ -6,25 +6,29 @@ const ProductContext = createContext(undefined);
 
 export const ProductProvider = ({ children }) => {
     const { getAuthHeader, user } = Autentikacio();
+    const vevoId = user?.VevoID || user?.id;
+
     const { data: products, loading: loadingProducts, refresh: refreshProducts } = useFetchData(user ? "/termek" : null, getAuthHeader());
     const { data: categories, loading: loadingCategories, refresh: refreshCategories} = useFetchData("/kategoria", getAuthHeader());
     const { data: brands, loading: loadingBrands, refresh: refreshBrands} = useFetchData("/termek/brands", getAuthHeader());
-    
+    const { data: ratings, refresh: refreshRatings } = useFetchData(vevoId ? `/ertekeles/${vevoId}/osszes` : null, getAuthHeader());
     const loading = loadingProducts || loadingCategories || loadingBrands;
 
     const refreshAll = () => {
         refreshProducts();
         refreshCategories();
         refreshBrands();
+        refreshRatings();
     };
 
     const value = useMemo(() => ({
     products: products || [],
     categories: categories || [],
     brands: brands || [],
-    loading,
+    ratings: ratings || [],
+    loading: loadingProducts || loadingCategories || loadingBrands,
     refresh: refreshAll
-  }), [products, categories, brands, loading]);
+  }), [products, categories, brands, ratings, loadingProducts]);
 
   return (
     <ProductContext.Provider value={value}>

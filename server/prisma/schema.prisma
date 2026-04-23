@@ -34,7 +34,6 @@ model Termek {
   KosarTetelek KosarTetel[]
   Rendelesek   RendeltTermek[]
   Ertekelesek  Ertekeles[]
-  Kepek TermekKep[]
 }
 
 enum VevoRole {
@@ -54,21 +53,19 @@ model Vevo {
   Role        VevoRole        @default(USER)
   Kosar       FizetesiKosar?
   Rendelesek  Rendeles[]
-  Tokens Token[]
   Ertekelesek Ertekeles[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Ertekeles {
-  ErtekelesID Int @id @default(autoincrement())
   VevoID Int
   TermekID Int
   ErtekelesSzam Int
   Vevo Vevo @relation(fields: [VevoID], references: [VevoID])
   Termek Termek @relation(fields: [TermekID], references: [TermekID])
 
-  @@unique([VevoID, TermekID])
+  @@id([VevoID, TermekID])
 }
 
 

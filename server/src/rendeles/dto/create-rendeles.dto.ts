@@ -8,9 +8,9 @@ export class FizetesiKosarDto {
 }
 
 export class KosarTetelDto {
+    @IsOptional()
     @IsInt({message: "A kosár azonosítója szám!"})
-    @IsNotEmpty({message: "A kosár azonosítója nem lehet üres!"})
-    KosarID: number;
+    KosarID?: number;
 
     @IsInt({message: "A termék azonosítója szám!"})
     @IsNotEmpty({message: "A termék azonosítója nem lehet üres!"})
@@ -22,6 +22,8 @@ export class KosarTetelDto {
     @IsNotEmpty({message: "A tétel mennyiség nem lehet üres!"})
     TetelMennyiseg: number;
 
+    @IsInt()
+    @IsNotEmpty()
     VevoID: number;
 }
 

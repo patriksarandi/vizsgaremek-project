@@ -54,7 +54,7 @@ export class RendelesController {
     try {
       return await this.rendelesService.createKosarTetel(dto, dto.VevoID);
     } catch (error: any) {
-      throw new BadRequestException('Nem sikerült a tétel a kosárhoz adni.');
+      throw new BadRequestException('Nem sikerült a tétel a kosárhoz adni.', error.message);
     }
   }
 

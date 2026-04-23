@@ -1,9 +1,10 @@
 ﻿import { Badge, Button, Card } from "react-bootstrap";
 import { Autentikacio } from "./AuthContext";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import Rating from "@mui/material/Rating";
 import { useNavigate } from "react-router-dom";
 import { useKosar } from "./CartContext";
+import { useProducts } from "./ProductContext";
 
 export const KATEGORIAK = [
   "",
@@ -24,10 +25,21 @@ const ProductComponent = ({
 }) => {
   const { user, getAuthHeader } = Autentikacio();
   const { hozzaadasAKosarhoz } = useKosar();
-  const [ertekeles, setErtekeles] = useState(termekErtekeles ?? 0);
+  const { ratings, refresh } = useProducts();
   const navigate = useNavigate();
 
-  const handleErtekeles = async (ertekelesiErtek: number | null) => {
+  const megjelenitettErtekeles = useMemo(() => {
+    if (Array.isArray(ratings)) {
+      const contextRating = ratings.find(
+        (r) => r.TermekID === product.TermekID,
+      );
+      if (contextRating) return contextRating.ErtekelesSzam;
+    }
+    
+    return termekErtekeles ?? 0;
+  }, [ratings, product.TermekID, termekErtekeles]);
+
+  const handleErtekeles = async (ertekelesiErtek) => {
     if (ertekelesiErtek === null || !user) return;
     const vevoId = user.VevoID || user.id;
 
@@ -49,20 +61,16 @@ const ProductComponent = ({
       );
 
       if (response.ok) {
-        setErtekeles(ertekelesiErtek);
+        await refresh();
         onErtekelesFrissites?.(product.TermekID, ertekelesiErtek);
+      } else {
+        const hibaAdat = await response.json();
+        alert(hibaAdat.message || "Hiba az értékelés mentésekor");
       }
     } catch (error) {
-      const hiba = await response.json();
-      console.error("Hiba történt:", hiba);
+      console.error("Hiba történt az értékelés mentésekor:", error);
     }
   };
-
-  useEffect(() => {
-    if (termekErtekeles !== undefined && termekErtekeles !== ertekeles) {
-      setErtekeles(termekErtekeles);
-    }
-  }, [termekErtekeles]);
 
   return (
     <Card className="h-100 border-0 shadow-sm hover-shadow transition">
@@ -122,10 +130,12 @@ const ProductComponent = ({
             <Rating
               size="small"
               precision={1}
-              value={ertekeles || 0}
+              value={megjelenitettErtekeles}
               onChange={(event, newValue) => handleErtekeles(newValue)}
             />
-            <span className="ms-2 small text-muted">({ertekeles})</span>
+            <span className="ms-2 small text-muted">
+              ({megjelenitettErtekeles})
+            </span>
           </div>
 
           <div className="d-flex gap-2">

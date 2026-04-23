@@ -5,16 +5,16 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class ErtekelesService {
-  constructor (private readonly db: PrismaService) {}
+  constructor(private readonly db: PrismaService) {}
 
   async updateErtekeles(dto: CreateErtekeleDto, vevoId: number) {
-    const vevo = await this.db.vevo.findUnique({
-      where: {VevoID: vevoId}
-    })
+    const [vevo, termek] = await Promise.all([
+      this.db.vevo.findUnique({ where: { VevoID: vevoId } }),
+      this.db.termek.findUnique({ where: { TermekID: dto.TermekID } }),
+    ]);
 
-    if (!vevo) {
-      throw new NotFoundException('A felhasználó nem található.')
-    }
+    if (!vevo) throw new NotFoundException('A felhasználó nem található.');
+    if (!termek) throw new NotFoundException('A termék nem található!')
 
     return await this.db.ertekeles.upsert({
       where: {
@@ -24,25 +24,26 @@ export class ErtekelesService {
         },
       },
       update: {
-        ErtekelesSzam: dto.ErtekelesSzam,
+        ErtekelesSzam: Number(dto.ErtekelesSzam),
       },
       create: {
         VevoID: vevoId,
         TermekID: dto.TermekID,
-        ErtekelesSzam: dto.ErtekelesSzam
-      }
-    })
+        ErtekelesSzam: Number(dto.ErtekelesSzam),
+      },
+    });
   }
 
   async findAllErtekeles(vevoId: number) {
-    return this.db.ertekeles.findMany({
+    const ertekelesek = this.db.ertekeles.findMany({
       where: {
-        VevoID: vevoId
+        VevoID: vevoId,
       },
       include: {
         Termek: true,
-      }
-    })
+      },
+    });
+    return ertekelesek;
   }
 
   async removeErtekeles(vevoId: number, termekId: number) {
@@ -51,12 +52,12 @@ export class ErtekelesService {
         where: {
           VevoID_TermekID: {
             VevoID: vevoId,
-            TermekID: termekId
-          }
-        }
-      })
+            TermekID: termekId,
+          },
+        },
+      });
     } catch (error: any) {
-      throw new NotFoundException('Az értékelés nem található!')
+      throw new NotFoundException('Az értékelés nem található!');
     }
   }
 }

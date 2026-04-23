@@ -3,7 +3,7 @@ import { Form, Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
-const AdminTermekekPage = ({ termekAdatok }) => {
+const AdminTermekekPage = () => {
   const [kategoriaId, setKategoriaId] = useState<number>(0);
   const [termekNev, setTermekNev] = useState<string>("");
   const [termekAr, setTermekAr] = useState<number>(0);
@@ -42,7 +42,6 @@ const AdminTermekekPage = ({ termekAdatok }) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        // Ha a message egy tömb, írjuk ki az első elemét (pl. "TermekAr must be a number")
         const specificError = Array.isArray(errorData.message)
           ? errorData.message[0]
           : errorData.message;

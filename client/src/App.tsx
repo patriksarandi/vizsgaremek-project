@@ -4,7 +4,6 @@ import MarketplacePage from "./pages/MarketPlacePage";
 import ProductPage from "./pages/ProductPage";
 import SignUpPage from "./pages/SignUpPage";
 
-import { useEffect, useState } from "react";
 import AdminFelhasznalokPage from "./pages/AdminPage/AdminFelhasznalokPage";
 import AdminKategoriakPage from "./pages/AdminPage/AdminKategoriakPage";
 import AdminTermekekPage from "./pages/AdminPage/AdminTermekekPage";
@@ -17,7 +16,7 @@ import { Autentikacio } from "./components/AuthContext";
 
 const App = () => {
   const { user, loading } = Autentikacio();
-  
+
   if (loading) return null;
 
   return (
@@ -57,7 +56,13 @@ const App = () => {
 
       <Route
         path="/admin/dashboard"
-        element={user?.Role === "ADMIN" ? <AdminPage /> : <Navigate to="/" />}
+        element={
+          user?.Role || user?.role === "ADMIN" ? (
+            <AdminPage />
+          ) : (
+            <Navigate to="/" />
+          )
+        }
       >
         <Route path="felhasznalok" element={<AdminFelhasznalokPage />} />
         <Route path="kategoriak" element={<AdminKategoriakPage />} />
@@ -69,7 +74,7 @@ const App = () => {
         <Route path="megrendelesek" element={<ProfileMegrendelesek />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace/>}/>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

@@ -29,16 +29,14 @@ const MarketplacePage = ({ userRatings = {} }) => {
   //console.log("Kosár tételek:", kosarTetelek);
 
   const productUpdate = async (termekId, ujErtekeles) => {
-    // 1. Azonnali UI frissítés a helyi listában
     setProducts((prev) =>
       prev.map((p) =>
         p.TermekID === termekId
-          ? { ...p, ideiglenesErtekeles: ujErtekeles } // Ezt adjuk át a ProductComponentnek
+          ? { ...p, ideiglenesErtekeles: ujErtekeles }
           : p,
       ),
     );
 
-    // 2. Opcionális: A Context frissítése a háttérben
     await refresh();
   };
 

@@ -2,7 +2,7 @@
 import { Autentikacio } from "../../components/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
-const AdminFelhasznalokPage = ({ customersData }) => {
+const AdminFelhasznalokPage = () => {
   const { getAuthHeader } = Autentikacio();
   const { data: customers, loading, refresh } = useFetchData("/vevo", getAuthHeader())
 

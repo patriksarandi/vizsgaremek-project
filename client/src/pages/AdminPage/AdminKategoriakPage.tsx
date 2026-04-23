@@ -3,7 +3,7 @@ import { Form, Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../components/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
-const AdminKategoriakPage = ({ categoriesData }) => {
+const AdminKategoriakPage = () => {
   const [kategoriaNev, setKategoriaNev] = useState<string>("");
   const { getAuthHeader } = Autentikacio();
   const { data: categories, loading, refresh } = useFetchData("/kategoria", getAuthHeader())

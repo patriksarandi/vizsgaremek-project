@@ -1,13 +1,4 @@
-﻿import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Container,
-  Nav,
-  Navbar,
-  Row,
-} from "react-bootstrap";
+﻿import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Autentikacio } from "../components/AuthContext";
 import { useEffect, useState } from "react";
@@ -17,7 +8,7 @@ import { useKosar } from "../components/CartContext";
 const ProductPage = () => {
   const { id } = useParams();
   const { user, getAuthHeader } = Autentikacio();
-  const { hozzaadasAKosarhoz } = useKosar()
+  const { hozzaadasAKosarhoz } = useKosar();
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
@@ -36,7 +27,7 @@ const ProductPage = () => {
     fetchProduct();
   }, [id]);
 
-  if (!product) return <Container className="mt-5">Betöltés...</Container>
+  if (!product) return <Container className="mt-5">Betöltés...</Container>;
 
   return (
     <>
@@ -107,7 +98,9 @@ const ProductPage = () => {
                 className="w-100 py-3 fw-bold"
                 variant="primary"
                 disabled={product.Keszlet === 0}
-                onClick={() => {hozzaadasAKosarhoz(product.TermekID, 1)}}
+                onClick={() => {
+                  hozzaadasAKosarhoz(product.TermekID, 1);
+                }}
               >
                 <i className="bi bi-cart-plus me-2"></i> Kosárba
               </Button>
