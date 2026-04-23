@@ -1,174 +1,90 @@
-# 🎸 OnFret Marketplace — Hangszer Piactér
+# 🎸 OnFret Marketplace - Vizsgaremek 2026
 
-Az **OnFret Marketplace** egy full-stack webalkalmazás, amely hangszerek és zenei eszközök online adás-vételét teszi lehetővé.
-A projekt modern webfejlesztési elvek mentén készült: tiszta architektúra, JWT-alapú autentikáció és teljes körű CRUD funkcionalitás.
+Az **OnFret Marketplace** egy modern, full-stack e-kereskedelmi platform, amelyet kifejezetten hangszerek és zenei kiegészítők online adásvételére fejlesztettünk ki. A projekt célja egy skálázható, biztonságos és reszponzív webalkalmazás megvalósítása a legfrissebb iparági technológiák alkalmazásával.
 
----
-
-## 📖 Tartalomjegyzék
-
-* 🌟 Funkciók
-* 🏗️ Technológiai Stack
-* 💻 Telepítés és Futtatás
-* 📊 Adatbázis Séma
-* 🧪 Minőségbiztosítás
-* 🛣️ API Dokumentáció
-* 📈 Továbbfejlesztési tervek
+## 👥 Szerzők
+- **Sárándi Patrik**
+- **Kökény Bálint**
+- **Pacskó Dániel László**
 
 ---
 
-## 🌟 Funkciók
+## 📌 Projekt áttekintés
+Az alkalmazás lehetővé teszi a felhasználók számára termékek böngészését, szűrését és megvásárlását, miközben teljes körű adminisztrációs felületet biztosít a készlet és a felhasználók kezeléséhez.
 
-### 🔐 Biztonság és Felhasználók
-
-* JWT alapú autentikáció (biztonságos token kezelés)
-* Felhasználói profil rendszer
-* Korábbi rendelések nyomon követése
-* Termékértékelési rendszer (csillagos)
-
-### 🔍 Intelligens Keresés és Szűrés
-
-* Backend oldali szűrés:
-
-  * név
-  * ár intervallum
-  * kategória
-  * márka
-* Gyors lekérdezések optimalizált API-val
-* Dinamikus, reszponzív UI
-
-### 🛒 E-commerce Logika
-
-* Perzisztens kosár (LocalStorage + backend szinkron)
-* Rendeléskezelés
-* Automatikus készletfrissítés
-
-### 🛠️ Admin Felület
-
-* Felhasználók kezelése
-* Termékek és kategóriák kezelése
-* Teljes admin kontroll
+### Fő jellemzők:
+* **Tiszta architektúra:** Moduláris felépítés a könnyű karbantarthatóság érdekében.
+* **Biztonság:** JWT-alapú hitelesítés és szerepkör alapú hozzáférés-szabályozás (RBAC).
+* **Interaktivitás:** Valós idejű kosárkezelés és dinamikus keresőmotor.
+* **Modern UI:** Teljesen reszponzív felület React Bootstrap és Material UI segítségével.
 
 ---
 
-## 🏗️ Technológiai Stack
+## 🛠️ Technológiai Stack
 
 ### Frontend
-
-* **React 18** – komponens alapú UI
-* **Context API** – globális állapotkezelés
-* **React Bootstrap** – reszponzív design
-* **Material UI (MUI)** – speciális UI elemek
+- **React 18** – Komponens alapú felhasználói felület.
+- **Context API** – Globális állapotkezelés.
+- **React Bootstrap** – Gyors, reszponzív elrendezések.
+- **Material UI** – Modern, interaktív UI elemek.
 
 ### Backend
-
-* **NestJS** – skálázható Node.js framework
-* **Prisma ORM** – típusbiztos adatkezelés
-* **MySQL** – relációs adatbázis
-* **Jest** – tesztelés
-
----
-
-## 💻 Telepítés és Futtatás
-
-### 1. Előfeltételek
-
-* Node.js (v18+)
-* MySQL Server (v8+)
+- **NestJS** – Skálázható, TypeScript alapú Node.js keretrendszer.
+- **Prisma ORM** – Típusbiztos adatkezelés.
+- **MySQL** – Relációs adatbázis-kezelő.
+- **Jest** – Automatizált tesztelési környezet.
 
 ---
 
-### 2. Backend (Server)
+## 🗄️ Adatbázis séma
+A rendszer relációs adatbázist használ, normalizált struktúrával.
 
-```bash
-cd server
-npm install
-```
-
-.env fájl létrehozása:
-
-```env
-DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/onfret"
-JWT_SECRET="your_secret_key"
-```
-
-Adatbázis migráció és indítás:
-
-```bash
-npx prisma migrate dev
-npm run start:dev
-```
+**Fő entitások:**
+* **User (Customer):** Felhasználói adatok, jelszavak és jogosultságok (Role).
+* **Product:** Termékek ára, leírása és márkája.
+* **Category:** Hierarchikus struktúra a rendszerezéshez.
+* **CartItem:** Ideiglenes kosár elemek (LocalStorage + backend szinkron).
+* **Order & OrderItem:** Véglegesített rendelések és azok részletei.
 
 ---
 
-### 3. Frontend (Client)
-
-```bash
-cd client
-npm install
-npm start
-```
-
----
-
-## 📊 Adatbázis Séma (Vázlat)
-
-Fő entitások:
-
-* **Vevő (User)** – hitelesítés és profil adatok
-* **Termék (Product)** – ár, leírás, márka
-* **Kategória (Category)** – hierarchikus struktúra
-* **KosárTétel (CartItem)** – ideiglenes tárolás
-* **Rendelés (Order)** – végleges tranzakció
-* **RendelésTétel (OrderItem)** – rendelés részletek
-
----
-
-## 🧪 Minőségbiztosítás
-
-### Tesztek futtatása
-
-**Unit tesztek:**
-
-```bash
-npm run test
-```
-
-**E2E tesztek:**
-
-```bash
-npm run test:e2e
-```
-
----
-
-## 🛣️ API Dokumentáció
+## 🔌 API Dokumentáció
 
 ### Termékek szűrése
+`GET /termek?search={név}&minPrice={min}&maxPrice={max}&category={id}&brand={márka}`
 
-```
-GET /termek?search={név}&minPrice={min}&maxPrice={max}&category={id}&brand={márka}
-```
-
-| Paraméter | Típus  | Kötelező | Leírás                        |
-| --------- | ------ | -------- | ----------------------------- |
-| search    | string | Nem      | Keresés névben vagy leírásban |
-| minPrice  | number | Nem      | Minimum ár                    |
-| maxPrice  | number | Nem      | Maximum ár                    |
-| category  | number | Nem      | Kategória azonosító           |
-| brand     | string | Nem      | Márka szűrés                  |
+| Paraméter | Típus | Kötelező | Leírás |
+| :--- | :--- | :---: | :--- |
+| `search` | string | Nem | Keresés név vagy leírás alapján |
+| `minPrice` | number | Nem | Minimum ár szűrés |
+| `maxPrice` | number | Nem | Maximum ár szűrés |
+| `category` | number | Nem | Kategória azonosító |
+| `brand` | string | Nem | Márka alapú szűrés |
 
 ---
 
-## 📈 Továbbfejlesztési tervek
+## 🧪 Tesztelés
+A kódminőséget automatizált tesztekkel biztosítjuk.
 
-* [ ] Stripe / Barion fizetés integráció
-* [ ] Képfeltöltés (AWS S3 / Cloudinary)
-* [ ] Email értesítések (pl. rendelés után)
+**Unit tesztek:**
+```bash
+npm run test
+E2E (End-to-End) tesztek:
 
----
+Bash
+npm run test:e2e
+🚀 További fejlesztési tervek
+[ ] Online fizetés: Stripe vagy Barion integráció.
 
-## 👨‍💻 Készítette
+[ ] Kép feltöltés: AWS S3 vagy Cloudinary felhő alapú tárolás.
 
-**Patrik Sarandi**
-Vizsgaremek projekt — 2026
+[ ] Email értesítések: Automatikus visszaigazolás és szállítási státusz küldése.
+
+📊 Összegzés
+✅ Full-stack alkalmazás (frontend + backend)
+
+✅ 6 fő adatbázis entitás
+
+✅ 100% CRUD lefedettség
+
+✅ JWT-alapú biztonság
