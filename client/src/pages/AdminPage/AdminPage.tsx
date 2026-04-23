@@ -3,7 +3,7 @@ import { Outlet, NavLink } from "react-router-dom";
 import { Autentikacio } from "../../context/AuthContext";
 
 const AdminPage = () => {
-  const { logout } = Autentikacio()
+  const { logout } = Autentikacio();
 
   return (
     <div className="min-vh-100 bg-light d-flex flex-column">
@@ -91,6 +91,15 @@ const AdminPage = () => {
                     className="d-flex align-items-center px-3 py-2"
                   >
                     <i className="bi bi-people me-2"></i> Felhasználók
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item className="mb-lg-2 me-2 me-lg-0">
+                  <Nav.Link
+                    as={NavLink}
+                    to="rendelesek"
+                    className="d-flex align-items-center px-3 py-2"
+                  >
+                    <i className="bi bi-cart-check me-2"></i> Megrendelések
                   </Nav.Link>
                 </Nav.Item>
               </Nav>

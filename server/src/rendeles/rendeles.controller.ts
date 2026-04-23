@@ -53,7 +53,10 @@ export class RendelesController {
     try {
       return await this.rendelesService.createKosarTetel(dto, dto.VevoID);
     } catch (error: any) {
-      throw new BadRequestException('Nem sikerült a tétel a kosárhoz adni.', error.message);
+      throw new BadRequestException(
+        'Nem sikerült a tétel a kosárhoz adni.',
+        error.message,
+      );
     }
   }
 
@@ -76,6 +79,29 @@ export class RendelesController {
   async createRendeles(@Body() body: any) {
     const vevoId = Number(body.vevoId || body.VevoID);
     return this.rendelesService.createRendeles(vevoId, body);
+  }
+
+  @Get('admin')
+  findAll() {
+    return this.rendelesService.findAllAdmin();
+  }
+
+  @Get('admin')
+  async findAllAdmin() {
+    return await this.rendelesService.findAllAdmin();
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body('Statusz') statusz: string) {
+    return this.rendelesService.updateStatus(+id, statusz);
+  }
+
+  @Patch(':id')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('Statusz') statusz: string,
+  ) {
+    return await this.rendelesService.updateStatus(+id, statusz);
   }
 
   @Delete('/kosar/:vevoId')

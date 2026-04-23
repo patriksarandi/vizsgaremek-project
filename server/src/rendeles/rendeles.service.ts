@@ -260,6 +260,19 @@ export class RendelesService {
     });
   }
 
+  async findAllAdmin() {
+    return this.db.rendeles.findMany({
+      orderBy: { RendelesiDatum: 'desc' },
+    });
+  }
+
+  async updateStatus(id: number, statusz: string) {
+    return this.db.rendeles.update({
+      where: { RendelesID: id },
+      data: { Statusz: statusz },
+    });
+  }
+
   async removeKosarTetel(id: number) {
     const letezik = await this.db.kosarTetel.findUnique({
       where: { KosarTetelID: id },

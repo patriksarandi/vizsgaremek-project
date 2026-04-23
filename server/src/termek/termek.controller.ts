@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   Req,
@@ -41,7 +41,7 @@ export class TermekController {
     return this.termekService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateTermekDto: UpdateTermekDto) {
     return this.termekService.update(+id, updateTermekDto);
   }

@@ -6,13 +6,14 @@ import SignUpPage from "./pages/SignUpPage";
 import AdminFelhasznalokPage from "./pages/AdminPage/AdminFelhasznalokPage";
 import AdminKategoriakPage from "./pages/AdminPage/AdminKategoriakPage";
 import AdminTermekekPage from "./pages/AdminPage/AdminTermekekPage";
+
 import AdminPage from "./pages/AdminPage/AdminPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import ProfileFelhasznaloi from "./pages/ProfilePage/ProfileFelhasznaloi";
 import ProfileMegrendelesek from "./pages/ProfilePage/ProfileMegrendelesek";
 import CartPage from "./pages/CartPage";
 import { Autentikacio } from "./context/AuthContext";
-
+import AdminRendelesekPage from "./pages/AdminPage/AdminMegrendelesek";
 
 const App = () => {
   const { user, loading } = Autentikacio();
@@ -67,6 +68,7 @@ const App = () => {
         <Route path="felhasznalok" element={<AdminFelhasznalokPage />} />
         <Route path="kategoriak" element={<AdminKategoriakPage />} />
         <Route path="termekek" element={<AdminTermekekPage />} />
+        <Route path="rendelesek" element={<AdminRendelesekPage />} />
       </Route>
 
       <Route path="/profile" element={<ProfilePage />}>

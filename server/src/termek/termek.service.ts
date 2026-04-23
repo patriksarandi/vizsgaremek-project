@@ -97,8 +97,8 @@ export class TermekService {
       }
     }
 
-    console.log('Beérkező query:', query);
-    console.log('Generált where objektum:', JSON.stringify(where, null, 2));
+    //console.log('Beérkező query:', query);
+    //console.log('Generált where objektum:', JSON.stringify(where, null, 2));
 
     return this.db.termek.findMany({
       where,
@@ -142,8 +142,23 @@ export class TermekService {
     return termek;
   }
 
-  update(id: number, updateTermekDto: UpdateTermekDto) {
-    return `This action updates a #${id} termek`;
+  async update(id: number, dto: UpdateTermekDto) {
+    const letezo = await this.db.termek.findUnique({
+      where: { TermekID: id },
+    });
+
+    if (!letezo) throw new NotFoundException('Nincs ilyen termék!');
+
+    return await this.db.termek.update({
+      where: { TermekID: id },
+      data: {
+        KategoriaID: dto.KategoriaID ? Number(dto.KategoriaID) : undefined,
+        TermekNev: dto.TermekNev,
+        TermekAr: dto.TermekAr,
+        Keszlet: dto.Keszlet ? Number(dto.Keszlet) : undefined,
+        Brand: dto.Brand,
+      },
+    });
   }
 
   async remove(id: number) {

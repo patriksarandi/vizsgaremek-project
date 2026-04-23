@@ -15,11 +15,12 @@ const mockPrisma = {
   },
   termek: {
     findUnique: jest.fn(),
-    update: jest.fn(), // Ez is kell a készlet csökkentéshez
+    update: jest.fn(),
   },
   rendeles: {
     create: jest.fn(),
     findMany: jest.fn(),
+    update: jest.fn()
   },
   rendeltTermek: {
     create: jest.fn(),
@@ -136,4 +137,35 @@ describe('RendelesService', () => {
       expect(db.kosarTetel.deleteMany).toHaveBeenCalled();
     });
   });
+
+  describe('findAllAdmin', () => {
+    it('visszaadja a rendeléseket', async () => {
+        const mockRendelesek = [
+            {RendelesID: 2, Statusz: 'Függőben'},
+            {RendelesID: 1, Statusz: 'Teljesítve'}
+        ];
+        mockPrisma.rendeles.findMany.mockResolvedValue(mockRendelesek);
+        const result = await service.findAllAdmin();
+
+        expect(db.rendeles.findMany).toHaveBeenCalledWith({
+            orderBy: { RendelesiDatum: 'desc'},
+        });
+
+        expect(result).toEqual(mockRendelesek);
+    });
+  });
+
+  describe('updateStatusz', () => {
+    it('a rendeles státuszát frissíti', async () => {
+        const mockUpdatedRendeles = { RendelesID: 1, Statusz: 'Teljesítve'};
+        mockPrisma.rendeles.update.mockResolvedValue(mockUpdatedRendeles);
+        const result = await service.updateStatus(1, 'Teljesítve');
+
+        expect(db.rendeles.update).toHaveBeenCalledWith({
+            where: { RendelesID: 1 },
+            data: { Statusz: 'Teljesítve' }, 
+        });
+        expect(result).toEqual(mockUpdatedRendeles);
+    })
+  })
 });

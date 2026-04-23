@@ -16,6 +16,8 @@ describe('RendelesController', () => {
     createRendeles: jest.fn(),
     removeKosar: jest.fn(),
     updateKosarTetelMennyiseg: jest.fn(),
+    findAllAdmin: jest.fn(),
+    updateStatus: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -82,11 +84,51 @@ describe('RendelesController', () => {
 
   describe('createRendeles', () => {
     it('meghívja a szervizt a vevoId-val', async () => {
-        const body = { vevoId: 5, adat: 'valami' };
-        mockRendelesService.createRendeles.mockResolvedValue({ id: 99 });
-        const result = await controller.createRendeles(body);
-        expect(service.createRendeles).toHaveBeenCalledWith(5, body);
-        expect(result).toEqual({id:99})
-    })
-  })
+      const body = { vevoId: 5, adat: 'valami' };
+      mockRendelesService.createRendeles.mockResolvedValue({ id: 99 });
+      const result = await controller.createRendeles(body);
+      expect(service.createRendeles).toHaveBeenCalledWith(5, body);
+      expect(result).toEqual({ id: 99 });
+    });
+  });
+
+  describe('findAllAdmin', () => {
+    it('visszaadja az összes rendelést az admin felülethez', async () => {
+      const mockData = [
+        { RendelesID: 1, Statusz: 'Függőben' },
+        { RendelesID: 2, Statusz: 'Teljesítve' },
+      ];
+      mockRendelesService.findAllAdmin.mockResolvedValue(mockData);
+
+      const result = await controller.findAllAdmin();
+
+      expect(service.findAllAdmin).toHaveBeenCalled();
+      expect(result).toEqual(mockData);
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('helyesen hívja meg a szervizt a string ID konvertálásával', async () => {
+      const idStr = '15';
+      const ujStatusz = 'Teljesítve';
+      const expectedResult = { RendelesID: 15, Statusz: ujStatusz };
+
+      mockRendelesService.updateStatus.mockResolvedValue(expectedResult);
+
+      const result = await controller.updateStatus(idStr, ujStatusz);
+
+      expect(service.updateStatus).toHaveBeenCalledWith(15, ujStatusz);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('hibát továbbít, ha a service elbukik', async () => {
+      mockRendelesService.updateStatus.mockRejectedValue(
+        new Error('Update failed'),
+      );
+
+      await expect(controller.updateStatus('1', 'Törölve')).rejects.toThrow(
+        'Update failed',
+      );
+    });
+  });
 });

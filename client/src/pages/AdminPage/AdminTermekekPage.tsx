@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Form, Container, Table, Button } from "react-bootstrap";
+import { Form, Container, Table, Button, Modal } from "react-bootstrap";
 import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
@@ -9,12 +9,20 @@ const AdminTermekekPage = () => {
   const [termekAr, setTermekAr] = useState<number>(0);
   const [keszlet, setKeszlet] = useState<number>(0);
   const [brand, setBrand] = useState<string>("Ismeretlen");
+  const [showModositas, setShowModositas] = useState(false);
+  const [selectedTermek, setSelectedTermek] = useState<any>(null);
   const { getAuthHeader } = Autentikacio();
   const {
     data: termekek,
     loading,
     refresh,
   } = useFetchData("/termek", getAuthHeader());
+
+  const handleEdit = (termek) => {
+    console.log("Szerkesztés:", termek)
+    setSelectedTermek(termek);
+    setShowModositas(true);
+  };
 
   const handleAdd = async (dto, url) => {
     if (!termekNev.trim() || kategoriaId === 0) {
@@ -30,6 +38,7 @@ const AdminTermekekPage = () => {
       Brand: brand || "Ismeretlen",
     };
 
+
     try {
       const response = await fetch("http://localhost:7777/termek", {
         method: "POST",
@@ -41,12 +50,7 @@ const AdminTermekekPage = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const specificError = Array.isArray(errorData.message)
-          ? errorData.message[0]
-          : errorData.message;
-        console.error("A konkrét mező hiba:", specificError);
-        throw new Error(specificError || `Hiba: ${response.status}`);
+        throw new Error(`Hiba: ${response.status}`);
       }
 
       setTermekNev("");
@@ -59,6 +63,37 @@ const AdminTermekekPage = () => {
       refresh();
     } catch (error) {
       alert("Hiba", error.message);
+    }
+  };
+
+  const handleUpdate = async () => {
+    console.log("Küldés erre az ID-ra:", selectedTermek.TermekID);
+
+    try {
+      const response = await fetch(
+        `http://localhost:7777/api/termek/${selectedTermek.TermekID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+          body: JSON.stringify({
+            KategoriaID: Number(selectedTermek.KategoriaID),
+            TermekNev: selectedTermek.TermekNev,
+            TermekAr: Number(selectedTermek.TermekAr),
+            Keszlet: Number(selectedTermek.Keszlet),
+            Brand: selectedTermek.Brand,
+          }),
+        },
+      );
+
+      if (!response.ok) throw new Error("Sikertelen frissítés.");
+      alert("Termék sikeresen frissítve!");
+      setShowModositas(false);
+      refresh();
+    } catch (error) {
+      alert(error.message);
     }
   };
 
