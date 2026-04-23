@@ -69,22 +69,3 @@ A kódminőséget automatizált tesztekkel biztosítjuk.
 **Unit tesztek:**
 ```bash
 npm run test
-E2E (End-to-End) tesztek:
-
-Bash
-npm run test:e2e
-🚀 További fejlesztési tervek
-[ ] Online fizetés: Stripe vagy Barion integráció.
-
-[ ] Kép feltöltés: AWS S3 vagy Cloudinary felhő alapú tárolás.
-
-[ ] Email értesítések: Automatikus visszaigazolás és szállítási státusz küldése.
-
-📊 Összegzés
-✅ Full-stack alkalmazás (frontend + backend)
-
-✅ 6 fő adatbázis entitás
-
-✅ 100% CRUD lefedettség
-
-✅ JWT-alapú biztonság
