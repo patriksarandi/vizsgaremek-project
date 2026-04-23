@@ -14,12 +14,16 @@ import { RendelesService } from './rendeles.service';
 import { KosarTetelDto } from './dto/create-rendeles.dto';
 import { FizetesiKosarDto } from './dto/create-rendeles.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('rendeles')
 @Controller('rendeles')
 export class RendelesController {
   constructor(private readonly rendelesService: RendelesService) {}
 
   @Post('/kosar')
+  @ApiOperation({ summary: 'Fizetési kosár létrehozása egy vevőhöz' })
+  @ApiResponse({ status: 201, description: 'A kosár sikeresen létrejött.' })
   createFizetesiKosar(@Body() fizetesiKosarDto: FizetesiKosarDto) {
     const vevoId = fizetesiKosarDto.VevoID;
 
@@ -37,18 +41,22 @@ export class RendelesController {
   }
 
   @Get('/kosar')
+  @ApiOperation({ summary: 'Az összes fizetési kosár lekérése' })
   findAllFizetesiKosar() {
     return this.rendelesService.findAllFizetesiKosar();
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('user/:id')
+  @ApiOperation({ summary: 'Egy adott felhasználó összes rendelésének lekérése' })
+  @ApiParam({ name: 'id', description: 'A felhasználó (vevő) azonosítója', example: 1 })
   async findByUser(@Param('id', ParseIntPipe) id: number) {
     return this.rendelesService.findRendelesekByVevo(id);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/kosartetel')
+  @ApiOperation({ summary: 'Új tétel hozzáadása a kosárhoz' })
   async createKosarTetel(@Body() dto: KosarTetelDto) {
     try {
       return await this.rendelesService.createKosarTetel(dto, dto.VevoID);
@@ -61,6 +69,8 @@ export class RendelesController {
   }
 
   @Get('/kosartetel/:vevoId')
+  @ApiOperation({ summary: 'Egy adott vevő kosarában lévő tételek lekérése' })
+  @ApiParam({ name: 'vevoId', description: 'Vevő azonosító', example: 1 })
   async findKosarTetelByVevoId(@Param('vevoId', ParseIntPipe) vevoId: number) {
     return this.rendelesService.findKosarTetelByVevoId(vevoId);
   }
@@ -71,11 +81,14 @@ export class RendelesController {
   }
 
   @Delete('/kosartetel/:id')
+  @ApiOperation({ summary: 'Tétel törlése a kosárból' })
+  @ApiParam({ name: 'id', description: 'Kosár tétel azonosítója' })
   removeKosarTetel(@Param('id') id: number) {
     return this.rendelesService.removeKosarTetel(+id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Rendelés létrehozása (fizetés indítása)' })
   async createRendeles(@Body() body: any) {
     const vevoId = Number(body.vevoId || body.VevoID);
     return this.rendelesService.createRendeles(vevoId, body);
@@ -97,6 +110,9 @@ export class RendelesController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Rendelés státuszának frissítése' })
+  @ApiParam({ name: 'id', description: 'Rendelés azonosítója' })
+  @ApiBody({ schema: { type: 'object', properties: { Statusz: { type: 'string', example: 'Teljesítve' } } } })
   async updateStatus(
     @Param('id') id: string,
     @Body('Statusz') statusz: string,
@@ -105,11 +121,23 @@ export class RendelesController {
   }
 
   @Delete('/kosar/:vevoId')
+  @ApiOperation({ summary: 'Egy vevő teljes kosarának törlése' })
   async removeKosar(@Param('vevoId', ParseIntPipe) vevoId: number) {
     return this.rendelesService.removeKosar(vevoId);
   }
 
   @Patch('kosartetel/update')
+  @ApiOperation({ summary: 'Kosárban lévő termék mennyiségének módosítása' })
+  @ApiBody({ 
+    schema: { 
+      type: 'object', 
+      properties: { 
+        vevoId: { type: 'number' }, 
+        termekId: { type: 'number' }, 
+        valtozas: { type: 'number', description: 'Lehet pozitív vagy negatív irányú elmozdulás' } 
+      } 
+    } 
+  })
   async updateKosarTetel(
     @Body('vevoId') vevoId: number,
     @Body('termekId') termekId: number,
