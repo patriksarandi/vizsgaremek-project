@@ -1,6 +1,6 @@
 ﻿import { Navbar, Container, Nav, Button, Col, Row } from "react-bootstrap";
 import { NavLink, Outlet } from "react-router-dom";
-import { Autentikacio } from "../../components/AuthContext";
+import { Autentikacio } from "../../context/AuthContext";
 
 
 const ProfilePage = () => {

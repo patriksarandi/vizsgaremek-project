@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
 import { KategoriaService } from './kategoria.service';
 import { CreateKategoriaDto } from './dto/create-kategoria.dto';
 import { UpdateKategoriaDto } from './dto/update-kategoria.dto';
@@ -15,6 +15,11 @@ export class KategoriaController {
   @Get()
   findAll() {
     return this.kategoriaService.findAllKategoria();
+  }
+
+  @Put(':id') 
+  update(@Param('id') id: string, @Body() updateDto: UpdateKategoriaDto) {
+    return this.kategoriaService.updateKategoria(+id, updateDto);
   }
 
   @Get(':id')

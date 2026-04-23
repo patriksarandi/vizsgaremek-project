@@ -1,5 +1,5 @@
-﻿import { createContext, useContext, useMemo, useState } from "react"
-import { Autentikacio } from "./AuthContext";
+﻿import { createContext, useContext, useMemo } from "react"
+import { Autentikacio } from "../context/AuthContext";
 import { useFetchData } from "./useFetchData";
 
 const ProductContext = createContext(undefined);

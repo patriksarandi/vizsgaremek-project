@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateKategoriaDto } from './dto/create-kategoria.dto';
 import { PrismaService } from 'src/prisma.service';
+import { UpdateKategoriaDto } from './dto/update-kategoria.dto';
 
 @Injectable()
 export class KategoriaService {
@@ -39,6 +40,28 @@ export class KategoriaService {
 
     if (!kategoria) throw new NotFoundException('A kategória nem található!');
     return kategoria;
+  }
+
+  async updateKategoria(id: number, dto: UpdateKategoriaDto) {
+    const kategoria = await this.db.kategoria.findUnique({
+      where: { KategoriaID: id},
+    });
+
+    if (!kategoria || kategoria.IsDeleted) {
+      throw new NotFoundException('A kategória nem található!');
+    }
+
+    try {
+      return await this.db.kategoria.update({
+        where: { KategoriaID: id },
+        data: { Nev: dto.kategoriaNev },
+      })
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new ConflictException('Ez a kategória név már foglalt!')
+      }
+      throw new InternalServerErrorException('Hiba történt a módosítás során!')
+    }
   }
 
   async removeKategoria(id: number) {

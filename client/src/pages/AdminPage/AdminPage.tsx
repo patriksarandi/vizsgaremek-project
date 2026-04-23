@@ -1,6 +1,6 @@
 ﻿import { Col, Container, Dropdown, Nav, Navbar, Row } from "react-bootstrap";
 import { Outlet, NavLink } from "react-router-dom";
-import { Autentikacio } from "../../components/AuthContext";
+import { Autentikacio } from "../../context/AuthContext";
 
 const AdminPage = () => {
   const { logout } = Autentikacio()

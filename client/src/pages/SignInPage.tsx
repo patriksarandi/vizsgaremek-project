@@ -1,7 +1,7 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Autentikacio } from "../components/AuthContext";
+import { Autentikacio } from "../context/AuthContext";
 
 const SignInPage = () => {
   const { user, login } = Autentikacio();

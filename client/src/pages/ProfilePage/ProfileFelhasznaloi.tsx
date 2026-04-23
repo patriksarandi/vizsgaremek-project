@@ -1,5 +1,5 @@
 ﻿import { Button, Form, Spinner } from "react-bootstrap";
-import { Autentikacio } from "../../components/AuthContext";
+import { Autentikacio } from "../../context/AuthContext";
 import { useRef } from "react";
 
 const ProfileFelhasznaloi = () => {

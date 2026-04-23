@@ -1,5 +1,5 @@
 ﻿import { Container, Table, Button } from "react-bootstrap";
-import { Autentikacio } from "../../components/AuthContext";
+import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
 const AdminFelhasznalokPage = () => {

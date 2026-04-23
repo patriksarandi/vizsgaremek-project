@@ -1,8 +1,8 @@
 ﻿import { Button, Col, Container, Row } from "react-bootstrap";
 import CartItem from "../components/CartItem";
 import NavbarComponent from "../components/NavbarComponent";
-import { Autentikacio } from "../components/AuthContext";
-import { useKosar } from "../components/CartContext";
+import { Autentikacio } from "../context/AuthContext";
+import { useKosar } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {

@@ -1,9 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import SignInPage from "./pages/SignInPage";
-import MarketplacePage from "./pages/MarketPlacePage";
+import MarketplacePage from "./pages/MarketplacePage";
 import ProductPage from "./pages/ProductPage";
 import SignUpPage from "./pages/SignUpPage";
-
 import AdminFelhasznalokPage from "./pages/AdminPage/AdminFelhasznalokPage";
 import AdminKategoriakPage from "./pages/AdminPage/AdminKategoriakPage";
 import AdminTermekekPage from "./pages/AdminPage/AdminTermekekPage";
@@ -12,7 +11,8 @@ import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import ProfileFelhasznaloi from "./pages/ProfilePage/ProfileFelhasznaloi";
 import ProfileMegrendelesek from "./pages/ProfilePage/ProfileMegrendelesek";
 import CartPage from "./pages/CartPage";
-import { Autentikacio } from "./components/AuthContext";
+import { Autentikacio } from "./context/AuthContext";
+
 
 const App = () => {
   const { user, loading } = Autentikacio();

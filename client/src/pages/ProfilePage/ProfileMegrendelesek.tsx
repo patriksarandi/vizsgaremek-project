@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { Table, Container, Badge, Spinner } from "react-bootstrap";
-import { Autentikacio } from "../../components/AuthContext";
+import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
 const ProfileMegrendelesek = () => {

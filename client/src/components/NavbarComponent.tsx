@@ -9,9 +9,9 @@
   Offcanvas,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Autentikacio } from "./AuthContext";
+import { Autentikacio } from "../context/AuthContext";
 import { useState } from "react";
-import { useKosar } from "./CartContext";
+import { useKosar } from "../context/CartContext";
 import CartItem from "./CartItem";
 
 const NavbarComponent = ({ searchTerm = "", setSearchTerm = () => {}  }) => {

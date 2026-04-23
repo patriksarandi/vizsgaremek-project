@@ -1,5 +1,4 @@
-﻿import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
-import { Autentikacio } from "./AuthContext";
+﻿import { Button } from "react-bootstrap";
 
 const CartItem = ({ tetel, updateTermekMennyiseg }: { tetel: any }) => {
   const termekId = tetel.TermekID || tetel.Termek?.TermekID;

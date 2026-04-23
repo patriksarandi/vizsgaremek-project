@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Min } from "class-validator";
+import { IsDate, IsInt, IsNotEmpty, IsOptional, IsPositive, Min } from "class-validator";
 
 export class FizetesiKosarDto {
     @IsInt({message: "A vevő azonosítója szám!"})

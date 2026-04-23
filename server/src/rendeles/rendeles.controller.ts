@@ -9,10 +9,9 @@ import {
   ParseIntPipe,
   Patch,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { RendelesService } from './rendeles.service';
-import { CreateRendelesDto, KosarTetelDto } from './dto/create-rendeles.dto';
+import { KosarTetelDto } from './dto/create-rendeles.dto';
 import { FizetesiKosarDto } from './dto/create-rendeles.dto';
 import { AuthGuard } from '@nestjs/passport';
 

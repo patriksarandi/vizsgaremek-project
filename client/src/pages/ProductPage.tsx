@@ -1,9 +1,9 @@
 ﻿import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import { Autentikacio } from "../components/AuthContext";
+import { Autentikacio } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import NavbarComponent from "../components/NavbarComponent";
-import { useKosar } from "../components/CartContext";
+import { useKosar } from "../context/CartContext";
 
 const ProductPage = () => {
   const { id } = useParams();

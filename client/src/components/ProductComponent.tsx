@@ -1,9 +1,9 @@
 ﻿import { Badge, Button, Card } from "react-bootstrap";
-import { Autentikacio } from "./AuthContext";
+import { Autentikacio } from "../context/AuthContext";
 import { useMemo } from "react";
 import Rating from "@mui/material/Rating";
 import { useNavigate } from "react-router-dom";
-import { useKosar } from "./CartContext";
+import { useKosar } from "../context/CartContext";
 import { useProducts } from "./ProductContext";
 
 export const KATEGORIAK = [

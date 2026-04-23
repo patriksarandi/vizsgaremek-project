@@ -1,11 +1,11 @@
 ﻿import { Alert, Button, Col, Container, Offcanvas, Row } from "react-bootstrap";
-import { Autentikacio } from "../components/AuthContext";
+import { Autentikacio } from "../context/AuthContext";
 import NavbarComponent from "../components/NavbarComponent";
 import ProductComponent from "../components/ProductComponent";
 import FilterSidebarComponent from "../components/FilterSidebarComponent";
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useKosar } from "../components/CartContext";
+import { useKosar } from "../context/CartContext";
 import { useProducts } from "../components/ProductContext";
 
 const MarketplacePage = ({ userRatings = {} }) => {
