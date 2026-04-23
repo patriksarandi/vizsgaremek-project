@@ -1,101 +1,107 @@
-# 🎸 OnFret Marketplace
+# 🎸 OnFret Marketplace — Hangszer Piactér
 
-Egy teljes stack webalkalmazás hangszer és zenei eszközök online piacteréhez.
-A projekt célja egy modern, skálázható webshop rendszer megvalósítása backend szűréssel, felhasználókezeléssel és admin felülettel.
+Az **OnFret Marketplace** egy full-stack webalkalmazás, amely hangszerek és zenei eszközök online adás-vételét teszi lehetővé.
+A projekt modern webfejlesztési elvek mentén készült: tiszta architektúra, JWT-alapú autentikáció és teljes körű CRUD funkcionalitás.
 
 ---
 
-## 🚀 Funkciók
+## 📖 Tartalomjegyzék
 
-### 👤 Felhasználók
+* 🌟 Funkciók
+* 🏗️ Technológiai Stack
+* 💻 Telepítés és Futtatás
+* 📊 Adatbázis Séma
+* 🧪 Minőségbiztosítás
+* 🛣️ API Dokumentáció
+* 📈 Továbbfejlesztési tervek
 
-* Regisztráció / Bejelentkezés (JWT alapú autentikáció)
-* Profil kezelés
-* Termékek értékelése
+---
 
-### 🛍 Termékek
+## 🌟 Funkciók
 
-* Termékek listázása kategóriák szerint
-* **Komplex szűrés (backend oldalon):**
+### 🔐 Biztonság és Felhasználók
 
-  * név szerinti keresés
-  * kategória
+* JWT alapú autentikáció (biztonságos token kezelés)
+* Felhasználói profil rendszer
+* Korábbi rendelések nyomon követése
+* Termékértékelési rendszer (csillagos)
+
+### 🔍 Intelligens Keresés és Szűrés
+
+* Backend oldali szűrés:
+
+  * név
   * ár intervallum
+  * kategória
   * márka
-* Rendezés (ár szerint)
+* Gyors lekérdezések optimalizált API-val
+* Dinamikus, reszponzív UI
 
-### 🛒 Kosár és rendelés
+### 🛒 E-commerce Logika
 
-* Kosár kezelés (termék hozzáadás, mennyiség módosítás)
-* Rendelés leadás
-* Korábbi rendelések megtekintése
+* Perzisztens kosár (LocalStorage + backend szinkron)
+* Rendeléskezelés
+* Automatikus készletfrissítés
 
-### 🛠 Admin felület
+### 🛠️ Admin Felület
 
 * Felhasználók kezelése
-* Kategóriák kezelése
-* Termékek kezelése
+* Termékek és kategóriák kezelése
+* Teljes admin kontroll
 
 ---
 
-## 🧠 Technológiák
-
-### Backend
-
-* NestJS
-* Prisma ORM
-* MySQL
-* JWT autentikáció
+## 🏗️ Technológiai Stack
 
 ### Frontend
 
-* React
-* React Router
-* React Bootstrap
-* Context API (Auth, Kosár)
+* **React 18** – komponens alapú UI
+* **Context API** – globális állapotkezelés
+* **React Bootstrap** – reszponzív design
+* **Material UI (MUI)** – speciális UI elemek
+
+### Backend
+
+* **NestJS** – skálázható Node.js framework
+* **Prisma ORM** – típusbiztos adatkezelés
+* **MySQL** – relációs adatbázis
+* **Jest** – tesztelés
 
 ---
 
-## ⚙️ Telepítés
+## 💻 Telepítés és Futtatás
 
-### 1. Repository klónozása
+### 1. Előfeltételek
 
-```bash
-git clone https://github.com/patriksarandi/vizsgaremek-project.git
-cd vizsgaremek-project
-```
+* Node.js (v18+)
+* MySQL Server (v8+)
 
 ---
 
-### 2. Backend indítása
+### 2. Backend (Server)
 
 ```bash
 cd server
 npm install
 ```
 
-#### .env fájl létrehozása:
+.env fájl létrehozása:
 
 ```env
-DATABASE_URL="mysql://user:password@localhost:3306/adatbazis"
-JWT_SECRET="titkoskulcs"
+DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/onfret"
+JWT_SECRET="your_secret_key"
 ```
 
-#### Adatbázis migráció:
+Adatbázis migráció és indítás:
 
 ```bash
 npx prisma migrate dev
-```
-
-#### Backend indítása:
-
-```bash
 npm run start:dev
 ```
 
 ---
 
-### 3. Frontend indítása
+### 3. Frontend (Client)
 
 ```bash
 cd client
@@ -105,73 +111,64 @@ npm start
 
 ---
 
-## 🔎 API használat (példa)
+## 📊 Adatbázis Séma (Vázlat)
 
-### Termékek lekérdezése szűréssel
+Fő entitások:
 
-```http
-GET /termek?search=fender&minPrice=10000&maxPrice=500000&category=1&brand=Fender
-```
-
-### Paraméterek
-
-| Paraméter | Leírás              |
-| --------- | ------------------- |
-| search    | keresés név alapján |
-| category  | kategória ID        |
-| minPrice  | minimum ár          |
-| maxPrice  | maximum ár          |
-| brand     | márka               |
-| page      | oldalszám           |
-| limit     | elemszám            |
+* **Vevő (User)** – hitelesítés és profil adatok
+* **Termék (Product)** – ár, leírás, márka
+* **Kategória (Category)** – hierarchikus struktúra
+* **KosárTétel (CartItem)** – ideiglenes tárolás
+* **Rendelés (Order)** – végleges tranzakció
+* **RendelésTétel (OrderItem)** – rendelés részletek
 
 ---
 
-## 🧪 Tesztelés
+## 🧪 Minőségbiztosítás
 
-Az API tesztelése Thunder Client segítségével történt.
+### Tesztek futtatása
 
-### Példa kérés:
+**Unit tesztek:**
 
-```http
-GET /termek?search=laptop&minPrice=100000
+```bash
+npm run test
+```
+
+**E2E tesztek:**
+
+```bash
+npm run test:e2e
 ```
 
 ---
 
-## 🎯 Architektúra
+## 🛣️ API Dokumentáció
 
-A backend réteges felépítésű:
+### Termékek szűrése
 
-* Controller → HTTP kezelés
-* Service → üzleti logika
-* Prisma → adatbázis műveletek
+```
+GET /termek?search={név}&minPrice={min}&maxPrice={max}&category={id}&brand={márka}
+```
 
-A frontend komponens alapú és Context API-t használ globális állapotkezelésre.
-
----
-
-## 💡 UX megoldások
-
-* Dinamikus keresés `onChange` eseménnyel
-* Debounce használata az API hívások optimalizálására
-* Reszponzív design (mobil támogatás Offcanvas segítségével)
-* Kosár dropdown gyors eléréssel
+| Paraméter | Típus  | Kötelező | Leírás                        |
+| --------- | ------ | -------- | ----------------------------- |
+| search    | string | Nem      | Keresés névben vagy leírásban |
+| minPrice  | number | Nem      | Minimum ár                    |
+| maxPrice  | number | Nem      | Maximum ár                    |
+| category  | number | Nem      | Kategória azonosító           |
+| brand     | string | Nem      | Márka szűrés                  |
 
 ---
 
-## 📌 Továbbfejlesztési lehetőségek
+## 📈 Továbbfejlesztési tervek
 
-* Unit tesztek bővítése
-* Pagination UI
-* Többszörös kategória szűrés backend oldalon
-* Kép feltöltés optimalizálása
+* [ ] Stripe / Barion fizetés integráció
+* [ ] Képfeltöltés (AWS S3 / Cloudinary)
+* [ ] Email értesítések (pl. rendelés után)
 
 ---
 
 ## 👨‍💻 Készítette
 
-Patrik Sarandi
-Vizsgaremek projekt
-
----
+**Patrik Sarandi**
+Vizsgaremek projekt — 2026

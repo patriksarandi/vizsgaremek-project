@@ -80,7 +80,7 @@ const CartPage = () => {
               <div className="d-flex justify-content-between mb-4">
                 <span className="text-muted">Végösszeg:</span>
                 <strong className="fs-4 text-primary">
-                  {Number(osszeg.toLocaleString())} Ft
+                  {new Intl.NumberFormat("hu-HU").format(osszeg)} Ft
                 </strong>
               </div>
               <Button

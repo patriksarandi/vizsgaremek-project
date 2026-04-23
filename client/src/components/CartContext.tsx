@@ -76,7 +76,7 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Kosár hiba:", error);
-      console.log(data.message)
+      console.log(data.message);
     }
     return false;
   };
@@ -111,15 +111,17 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) fetchKosarTetelek();
-    else setKosarTetelek([]); localStorage.removeItem("onfret_kosar")
+    else setKosarTetelek([]);
+    localStorage.removeItem("onfret_kosar");
   }, [user]);
 
   const osszeg = useMemo(() => {
     if (!Array.isArray(kosarTetelek)) return 0;
 
     return kosarTetelek.reduce((acc, tetel) => {
-      const ar = Number(tetel?.Termek?.TermekAr || 0);
-      const mennyiseg = Number(tetel?.TetelMennyiseg || 0);
+      const ar = Number(tetel?.Termek?.TermekAr) || 0;
+      const mennyiseg = Number(tetel?.TetelMennyiseg) || 0;
+
       return acc + ar * mennyiseg;
     }, 0);
   }, [kosarTetelek]);
@@ -133,9 +135,9 @@ export const CartProvider = ({ children }) => {
         updateTermekMennyiseg,
         refreshKosar: fetchKosarTetelek,
         emptyKosar: () => {
-            setKosarTetelek([]);
-            localStorage.removeItem("onfret_kosar")
-        }
+          setKosarTetelek([]);
+          localStorage.removeItem("onfret_kosar");
+        },
       }}
     >
       {children}
