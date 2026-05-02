@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Vizsgaremek Webshop API')
+    .setTitle('Vizsgaremek OnFret Webshop API')
     .setDescription('A webshop backend végpontjainak dokumentációja')
     .setVersion('1.0')
     .addTag('rendeles')

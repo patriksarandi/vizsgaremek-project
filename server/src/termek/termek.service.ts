@@ -42,7 +42,7 @@ export class TermekService {
   async findAll(query: any) {
     const page = Number(query.page || 1);
     const limit = Number(query.limit || 10);
-    const where: any = {};
+    const where: any = { IsDeleted: false };
 
     if (query.search) {
       const searchWords = query.search
@@ -128,8 +128,8 @@ export class TermekService {
   }
 
   async findOne(id: number) {
-    const termek = await this.db.termek.findUnique({
-      where: { TermekID: id },
+    const termek = await this.db.termek.findFirst({
+      where: { TermekID: id, IsDeleted: false },
       include: { Kategoria: true },
     });
 

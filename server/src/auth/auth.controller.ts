@@ -18,17 +18,17 @@ export class AuthController {
   @Post('signin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Bejelentkezés és JWT token generálása' })
-  @ApiResponse({ status: 200, description: 'Sikeres bejelentkezés, visszaadja a tokent.' })
-  @ApiResponse({ status: 401, description: 'Hibás e-mail vagy jelszó.' })
+  @ApiResponse({ status: 200, description: 'Sikeres bejelentkezés.' })
+  @ApiResponse({ status: 401, description: 'Hibás adatok.' })
   async signIn(@Body() signInDto: SignInDto) {
     return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
   @Post('signup')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Új felhasználó regisztrációja' })
-  @ApiResponse({ status: 201, description: 'A felhasználó sikeresen létrejött.' })
-  @ApiResponse({ status: 400, description: 'Az e-mail cím már foglalt vagy hibás adatok.' })
+  @ApiResponse({ status: 201, description: 'Sikeres regisztráció.' })
+  @ApiResponse({ status: 400, description: 'Az e-mail cím már foglalt.' })
   async signUp(@Body() signUpDto: SignUpDto) {
     return await this.authService.signUp(signUpDto);
   }

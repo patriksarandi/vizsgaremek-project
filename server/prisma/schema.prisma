@@ -72,7 +72,7 @@ model Ertekeles {
 model FizetesiKosar {
   KosarID Int          @id @default(autoincrement())
   VevoID  Int          @unique
-  Vevo    Vevo         @relation(fields: [VevoID], references: [VevoID])
+  Vevo    Vevo         @relation(fields: [VevoID], references: [VevoID], onDelete: Cascade)
   Tetelek KosarTetel[]
 }
 

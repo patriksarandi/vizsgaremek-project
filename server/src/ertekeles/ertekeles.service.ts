@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateErtekeleDto } from './dto/create-ertekele.dto';
-import { UpdateErtekeleDto } from './dto/update-ertekele.dto';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()

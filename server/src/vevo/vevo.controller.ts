@@ -7,56 +7,64 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { VevoService } from './vevo.service';
 import { CreateVevoDto, VevoRole } from './dto/create-vevo.dto';
 import { UpdateVevoDto } from './dto/update-vevo.dto';
-import { ApiResponse, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ApiResponse, ApiOperation, ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('vevo')
 @Controller('vevo')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 export class VevoController {
   constructor(private readonly vevoService: VevoService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
-  @ApiOperation({ summary: 'A bejelentkezett felhasználó saját profiljának lekérése' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'A bejelentkezett felhasználó saját profiljának lekérése', description: 'A JWT token alapján azonosított felhasználó adatai.' })
   @ApiResponse({ status: 200, description: 'Sikeres lekérdezés.' })
   @ApiResponse({ status: 401, description: 'Nincs érvényes token.' })
+  @Get('profile')
   getProfile(@Request() req) {
     return this.vevoService.findOne(req.user.id);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch('profile')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'A bejelentkezett felhasználó saját adatainak módosítása' })
   @ApiResponse({ status: 200, description: 'Profil sikeresen frissítve.' })
+  @Patch('profile')
   updateProfile(@Request() req, @Body() dto: UpdateVevoDto) {
-    return this.vevoService.update(req.user.id, dto)
+    return this.vevoService.update(req.user.id, dto, false)
   }
 
   @Post()
-  @ApiOperation({ summary: 'Új vevő regisztrációja' })
-  @ApiResponse({ status: 201, description: 'Sikeres regisztráció.' })
-  @ApiResponse({ status: 400, description: 'Hibás adatok vagy foglalt e-mail.' })
+  @ApiOperation({ summary: 'Új vevő regisztrációja', description: 'Új vevő létrehozása a rendszerben.' })
+  @ApiResponse({ status: 201, description: 'Sikeres regisztráció.', type: CreateVevoDto })
+  @ApiResponse({ status: 400, description: 'Validációs hiba vagy foglalt e-mail.' })
   create(@Body() createVevoDto: CreateVevoDto) {
     return this.vevoService.create(createVevoDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
-  @Get()
-  @ApiOperation({ summary: 'Az összes vevő listázása (Admin)' })
-  @Get()
-  findAll(@Request() req) {
-    console.log('Lekérte: ', req.user);
-    return this.vevoService.findAll();
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth()
+  // @ApiOperation({ summary: 'Az összes vevő listázása (Admin)', description: 'Csak adminisztrácorok számára elérhető lista.' })
+  // @ApiResponse({ status: 200, description: 'Sikeres listázás', type: [CreateVevoDto]})
+  // @Get()
+  // findAll() {
+  //   //console.log('Lekérte: ', req.user);
+  //   return this.vevoService.findAll();
+  // }
 
   @Get(':id')
   @ApiOperation({ summary: 'Vevő lekérése azonosító alapján' })
-  @ApiParam({ name: 'id', type: 'number', example: 1 })
+  @ApiParam({ name: 'id', type: 'number', example: 1, description: 'A vevő egyedi azonosítója.' })
+  @ApiResponse({ status: 200, type: CreateVevoDto })
+  @ApiResponse({ status: 404, description: 'Vevő nem található.'})
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.vevoService.findOne(id);
   }
@@ -102,10 +110,14 @@ export class VevoController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @Delete(':id')
   @ApiOperation({ summary: 'Felhasználói fiók törlése' })
   @ApiParam({ name: 'id', description: 'A törlendő felhasználó azonosítója' })
-  remove(@Param('id') id: string) {
-    return this.vevoService.remove(+id);
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    if (req.user.role !== 'ADMIN' && req.user.id !== id) {
+      throw new ForbiddenException('Nincs jogosultságod más fiókját törölni!')
+    }
+
+    return this.vevoService.remove(id);
   }
 }

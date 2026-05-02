@@ -7,9 +7,21 @@ import { KategoriaModule } from './kategoria/kategoria.module';
 import { TermekModule } from './termek/termek.module';
 import { RendelesModule } from './rendeles/rendeles.module';
 import { ErtekelesModule } from './ertekeles/ertekeles.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [VevoModule, AuthModule, KategoriaModule, TermekModule, RendelesModule, ErtekelesModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    VevoModule, 
+    AuthModule, 
+    KategoriaModule, 
+    TermekModule, 
+    RendelesModule, 
+    ErtekelesModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

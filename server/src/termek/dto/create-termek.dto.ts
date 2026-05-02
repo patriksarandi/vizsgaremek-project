@@ -34,7 +34,7 @@ export class CreateTermekDto {
     minimum: 0,
   })
   @IsInt({ message: 'A készlet egész szám kell legyen!' })
-  @Min(0, { message: 'A termék ára nem lehet negatív!' })
+  @Min(0, { message: 'A termék készlet nem lehet negatív!' })
   @IsNotEmpty({ message: 'Az ár megadása kötelező!' })
   Keszlet: number;
 

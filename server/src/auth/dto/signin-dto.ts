@@ -8,8 +8,7 @@ export class SignInDto {
   email: string;
 
   @ApiProperty({ example: 'Jelszo123', description: 'A felhasználó jelszava'})
-  @IsString()
+  @IsString({ message: 'Érvénytelen jelszó formátum!' })
   @IsNotEmpty({ message: 'A jelszó megadása kötelező!'})
   password: string;
-
 }

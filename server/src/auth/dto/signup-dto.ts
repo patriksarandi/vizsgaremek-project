@@ -19,11 +19,11 @@ export class SignUpDto {
   @IsNotEmpty({ message: 'Az e-mail megadása kötelező' })
   email: string;
 
-  @ApiProperty({ example: 'Jelszo123', description: 'Legalább 6 karakter hosszú jelszó'})
+  @ApiProperty({ example: 'Jelszo123', description: 'Legalább 8 karakter hosszú jelszó'})
   @IsString({ message: 'A jelszó szöveg típusú kell legyen!' })
   @IsNotEmpty({ message: 'A jelszó megadása kötelező! ' })
-  @MinLength(6, {
-    message: 'A jelszónak legalább 6 karakter hosszúnak kell lennie!',
+  @MinLength(8, {
+    message: 'A jelszónak legalább 8 karakter hosszúnak kell lennie!',
   })
   password: string;
 
