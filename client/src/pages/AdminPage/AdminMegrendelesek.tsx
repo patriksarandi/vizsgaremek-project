@@ -45,7 +45,7 @@ const AdminRendelesekPage = () => {
             rendelesek.map((r: any) => (
               <tr key={r.RendelesID}>
                 <td>#{r.RendelesID}</td>
-                <td>{new Date(r.Datum).toLocaleString("hu-HU")}</td>
+                <td>{new Date(r.RendelesiDatum).toLocaleString("hu-HU")}</td>
                 <td>{Number(r.RendelesiVegosszeg).toLocaleString("hu-HU")} Ft</td>
                 <td>
                   <Badge bg={r.Statusz === "Teljesítve" ? "success" : "warning"} text={r.Statusz === "Teljesítve" ? "white" : "dark"}>
