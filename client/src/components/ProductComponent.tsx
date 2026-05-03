@@ -1,4 +1,5 @@
-﻿import { Badge, Button, Card } from "react-bootstrap";
+import { API_BASE_URL } from "../lib/api";
+import { Badge, Button, Card } from "react-bootstrap";
 import { Autentikacio } from "../context/AuthContext";
 import { useMemo } from "react";
 import Rating from "@mui/material/Rating";
@@ -45,7 +46,7 @@ const ProductComponent = ({
 
     try {
       const response = await fetch(
-        `http://localhost:7777/ertekeles/${vevoId}`,
+        `${API_BASE_URL}/ertekeles/${vevoId}`,
         {
           method: "PATCH",
           headers: {

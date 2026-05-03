@@ -1,4 +1,5 @@
-﻿import { Button, Col, Container, Row } from "react-bootstrap";
+import { API_BASE_URL } from "../lib/api";
+import { Button, Col, Container, Row } from "react-bootstrap";
 import CartItem from "../components/CartItem";
 import NavbarComponent from "../components/NavbarComponent";
 import { Autentikacio } from "../context/AuthContext";
@@ -11,17 +12,30 @@ const CartPage = () => {
   const { kosarTetelek, osszeg, emptyKosar, updateTermekMennyiseg } =
     useKosar();
 
-  const handleRendeles = async () => {
-    if (!user || kosarTetelek.length === 0) return;
+  const nincsKitoltveCim = (cim) => {
+    return !cim || cim.trim() === "" || cim.trim() === "-";
+  };
 
-    // const osszeg = kosarTetelek.reduce((total, tetel) => {
-    //   return (
-    //     total + Number(tetel.Termek?.TermekAr) * Number(tetel.TetelMennyiseg)
-    //   );
-    // }, 0);
+  const handleRendeles = async () => {
+    if (!user) {
+      alert("A rendeléshez be kell jelentkezned!");
+      navigate("/login");
+      return;
+    }
+
+    if (kosarTetelek.length === 0) {
+      alert("A kosár üres.");
+      return;
+    }
+
+    if (nincsKitoltveCim(user.Cim)) {
+      alert("A rendeléshez előbb ki kell töltened a számlázási címedet!");
+      navigate("/profile");
+      return;
+    }
 
     try {
-      const response = await fetch("http://localhost:7777/rendeles", {
+      const response = await fetch(`${API_BASE_URL}/rendeles`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,6 +59,7 @@ const CartPage = () => {
       }
     } catch (error) {
       console.error("Hiba:", error);
+      alert("Hiba történt a rendelés leadása közben.");
     }
   };
 
@@ -83,6 +98,13 @@ const CartPage = () => {
                   {new Intl.NumberFormat("hu-HU").format(osszeg)} Ft
                 </strong>
               </div>
+
+              {nincsKitoltveCim(user?.Cim) && (
+                <div className="alert alert-warning py-2">
+                  A rendeléshez előbb ki kell töltened a számlázási címedet.
+                </div>
+              )}
+
               <Button
                 variant="success"
                 size="lg"

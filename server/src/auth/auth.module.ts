@@ -1,4 +1,4 @@
-﻿
+
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -7,18 +7,22 @@ import { PrismaService } from 'src/prisma.service';
 import { VevoService } from 'src/vevo/vevo.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true
-    }),
+    ConfigModule,
     VevoModule,
-    JwtModule.register({
+    JwtModule.registerAsync({
       global: true,
-      secret: 'TITKOS-KULCS',
-      signOptions: { expiresIn: '1d' },
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret:
+          configService.get<string>('JWT_SECRET') ??
+          'vizsgaremek-dev-secret-change-me',
+        signOptions: { expiresIn: Number(configService.get<string>('JWT_EXPIRES_IN_SECONDS') ?? 86400) },
+      }),
     }),
   ],
   controllers: [AuthController],

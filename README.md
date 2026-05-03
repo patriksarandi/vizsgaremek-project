@@ -1,77 +1,105 @@
-# 🎸 OnFret Marketplace - Vizsgaremek 2026
+# 🎸 OnFret Marketplace – Vizsgaremek 2026
 
-![Node.js](https://img.shields.io/badge/Node.js-LTS-green?style=for-the-badge&logo=node.js)
-![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
-
-Az **OnFret Marketplace** egy modern, full-stack e-kereskedelmi platform, amelyet kifejezetten hangszerek és zenei kiegészítők online adásvételére fejlesztettünk ki. A projekt célja egy skálázható, biztonságos és reszponzív webalkalmazás megvalósítása a legfrissebb iparági technológiák alkalmazásával.
+Az **OnFret Marketplace** egy full-stack webalkalmazás, amely hangszerek és zenei kiegészítők online értékesítésére szolgál.  
+A projekt célja egy modern, biztonságos és könnyen használható e-kereskedelmi rendszer megvalósítása volt.
 
 ---
 
-## 👥 Szerzők
-- **Sárándi Patrik**
-- **Kökény Bálint**
-- **Pacskó Dániel László**
+## 👥 Készítők
+
+- Sárándi Patrik
+- Kökény Bálint
+- Pacskó Dániel László
 
 ---
 
 ## 📌 Projekt áttekintés
-Az alkalmazás lehetővé teszi a felhasználók számára termékek böngészését, szűrését és megvásárlását, miközben teljes körű adminisztrációs felületet biztosít a készlet és a felhasználók kezeléséhez.
 
-### Fő jellemzők:
-*   **Tiszta architektúra:** Moduláris NestJS felépítés a könnyű karbantarthatóság érdekében.
-*   **Biztonság:** JWT-alapú hitelesítés és szerepkör alapú hozzáférés-szabályozás (RBAC).
-*   **ACID Tranzakciók:** Biztonságos rendelésleadás és készletkezelés Prisma tranzakciókkal.
-*   **Soft Delete:** Logikai törlés a termékeknél és kategóriáknál az adatintegritás megőrzése végett.
-*   **Modern UI:** Teljesen reszponzív felület React Bootstrap és Material UI segítségével.
+Az alkalmazás lehetővé teszi a felhasználók számára, hogy regisztráljanak, bejelentkezzenek, termékeket böngésszenek, kosárba helyezzenek, majd rendelést adjanak le.
 
 ---
 
-## 🛠️ Technológiai Stack
+## 🧩 Fő funkciók
+
+### Felhasználói funkciók
+
+- Regisztráció
+- Bejelentkezés
+- JWT autentikáció
+- Termék böngészés
+- Kosárkezelés
+- Rendelés leadás
+
+### Admin funkciók
+
+- Termék CRUD
+- Készlet kezelés
+- Rendelések kezelése
+
+---
+
+## 🛠️ Technológiai stack
 
 ### Frontend
-- **React 18** – Komponens alapú felhasználói felület.
-- **Context API** – Globális állapotkezelés (User session, Kosár).
-- **React Bootstrap & Material UI** – Modern és reszponzív megjelenés.
-- **Axios** – API hívások kezelése.
+- React
+- TypeScript
+- React Bootstrap
 
 ### Backend
-- **NestJS** – Skálázható, TypeScript alapú Node.js keretrendszer.
-- **Prisma ORM** – Típusbiztos adatkezelés és adatbázis-migráció.
-- **MySQL** – Relációs adatbázis-kezelő.
-- **Passport.js & JWT** – Biztonságos autentikáció.
+- NestJS
+- Prisma ORM
+- MySQL
+- JWT
 
 ---
 
-## 🗄️ Adatbázis séma
-A rendszer relációs adatbázist használ, normalizált struktúrával.
+## ⚙️ Telepítés
 
-**Fő entitások:**
-*   **User:** Felhasználói adatok, titkosított jelszavak (bcrypt) és jogosultságok.
-*   **Product:** Termékek ára, készlete és leírása (logikai törlés támogatással).
-*   **Category:** Hierarchikus kategóriarendszer.
-*   **FizetesiKosar & KosarTetel:** Felhasználóhoz kötött perzisztens kosárkezelés.
-*   **Order & RendeltTermek:** Véglegesített rendelések tranzakciós története.
+### Backend
+
+cd server  
+npm install  
+npx prisma migrate dev  
+npm run start:dev  
+
+### Frontend
+
+cd client  
+npm install  
+npm run dev  
 
 ---
 
-## 🚀 Telepítés és Futtatás
+## 🧪 Tesztelés
 
-### Előfeltételek
-- **Node.js** (v18 vagy újabb)
-- **MySQL** szerver
+cd server  
+npm run test  
 
-### 1. Szerver (Backend) beállítása
-```bash
-cd backend
-npm install
-Hozd létre a .env fájlt a backend gyökerében:KódrészletDATABASE_URL="mysql://USER:PASSWORD@localhost:3306/onfret_db"
-JWT_SECRET="valami-nagyon-titkos-kulcs"
-Adatbázis szinkronizálása és szerver indítása:Bashnpx prisma migrate dev
-npm run start:dev
-2. Kliens (Frontend) beállításaBashcd frontend
-npm install
-npm start
-🔌 API Dokumentáció (Példák)Termékek listázása és szűréseGET /termek?search={név}&minPrice={min}&maxPrice={max}&category={id}ParaméterTípusLeírássearchstringKeresés név vagy márka alapjánminPricenumberMinimum ár szűréscategoryIdnumberKategória azonosítóKosár és RendelésPOST /rendeles/kosartetel - Termék kosárba helyezése (Auth szükséges)POST /rendeles/veglegesit - Rendelés leadása és készlet levonása🛡️ LicencA projekt a Vizsgaremek 2026 keretében készült. Minden jog fenntartva.
+---
+
+## ⚠️ Ismert korlátok
+
+- nincs fizetési rendszer
+- nincs teljes frontend tesztelés
+
+---
+
+## 🚀 Továbbfejlesztési lehetőségek
+
+- Stripe / PayPal integráció
+- Email értesítések
+- Admin dashboard
+- Kereső fejlesztés
+- Docker + CI/CD
+
+---
+
+## 📊 Összegzés
+
+A projekt egy teljes full-stack webshop rendszer alapjait mutatja be.
+
+---
+
+## 🛡️ Licenc
+
+Vizsgaremek 2026

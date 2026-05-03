@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+import { API_BASE_URL } from "../../lib/api";
+import { useState } from "react";
 import { Form, Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
@@ -17,7 +18,7 @@ const AdminKategoriakPage = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:7777/kategoria", {
+      const response = await fetch(`${API_BASE_URL}/kategoria`, {
         method: "POST",
         headers: getAuthHeader(),
         body: JSON.stringify({ kategoriaNev: kategoriaNev }),
@@ -35,7 +36,7 @@ const AdminKategoriakPage = () => {
 
   const handleUpdate = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:7777/kategoria/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/kategoria/${id}`, {
         method: "PUT",
         headers: { ...getAuthHeader(), "Content-Type": "application/json"},
         body: JSON.stringify({ kategoriaNev: modositasNev}),
@@ -59,7 +60,7 @@ const AdminKategoriakPage = () => {
     if (!window.confirm("Biztosan törölni szeretnéd ezt a kategóriát?")) return;
 
     try {
-      const response = await fetch(`http://localhost:7777/kategoria/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/kategoria/${id}`, {
         method: "DELETE",
         headers: getAuthHeader()
       });

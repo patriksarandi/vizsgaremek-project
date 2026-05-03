@@ -1,4 +1,5 @@
-﻿import { Alert, Button, Col, Container, Offcanvas, Row } from "react-bootstrap";
+import { API_BASE_URL } from "../lib/api";
+import { Alert, Button, Col, Container, Offcanvas, Row } from "react-bootstrap";
 import { Autentikacio } from "../context/AuthContext";
 import NavbarComponent from "../components/NavbarComponent";
 import ProductComponent from "../components/ProductComponent";
@@ -54,7 +55,7 @@ const MarketplacePage = ({ userRatings = {} }) => {
           params.append("brand", filteredBrands.join(","));
         }
 
-        const response = await fetch(`http://localhost:7777/termek?${params}`, {
+        const response = await fetch(`${API_BASE_URL}/termek?${params}`, {
           headers: { ...getAuthHeader() },
         });
 

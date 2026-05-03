@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../lib/api";
+import { useEffect, useState } from "react";
 
 export const useFetchData = (endpoint, headers) => {
   const [data, setData] = useState([]);
@@ -9,7 +10,7 @@ export const useFetchData = (endpoint, headers) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:7777${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "GET",
         headers: headers,
       });

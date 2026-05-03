@@ -15,6 +15,7 @@ describe('AuthService', () => {
   beforeEach(async () => {
     mockVevoService = {
       findByEmail: jest.fn(),
+      create: jest.fn(),
     };
 
     mockJwtService = {
@@ -22,8 +23,13 @@ describe('AuthService', () => {
     };
 
     mockPrismaService = {
-      vevo: { findFirst: jest.fn(), create: jest.fn() },
-      fizetesiKosar: { create: jest.fn() },
+      vevo: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+      },
+      fizetesiKosar: {
+        create: jest.fn(),
+      },
       $transaction: jest.fn((cb) => cb(mockPrismaService)),
     };
 
@@ -46,25 +52,29 @@ describe('AuthService', () => {
 
   describe('signIn', () => {
     it('Helytelen jelszó esetén hibaüzenet', async () => {
-      mockVevoService.findByEmail.mockResolvedValue({ VevoJelszo: 'hashed_pw' });
+      mockVevoService.findByEmail.mockResolvedValue({
+        VevoJelszo: 'hashed_pw',
+      });
+
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
 
-      await expect(service.signIn('teszt@gmail.com', 'rossz-pw'))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.signIn('teszt@gmail.com', 'rossz-pw'),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('Sikeres belépésnél visszaadja a tokent és a felhasználót', async () => {
-      mockVevoService.findByEmail.mockResolvedValue({ 
-        VevoID: 1, 
+      mockVevoService.findByEmail.mockResolvedValue({
+        VevoID: 1,
         VevoEmail: 't@e.hu',
-        VevoJelszo: 'hash'
+        VevoJelszo: 'hash',
       });
-      
+
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
       mockJwtService.signAsync.mockResolvedValue('kamu_token');
 
       const result = await service.signIn('t@e.hu', 'jo-pw');
-      
+
       expect(result).toHaveProperty('access_token', 'kamu_token');
       expect(result.user.VevoEmail).toBe('t@e.hu');
     });
@@ -72,26 +82,47 @@ describe('AuthService', () => {
 
   describe('signUp', () => {
     it('Foglalt email esetén hibaüzenetet dob', async () => {
-        mockPrismaService.vevo.findFirst.mockResolvedValue({ id: 1 });
+      mockVevoService.findByEmail.mockResolvedValue({
+        VevoID: 1,
+        VevoEmail: 'hibas@email.hu',
+      });
 
-        await expect(service.signUp({ email: 'hibas@email.hu'} as any))
-        .rejects.toThrow(ConflictException);
+      await expect(
+        service.signUp({
+          email: 'hibas@email.hu',
+          password: '123',
+          name: 'Teszt Elek',
+        } as any),
+      ).rejects.toThrow(ConflictException);
+
+      expect(mockVevoService.create).not.toHaveBeenCalled();
+      expect(mockPrismaService.fizetesiKosar.create).not.toHaveBeenCalled();
     });
 
-    it ('Sikeres regisztrációnál menti a vevőt és inicializálja a kosarat', async () => {
-        mockPrismaService.vevo.findFirst.mockResolvedValue(null);
-        mockPrismaService.vevo.create.mockResolvedValue({ VevoID: 10 });
+    it('Sikeres regisztrációnál menti a vevőt és inicializálja a kosarat', async () => {
+      mockVevoService.findByEmail.mockResolvedValue(null);
 
-        const result = await service.signUp({
-            email: 'masik@gmail.hu',
-            password: '123',
-            name: 'Teszt Elek'
-        } as any);
+      mockVevoService.create.mockResolvedValue({
+        VevoID: 10,
+        VevoNev: 'Teszt Elek',
+        VevoEmail: 'masik@gmail.hu',
+      });
 
-        expect(result.message).toBe('Sikeres regisztráció!');
-        expect(mockPrismaService.fizetesiKosar.create).toHaveBeenCalledWith({
-            data: { VevoID: 10}
-        })
-    })
-  })
+      const result = await service.signUp({
+        email: 'masik@gmail.hu',
+        password: '123',
+        name: 'Teszt Elek',
+      } as any);
+
+      expect(result.message).toBe('Sikeres regisztráció!');
+
+      expect(mockVevoService.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          vevoNev: 'Teszt Elek',
+          vevoEmail: 'masik@gmail.hu',
+          vevoJelszo: '123',
+        }),
+      );
+    });
+  });
 });

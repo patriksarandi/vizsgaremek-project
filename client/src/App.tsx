@@ -58,7 +58,7 @@ const App = () => {
       <Route
         path="/admin/dashboard"
         element={
-          user?.Role || user?.role === "ADMIN" ? (
+          user?.Role === "ADMIN" || user?.role === "ADMIN" ? (
             <AdminPage />
           ) : (
             <Navigate to="/" />

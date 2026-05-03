@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+import { API_BASE_URL } from "../../lib/api";
+import { useState } from "react";
 import { Form, Container, Table, Button, Modal } from "react-bootstrap";
 import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
@@ -19,7 +20,6 @@ const AdminTermekekPage = () => {
   } = useFetchData("/termek", getAuthHeader());
 
   const handleEdit = (termek) => {
-    console.log("Szerkesztés:", termek)
     setSelectedTermek(termek);
     setShowModositas(true);
   };
@@ -38,9 +38,8 @@ const AdminTermekekPage = () => {
       Brand: brand || "Ismeretlen",
     };
 
-
     try {
-      const response = await fetch("http://localhost:7777/termek", {
+      const response = await fetch(`${API_BASE_URL}/termek`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,11 +66,9 @@ const AdminTermekekPage = () => {
   };
 
   const handleUpdate = async () => {
-    console.log("Küldés erre az ID-ra:", selectedTermek.TermekID);
-
     try {
       const response = await fetch(
-        `http://localhost:7777/api/termek/${selectedTermek.TermekID}`,
+        `${API_BASE_URL}/termek/${selectedTermek.TermekID}`,
         {
           method: "PUT",
           headers: {
@@ -101,7 +98,7 @@ const AdminTermekekPage = () => {
     if (!window.confirm("Biztosan törölni szeretnéd ezt a terméket?")) return;
 
     try {
-      const response = await fetch(`http://localhost:7777/termek/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/termek/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -208,6 +205,15 @@ const AdminTermekekPage = () => {
                 <td>{t.Keszlet} db</td>
                 <td className="text-center">
                   <Button
+                    variant="warning"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => handleEdit(t)}
+                  >
+                    Módosítás
+                  </Button>
+
+                  <Button
                     variant="danger"
                     size="sm"
                     onClick={() => handleDelete(t.TermekID)}
@@ -226,6 +232,96 @@ const AdminTermekekPage = () => {
           )}
         </tbody>
       </Table>
+      <Modal show={showModositas} onHide={() => setShowModositas(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Termék módosítása</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          {selectedTermek && (
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Termék neve</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={selectedTermek.TermekNev}
+                  onChange={(e) =>
+                    setSelectedTermek({
+                      ...selectedTermek,
+                      TermekNev: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Kategória ID</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={selectedTermek.KategoriaID}
+                  onChange={(e) =>
+                    setSelectedTermek({
+                      ...selectedTermek,
+                      KategoriaID: Number(e.target.value),
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Márka</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={selectedTermek.Brand || ""}
+                  onChange={(e) =>
+                    setSelectedTermek({
+                      ...selectedTermek,
+                      Brand: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Ár</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={selectedTermek.TermekAr}
+                  onChange={(e) =>
+                    setSelectedTermek({
+                      ...selectedTermek,
+                      TermekAr: Number(e.target.value),
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Készlet</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={selectedTermek.Keszlet}
+                  onChange={(e) =>
+                    setSelectedTermek({
+                      ...selectedTermek,
+                      Keszlet: Number(e.target.value),
+                    })
+                  }
+                />
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModositas(false)}>
+            Mégse
+          </Button>
+          <Button variant="primary" onClick={handleUpdate}>
+            Mentés
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

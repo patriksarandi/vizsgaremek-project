@@ -83,3 +83,26 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+## Környezeti változók / indítás
+
+A backend JWT alapú autentikációt használ, ezért szükséges a `JWT_SECRET` beállítása.
+Fejlesztéshez a projekt tartalmaz egy működő `.env` mintát is, de éles vagy vizsga előtti bemutatónál a titkos kulcsot cseréld le.
+
+Példa:
+
+```env
+DATABASE_URL="mysql://felhasznalo:jelszo@localhost:3306/adatbazis_neve"
+JWT_SECRET="egy-hosszu-egyedi-titkos-kulcs"
+JWT_EXPIRES_IN="1d"
+PORT=7777
+```
+
+Indítás előtt ajánlott parancsok:
+
+```bash
+npm install
+npx prisma generate
+npm run start:dev
+```

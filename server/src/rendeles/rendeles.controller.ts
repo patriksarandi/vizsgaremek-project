@@ -95,35 +95,8 @@ export class RendelesController {
   }
 
   @Get('admin')
-  findAll() {
-    return this.rendelesService.findAllAdmin();
-  }
-
-  @Get('admin')
   async findAllAdmin() {
     return await this.rendelesService.findAllAdmin();
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body('Statusz') statusz: string) {
-    return this.rendelesService.updateStatus(+id, statusz);
-  }
-
-  @Patch(':id')
-  @ApiOperation({ summary: 'Rendelés státuszának frissítése' })
-  @ApiParam({ name: 'id', description: 'Rendelés azonosítója' })
-  @ApiBody({ schema: { type: 'object', properties: { Statusz: { type: 'string', example: 'Teljesítve' } } } })
-  async updateStatus(
-    @Param('id') id: string,
-    @Body('Statusz') statusz: string,
-  ) {
-    return await this.rendelesService.updateStatus(+id, statusz);
-  }
-
-  @Delete('/kosar/:vevoId')
-  @ApiOperation({ summary: 'Egy vevő teljes kosarának törlése' })
-  async removeKosar(@Param('vevoId', ParseIntPipe) vevoId: number) {
-    return this.rendelesService.removeKosar(vevoId);
   }
 
   @Patch('kosartetel/update')
@@ -143,8 +116,6 @@ export class RendelesController {
     @Body('termekId') termekId: number,
     @Body('valtozas') valtozas: number,
   ) {
-    console.log('Beérkező adatok:', { vevoId, termekId, valtozas });
-
     if (
       vevoId === undefined ||
       termekId === undefined ||
@@ -161,4 +132,23 @@ export class RendelesController {
       Number(valtozas),
     );
   }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Rendelés státuszának frissítése' })
+  @ApiParam({ name: 'id', description: 'Rendelés azonosítója' })
+  @ApiBody({ schema: { type: 'object', properties: { Statusz: { type: 'string', example: 'Teljesítve' } } } })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('Statusz') statusz: string,
+  ) {
+    return await this.rendelesService.updateStatus(+id, statusz);
+  }
+
+  @Delete('/kosar/:vevoId')
+  @ApiOperation({ summary: 'Egy vevő teljes kosarának törlése' })
+  async removeKosar(@Param('vevoId', ParseIntPipe) vevoId: number) {
+    return this.rendelesService.removeKosar(vevoId);
+  }
+
+
 }

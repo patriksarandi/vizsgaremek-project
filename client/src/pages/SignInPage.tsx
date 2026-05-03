@@ -1,4 +1,5 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { API_BASE_URL } from "../lib/api";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Autentikacio } from "../context/AuthContext";
@@ -26,7 +27,7 @@ const SignInPage = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:7777/auth/signin", {
+      const response = await fetch(`${API_BASE_URL}/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signinData),
@@ -40,7 +41,6 @@ const SignInPage = () => {
       login(data.user, data.access_token);
 
       navigate("/");
-      console.log("Login successful:", data);
     } catch (error: any) {
       setError(error.message);
       throw new Error(error.message);

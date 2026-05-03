@@ -18,7 +18,7 @@ const NavbarComponent = ({ searchTerm = "", setSearchTerm = () => {}  }) => {
   const { user, logout } = Autentikacio();
   const { kosarTetelek, updateTermekMennyiseg } = useKosar();
 
-  const isAdmin = user?.Role === "ADMIN";
+  const isAdmin = user?.Role === "ADMIN" || user?.role === "ADMIN";
 
   const [showCartDropdown, setShowCartDropdown] = useState(false);
   const [show, setShow] = useState(false);

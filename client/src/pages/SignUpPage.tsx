@@ -1,4 +1,5 @@
-﻿import { useRef, useState } from "react";
+import { API_BASE_URL } from "../lib/api";
+import { useRef, useState } from "react";
 import {
   Container,
   Card,
@@ -29,7 +30,7 @@ const SignUpPage = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:7777/auth/signup", {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,13 +39,11 @@ const SignUpPage = () => {
       });
       if (!response.ok) {
         const errorBody = await response.json();
-        console.log("SERVER RESPONSE:", errorBody);
         throw new Error(errorBody.message || `Error: ${response.status}`);
       }
 
       const data = await response.json();
       navigate("/signin");
-      console.log("Sign Up successful:", data);
     } catch (error: any) {
       setError(error.message);
       throw new Error(error.message);

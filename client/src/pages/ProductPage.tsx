@@ -1,4 +1,5 @@
-﻿import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
+import { API_BASE_URL } from "../lib/api";
+import { Badge, Button, Card, Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { Autentikacio } from "../context/AuthContext";
 import { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:7777/termek/${id}`);
+        const response = await fetch(`${API_BASE_URL}/termek/${id}`);
         if (!response.ok) throw new Error(`Nem található termék`);
 
         const data = await response.json();

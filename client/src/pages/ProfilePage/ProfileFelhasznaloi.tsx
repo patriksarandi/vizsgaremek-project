@@ -1,4 +1,5 @@
-﻿import { Button, Form, Spinner } from "react-bootstrap";
+import { API_BASE_URL } from "../../lib/api";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { Autentikacio } from "../../context/AuthContext";
 import { useRef } from "react";
 
@@ -12,8 +13,14 @@ const ProfileFelhasznaloi = () => {
   const varosRef = useRef(null);
   const irszamRef = useRef(null);
 
-  if (loading) return <div className="text-center p-5"><Spinner animation="grow" /></div>;
-  if (!user) return <p className="text-center mt-5">Kérjük, jelentkezzen be!</p>;
+  if (loading)
+    return (
+      <div className="text-center p-5">
+        <Spinner animation="grow" />
+      </div>
+    );
+  if (!user)
+    return <p className="text-center mt-5">Kérjük, jelentkezzen be!</p>;
 
   const updateLocalUser = (updatedData) => {
     const frissitettUser = { ...user, ...updatedData };
@@ -27,7 +34,7 @@ const ProfileFelhasznaloi = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:7777/vevo/${user.VevoID}/teljes-nev`,
+        `${API_BASE_URL}/vevo/${user.VevoID}/teljes-nev`,
         {
           method: "PATCH",
           headers: {
@@ -42,7 +49,7 @@ const ProfileFelhasznaloi = () => {
       );
 
       if (response.ok) {
-        updateLocalUser({ Vezeteknev: ujVezeteknev, Keresznev: ujKeresztnev });
+        updateLocalUser({ Vezeteknev: ujVezeteknev, Keresztnev: ujKeresztnev });
         alert("Sikeresen elmetve az adatbázisba.");
       }
     } catch (error) {
@@ -54,7 +61,7 @@ const ProfileFelhasznaloi = () => {
     try {
       const tel = telefonszamRef.current.value;
       const response = await fetch(
-        `http://localhost:7777/vevo/${user.VevoID}/telefonszam`,
+        `${API_BASE_URL}/vevo/${user.VevoID}/telefonszam`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json", ...getAuthHeader() },
@@ -75,7 +82,7 @@ const ProfileFelhasznaloi = () => {
     try {
       const mail = emailRef.current.value;
       const response = await fetch(
-        `http://localhost:7777/vevo/${user.VevoID}/email`,
+        `${API_BASE_URL}/vevo/${user.VevoID}/email`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json", ...getAuthHeader() },
@@ -93,24 +100,40 @@ const ProfileFelhasznaloi = () => {
   };
 
   const handleUpdateCim = async () => {
-    try {
-      const teljesCim = `${irszamRef.current.value} ${varosRef.current.value}, ${utcaRef.current.value}`;
+    const irszam = irszamRef.current.value.trim();
+    const varos = varosRef.current.value.trim();
+    const utca = utcaRef.current.value.trim();
 
-      const response = await fetch(
-        `http://localhost:7777/vevo/${user.VevoID}/cim`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", ...getAuthHeader() },
-          body: JSON.stringify({ Cim: teljesCim }),
+    if (!irszam || !varos || !utca) {
+      alert("Kérjük, töltsd ki az irányítószámot, a várost és az utcát is!");
+      return;
+    }
+
+    try {
+      const teljesCim = `${irszam} ${varos}, ${utca}`;
+
+      const response = await fetch(`${API_BASE_URL}/vevo/${user.VevoID}/cim`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
-      );
+        body: JSON.stringify({
+          cim: teljesCim,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
 
       if (response.ok) {
         updateLocalUser({ Cim: teljesCim });
         alert("Cím sikeresen mentve");
+      } else {
+        alert(data?.message || "Nem sikerült menteni a címet.");
       }
     } catch (error) {
       console.error("Cím hiba:", error);
+      alert("Hálózati hiba történt a cím mentésekor.");
     }
   };
 
@@ -118,13 +141,10 @@ const ProfileFelhasznaloi = () => {
     if (!window.confirm("Biztosan törölni szeretnéd a fiókodat?")) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:7777/vevo/${user.VevoID}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json", ...getAuthHeader() },
-        },
-      );
+      const response = await fetch(`${API_BASE_URL}/vevo/${user.VevoID}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", ...getAuthHeader() },
+      });
 
       if (!response.ok) {
         alert("Fiók sikeresen törölve!");

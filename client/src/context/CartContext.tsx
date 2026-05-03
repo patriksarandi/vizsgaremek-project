@@ -1,4 +1,5 @@
-﻿import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { API_BASE_URL } from "../lib/api";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { Autentikacio } from "./AuthContext";
 
 const CartContext = createContext();
@@ -25,7 +26,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:7777/rendeles/kosartetel/${id}`,
+        `${API_BASE_URL}/rendeles/kosartetel/${id}`,
         {
           headers: { "Content-Type": "application/json", ...getAuthHeader() },
         },
@@ -52,7 +53,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel",
+        `${API_BASE_URL}/rendeles/kosartetel`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json", ...getAuthHeader() },
@@ -76,7 +77,6 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Kosár hiba:", error);
-      console.log(data.message);
     }
     return false;
   };
@@ -86,7 +86,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:7777/rendeles/kosartetel/update",
+        `${API_BASE_URL}/rendeles/kosartetel/update`,
         {
           method: "PATCH",
           headers: {

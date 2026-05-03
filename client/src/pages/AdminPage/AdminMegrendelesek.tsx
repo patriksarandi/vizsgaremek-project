@@ -1,4 +1,5 @@
-﻿import { Table, Badge, Container, Spinner, Form } from "react-bootstrap";
+import { API_BASE_URL } from "../../lib/api";
+import { Table, Badge, Container, Spinner, Form } from "react-bootstrap";
 import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
@@ -8,7 +9,7 @@ const AdminRendelesekPage = () => {
 
   const handleStatusChange = async (id: number, ujStatusz: string) => {
     try {
-      const response = await fetch(`http://localhost:7777/rendeles/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/rendeles/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +46,7 @@ const AdminRendelesekPage = () => {
               <tr key={r.RendelesID}>
                 <td>#{r.RendelesID}</td>
                 <td>{new Date(r.Datum).toLocaleString("hu-HU")}</td>
-                <td>{Number(r.Vegosszeg).toLocaleString()} Ft</td>
+                <td>{Number(r.RendelesiVegosszeg).toLocaleString("hu-HU")} Ft</td>
                 <td>
                   <Badge bg={r.Statusz === "Teljesítve" ? "success" : "warning"} text={r.Statusz === "Teljesítve" ? "white" : "dark"}>
                     {r.Statusz}

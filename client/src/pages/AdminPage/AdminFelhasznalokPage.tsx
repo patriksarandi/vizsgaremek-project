@@ -1,4 +1,5 @@
-﻿import { Container, Table, Button } from "react-bootstrap";
+import { API_BASE_URL } from "../../lib/api";
+import { Container, Table, Button } from "react-bootstrap";
 import { Autentikacio } from "../../context/AuthContext";
 import { useFetchData } from "../../components/useFetchData";
 
@@ -9,7 +10,7 @@ const AdminFelhasznalokPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Biztosan törölni szeretnéd?")) return;
 
-    const response = await fetch(`http://localhost:7777/vevo/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/vevo/${id}`, {
         method: "DELETE",
         headers: getAuthHeader()
       });

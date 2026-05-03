@@ -50,15 +50,32 @@ export class VevoController {
     return this.vevoService.create(createVevoDto);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiBearerAuth()
-  // @ApiOperation({ summary: 'Az összes vevő listázása (Admin)', description: 'Csak adminisztrácorok számára elérhető lista.' })
-  // @ApiResponse({ status: 200, description: 'Sikeres listázás', type: [CreateVevoDto]})
-  // @Get()
-  // findAll() {
-  //   //console.log('Lekérte: ', req.user);
-  //   return this.vevoService.findAll();
-  // }
+  @Get()
+  @ApiOperation({ summary: 'Az összes vevő listázása (Admin)' })
+  @ApiResponse({ status: 200, description: 'Sikeres listázás', type: [CreateVevoDto] })
+  findAll(@Request() req) {
+    if (req.user.role !== 'ADMIN') {
+      throw new ForbiddenException('Csak adminisztrátor kérheti le a felhasználók listáját.');
+    }
+
+    return this.vevoService.findAll();
+  }
+
+  @Get('search/:email')
+  @ApiOperation({ summary: 'Vevő keresése e-mail cím alapján' })
+  @ApiParam({ name: 'email', description: 'Keresett e-mail cím', example: 'teszt@email.hu' })
+  findByEmail(@Param('email') email: string) {
+    return this.vevoService.findByEmail(email);
+  }
+
+  @Patch(':id/cim')
+  @ApiOperation({ summary: 'Vevő szállítási címének frissítése' })
+  updateSzallitasiCim(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateVevoDto,
+  ) {
+    return this.vevoService.updateSzallitasiCim(id, dto);
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Vevő lekérése azonosító alapján' })
@@ -67,13 +84,6 @@ export class VevoController {
   @ApiResponse({ status: 404, description: 'Vevő nem található.'})
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.vevoService.findOne(id);
-  }
-
-  @Get('search/:email')
-  @ApiOperation({ summary: 'Vevő keresése e-mail cím alapján' })
-  @ApiParam({ name: 'email', description: 'Keresett e-mail cím', example: 'teszt@email.hu' })
-  findByEmail(@Param('email') email: string) {
-    return this.vevoService.findByEmail(email);
   }
 
   @Patch(':id/teljes-nev')

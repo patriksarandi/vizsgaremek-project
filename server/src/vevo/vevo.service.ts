@@ -61,6 +61,14 @@ export class VevoService {
     }
   }
 
+  async findAll() {
+    const vevok = await this.db.vevo.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return vevok.map(({ VevoJelszo, ...result }) => result);
+  }
+
   async findOne(id: number) {
     const vevo = await this.db.vevo.findUnique({
       where: { VevoID: id },

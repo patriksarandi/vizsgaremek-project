@@ -1,4 +1,5 @@
 ﻿import {
+  ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -26,37 +27,49 @@ export class AuthService {
       throw new UnauthorizedException('Hibás e-mail cím vagy jelszó!');
     }
 
-    //console.log('Bejelentkező vevő adatai az adatbázisból:', customer);
-
     const payload = {
       sub: user.VevoID,
       email: user.VevoEmail,
       role: user.Role,
     };
 
+    const token = await this.jwtService.signAsync(payload);
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: token,
       user: {
         VevoID: user.VevoID,
         VevoEmail: user.VevoEmail,
         VevoNev: user.VevoNev,
-        Role: user.Role,
+        Vezeteknev: user.Vezeteknev,
+        Keresztnev: user.Keresztnev,
+        Telefonszam: user.Telefonszam,
+        Cim: user.Cim,
+        role: user.Role,
       },
     };
   }
 
   async signUp(dto: SignUpDto): Promise<any> {
+    const existingUser = await this.vevoService.findByEmail(dto.email);
+
+    if (existingUser) {
+      throw new ConflictException('Ez az email már foglalt');
+    }
+
     await this.vevoService.create({
       vevoNev: dto.name,
       vevoEmail: dto.email,
       vevoJelszo: dto.password,
-      role: dto.role,
       vezeteknev: '',
       keresztnev: '',
       telefonszam: '',
       cim: '-',
+      role: undefined,
     });
 
-    return { message: 'Sikeres regisztráció!' };
+    return {
+      message: 'Sikeres regisztráció!',
+    };
   }
 }
