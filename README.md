@@ -571,34 +571,6 @@ Lehetséges megoldások:
 
 ---
 
-### Docker támogatás
-
-A projekt konténerizálható Docker segítségével.
-
-Előnyei:
-
-- egységes futtatási környezet,
-- egyszerűbb telepítés,
-- könnyebb deployment,
-- fejlesztői gépektől független működés.
-
----
-
-## 📊 Projekt értékelése szakmai szempontból
-
-A projekt bemutatja:
-
-- full-stack webfejlesztést,
-- REST API tervezést,
-- adatbázis-kezelést ORM segítségével,
-- JWT alapú autentikációt,
-- szerepkör alapú jogosultságkezelést,
-- kosár- és rendeléskezelést,
-- adminisztrációs felület megvalósítását,
-- unit tesztek használatát,
-- verziókezelést Git segítségével.
-
----
 
 ## 🧠 Fejlesztői megjegyzés
 
